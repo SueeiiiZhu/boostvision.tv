@@ -1,0 +1,20 @@
+export type {
+  StrapiEntity,
+  StrapiMedia,
+  StrapiMediaFormat,
+  SEOComponent,
+  FeatureComponent,
+  FAQComponent,
+  AppType,
+  App,
+  BlogCategory,
+  Author,
+  BlogPost,
+  Tutorial,
+  FAQPage,
+  Page,
+  Homepage,
+  TestimonialComponent,
+  GlobalSettings,
+} from "./strapi";
+

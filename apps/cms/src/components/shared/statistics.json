@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_statistics",
+  "info": {
+    "displayName": "Statistics",
+    "icon": "chartLine"
+  },
+  "attributes": {
+    "downloads": {
+      "type": "string"
+    },
+    "countries": {
+      "type": "string"
+    },
+    "customers": {
+      "type": "string"
+    },
+    "supportHours": {
+      "type": "string"
+    }
+  }
+}
+

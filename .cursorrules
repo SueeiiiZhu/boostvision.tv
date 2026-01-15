@@ -1,0 +1,414 @@
+# BoostVision.tv 项目 Cursor Rules
+
+## 项目概述
+
+这是 BoostVision.tv 官网重构项目，使用 Next.js 14 (App Router) + TailwindCSS + Strapi CMS 技术栈。网站主要展示屏幕镜像和电视遥控应用。
+
+## 技术栈
+
+- **前端框架**: Next.js 16.1.2 (App Router) - [文档](https://nextjs.org/docs)
+- **样式方案**: TailwindCSS 4.1 - [文档](https://tailwindcss.com/docs/installation/using-vite)
+- **后端 CMS**: Strapi 6.14.1 - [文档](https://docs.strapi.io/cms/quick-start)
+- **语言**: TypeScript 5
+- **包管理**: pnpm
+- **Monorepo**: Turborepo
+
+## 项目规范
+
+### 视觉一致性 (Visual Fidelity)
+
+- **必须原封不动地还原 https://www.boostvision.tv/ 的所有样式和结构。**
+- 不得添加任何 AI 或个人的设计创意，除非明确要求。
+- 颜色、字体、间距、圆角、阴影必须与原站计算出的样式 (Computed Styles) 一致。
+- 响应式布局必须与原站在不同断点下的表现一致。
+
+### 技术栈规范 (Next.js 16 + TailwindCSS 4)
+
+- 使用 TypeScript 严格模式
+- 优先使用 interface 而非 type（除非需要联合类型）
+- 所有函数参数和返回值都需要类型注解
+- 避免使用 any，必要时使用 unknown
+- 使用 satisfies 操作符进行类型检查
+
+```typescript
+// ✅ Good
+interface AppProps {
+  name: string;
+  slug: string;
+  type: 'screen-mirroring' | 'tv-remote';
+}
+
+// ❌ Bad
+type AppProps = {
+  name: any;
+  slug: string;
+}
+```
+
+### React/Next.js
+
+- 使用函数组件和 Hooks
+- 优先使用 Server Components，仅在需要交互时使用 Client Components
+- Client Components 文件顶部添加 'use client' 指令
+- 使用 Next.js Image 组件处理图片
+- 使用 Next.js Link 组件处理内部链接
+- 实现 loading.tsx 和 error.tsx 提升用户体验
+
+```tsx
+// Server Component (默认)
+export default async function AppPage({ params }: { params: { slug: string } }) {
+  const app = await getApp(params.slug);
+  return <AppContent app={app} />;
+}
+
+// Client Component
+'use client';
+
+import { useState } from 'react';
+
+export function MobileMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+  // ...
+}
+```
+
+### TailwindCSS 4
+
+TailwindCSS 4 使用全新的配置方式，无需 `tailwind.config.js` 文件。
+
+- 使用 Tailwind 类名而非内联样式
+- 复杂样式组合使用 cn() 工具函数（基于 clsx + tailwind-merge）
+- 响应式设计使用 mobile-first 原则
+- 使用 CSS `@theme` 指令定义主题变量
+- 使用 `@utility` 自定义工具类
+
+```css
+/* globals.css - TailwindCSS 4 配置 */
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-secondary: #10b981;
+}
+
+@utility container-custom {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+```
+
+```tsx
+import { cn } from '@/lib/utils';
+
+// ✅ Good
+<div className={cn(
+  "flex items-center gap-4",
+  "px-4 py-2",
+  isActive && "bg-primary text-white"
+)}>
+
+// ❌ Bad
+<div style={{ display: 'flex', alignItems: 'center' }}>
+```
+
+### 组件规范
+
+- 每个组件一个文件夹，包含组件文件和 index.ts 导出
+- 组件 Props 使用 interface 定义
+- 使用 forwardRef 处理需要 ref 的组件
+- 添加 displayName 便于调试
+
+```tsx
+// components/ui/Button/Button.tsx
+import { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          'inline-flex items-center justify-center rounded-lg font-medium',
+          // variant styles...
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
+
+Button.displayName = 'Button';
+
+export { Button, type ButtonProps };
+
+// components/ui/Button/index.ts
+export { Button, type ButtonProps } from './Button';
+```
+
+### 文件命名
+
+- 组件文件：PascalCase（如 `Button.tsx`）
+- 工具函数：camelCase（如 `formatDate.ts`）
+- 常量文件：camelCase（如 `navigation.ts`）
+- 类型文件：camelCase（如 `strapi.ts`）
+- 页面文件：page.tsx、layout.tsx、loading.tsx、error.tsx
+
+### API 调用 (Strapi 6)
+
+- 使用 Strapi 6 API 获取数据（扁平化响应结构）
+- 实现统一的 API 客户端
+- 使用 TypeScript 类型定义 API 响应
+- 合理使用缓存策略
+
+> **Strapi 6 重要变化**: API 响应已扁平化，不再有 `data.attributes` 嵌套结构，直接访问属性。
+
+```typescript
+// lib/strapi/client.ts
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
+
+interface StrapiResponse<T> {
+  data: T;
+  meta?: { pagination?: { page: number; pageSize: number; total: number } };
+}
+
+export async function fetchStrapi<T>(
+  endpoint: string,
+  options?: RequestInit & { revalidate?: number }
+): Promise<StrapiResponse<T>> {
+  const { revalidate = 3600, ...fetchOptions } = options || {};
+  
+  const res = await fetch(`${STRAPI_URL}/api${endpoint}`, {
+    ...fetchOptions,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${STRAPI_TOKEN}`,
+      ...fetchOptions?.headers,
+    },
+    next: { revalidate },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch: ${endpoint}`);
+  }
+
+  return res.json();
+}
+
+// Strapi 6 扁平化类型示例
+interface App {
+  id: number;
+  documentId: string;
+  name: string;         // 直接访问，无需 .attributes
+  slug: string;
+  type: 'screen-mirroring' | 'tv-remote';
+}
+```
+
+### SEO (Next.js 16)
+
+- 使用 Next.js Metadata API
+- 每个页面定义 generateMetadata 函数
+- 实现 sitemap.ts 和 robots.ts
+- 使用结构化数据
+
+> **Next.js 16 重要变化**: `params` 和 `searchParams` 现在是 Promise，需要 await。
+
+```tsx
+import type { Metadata } from 'next';
+
+// Next.js 16 - params 是 Promise
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}): Promise<Metadata> {
+  const { slug } = await params;  // 需要 await
+  const app = await getAppBySlug(slug);
+  
+  return {
+    title: `${app.name} | BoostVision`,
+    description: app.description,
+    openGraph: {
+      title: app.name,
+      description: app.description,
+      images: app.icon ? [app.icon.url] : [],
+    },
+  };
+}
+
+// 页面组件也需要 await params
+export default async function Page({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const { slug } = await params;
+  // ...
+}
+```
+
+## 项目结构
+
+```
+apps/web/src/
+├── app/               # Next.js App Router 页面
+├── components/        # React 组件
+│   ├── layout/       # 布局组件 (Header, Footer)
+│   ├── home/         # 首页组件
+│   ├── app/          # App 相关组件
+│   ├── blog/         # 博客组件
+│   ├── support/      # 支持页面组件
+│   ├── ui/           # 基础 UI 组件
+│   └── shared/       # 共享组件
+├── lib/              # 工具库
+│   ├── strapi/       # Strapi API 客户端
+│   ├── utils/        # 工具函数
+│   └── constants/    # 常量
+├── hooks/            # 自定义 Hooks
+├── types/            # TypeScript 类型
+└── styles/           # 样式文件
+```
+
+## Content Types (Strapi)
+
+### App (应用)
+
+```json
+{
+  "name": "string",
+  "slug": "string (unique)",
+  "type": "enum (screen-mirroring, tv-remote)",
+  "description": "text",
+  "shortDescription": "string",
+  "icon": "media",
+  "appStoreUrl": "string",
+  "googlePlayUrl": "string",
+  "amazonUrl": "string",
+  "features": "component (repeatable)",
+  "supportedDevices": "string[]",
+  "screenshots": "media[]",
+  "seo": "component"
+}
+```
+
+### Blog Post (博客文章)
+
+```json
+{
+  "title": "string",
+  "slug": "string (unique)",
+  "content": "richtext",
+  "excerpt": "text",
+  "coverImage": "media",
+  "category": "relation (blog-category)",
+  "author": "relation (author)",
+  "publishedAt": "datetime",
+  "seo": "component"
+}
+```
+
+## 设计规范
+
+### 颜色系统
+
+```css
+:root {
+  /* Primary Colors */
+  --primary: #2563eb;        /* Blue - 主色调 */
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  
+  /* Secondary Colors */
+  --secondary: #10b981;      /* Green - Screen Mirroring */
+  --accent: #3b82f6;         /* Blue - TV Remote */
+  
+  /* Neutral Colors */
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+}
+```
+
+### 响应式断点
+
+```css
+/* TailwindCSS 默认断点 */
+sm: 640px
+md: 768px
+lg: 1024px
+xl: 1280px
+2xl: 1536px
+```
+
+### 间距系统
+
+使用 TailwindCSS 默认间距（4px 为基础单位）
+
+## 常用命令
+
+```bash
+# 开发
+pnpm dev
+
+# 构建
+pnpm build
+
+# 类型检查
+pnpm type-check
+
+# Lint
+pnpm lint
+
+# 格式化
+pnpm format
+```
+
+## Git 提交规范
+
+```
+feat: 新功能
+fix: 修复 bug
+docs: 文档更新
+style: 代码格式（不影响功能）
+refactor: 重构
+perf: 性能优化
+test: 测试
+chore: 构建/工具
+```
+
+## 注意事项
+
+1. **性能优化**
+   - 使用 next/image 优化图片
+   - 实现组件懒加载
+   - 合理使用 ISR 缓存策略
+
+2. **可访问性**
+   - 使用语义化 HTML
+   - 添加 ARIA 标签
+   - 确保键盘导航
+
+3. **国际化**
+   - 预留多语言支持结构
+   - 使用 next-intl 或 next-i18next
+
+4. **错误处理**
+   - 实现全局错误边界
+   - 添加 loading 和 error 状态
+
+5. **安全性**
+   - 使用环境变量存储敏感信息
+   - 实现 CSRF 保护
+   - 验证用户输入
+

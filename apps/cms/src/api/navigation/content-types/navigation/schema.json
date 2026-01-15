@@ -1,0 +1,18 @@
+{
+  "kind": "singleType",
+  "collectionName": "navigations",
+  "info": {
+    "singularName": "navigation",
+    "pluralName": "navigations",
+    "displayName": "Navigation"
+  },
+  "attributes": {
+    "mainMenu": {
+      "type": "json"
+    },
+    "footerMenus": {
+      "type": "json"
+    }
+  }
+}
+

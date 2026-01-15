@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tutorials",
+  "info": {
+    "singularName": "tutorial",
+    "pluralName": "tutorials",
+    "displayName": "Tutorial"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "videoUrl": {
+      "type": "string"
+    },
+    "videoEmbed": {
+      "type": "text"
+    },
+    "app": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::app.app",
+      "inversedBy": "tutorials"
+    },
+    "steps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.tutorial-step"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
+

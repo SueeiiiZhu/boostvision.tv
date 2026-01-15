@@ -1,0 +1,109 @@
+{
+  "kind": "collectionType",
+  "collectionName": "apps",
+  "info": {
+    "singularName": "app",
+    "pluralName": "apps",
+    "displayName": "App",
+    "description": "Screen mirroring and TV remote applications"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["screen-mirroring", "tv-remote"],
+      "required": true
+    },
+    "shortDescription": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "description": {
+      "type": "text"
+    },
+    "icon": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "screenshots": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "appStoreUrl": {
+      "type": "string"
+    },
+    "googlePlayUrl": {
+      "type": "string"
+    },
+    "amazonUrl": {
+      "type": "string"
+    },
+    "downloadCount": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "decimal",
+      "min": 0,
+      "max": 5
+    },
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.feature"
+    },
+    "supportedDevices": {
+      "type": "json"
+    },
+    "targetBrands": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::device-brand.device-brand",
+      "mappedBy": "apps"
+    },
+    "tutorials": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::tutorial.tutorial",
+      "mappedBy": "app"
+    },
+    "faqs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::faq.faq",
+      "mappedBy": "app"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "isFeatured": {
+      "type": "boolean",
+      "default": false
+    },
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo"
+    }
+  }
+}
+

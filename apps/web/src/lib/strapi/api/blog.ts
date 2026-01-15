@@ -1,0 +1,39 @@
+import { fetchStrapi, buildStrapiQuery } from "../client";
+import { BlogPost, BlogCategory } from "../../../types/strapi";
+
+export async function getBlogPosts(params: {
+  categorySlug?: string;
+  isFeatured?: boolean;
+  limit?: number;
+} = {}) {
+  const query = buildStrapiQuery({
+    populate: ["coverImage", "category", "author"],
+    filters: {
+      ...(params.categorySlug && { category: { slug: { $eq: params.categorySlug } } }),
+      ...(params.isFeatured !== undefined && { isFeatured: { $eq: params.isFeatured } }),
+    },
+    pagination: {
+      pageSize: params.limit || 10,
+    },
+    sort: ["publishedAt:desc"],
+  });
+
+  return fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
+}
+
+export async function getBlogPostBySlug(slug: string) {
+  const query = buildStrapiQuery({
+    populate: ["coverImage", "category", "author", "seo"],
+    filters: {
+      slug: { $eq: slug },
+    },
+  });
+
+  const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
+  return response.data?.[0] || null;
+}
+
+export async function getBlogCategories() {
+  return fetchStrapi<BlogCategory[]>("/blog-categories");
+}
+

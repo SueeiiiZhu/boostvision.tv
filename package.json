@@ -1,0 +1,22 @@
+{
+  "name": "boostvision.tv",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "dev:web": "pnpm --filter web dev",
+    "dev:cms": "pnpm --filter cms develop",
+    "build:web": "pnpm --filter web build",
+    "build:cms": "pnpm --filter cms build"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0"
+  }
+}
+

@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_sections_feature_highlights",
+  "info": {
+    "displayName": "Feature Highlight",
+    "icon": "star"
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "features": {
+      "type": "json"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "imagePosition": {
+      "type": "enumeration",
+      "enum": ["left", "right"],
+      "default": "left"
+    },
+    "labelColor": {
+      "type": "enumeration",
+      "enum": ["green", "blue"],
+      "default": "green"
+    }
+  }
+}
+

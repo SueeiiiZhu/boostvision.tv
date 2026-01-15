@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "reviews",
+  "info": {
+    "singularName": "review",
+    "pluralName": "reviews",
+    "displayName": "Review"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "userName": {
+      "type": "string",
+      "required": true
+    },
+    "content": {
+      "type": "text",
+      "required": true
+    },
+    "rating": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 5
+    },
+    "app": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::app.app"
+    },
+    "isVerified": {
+      "type": "boolean",
+      "default": false
+    },
+    "source": {
+      "type": "enumeration",
+      "enum": ["app-store", "google-play", "website", "other"]
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
+

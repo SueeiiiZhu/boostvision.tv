@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_sections_ctas",
+  "info": {
+    "displayName": "CTA Section",
+    "icon": "cursor"
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "buttonText": {
+      "type": "string"
+    },
+    "buttonLink": {
+      "type": "string"
+    },
+    "showAppStoreLinks": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
+
