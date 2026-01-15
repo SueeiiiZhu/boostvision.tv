@@ -1,13 +1,12 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { getApps } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 
 export default async function Home() {
-  // Fetch real data from Strapi
   const [appsResponse, globalSetting] = await Promise.all([
-    getApps({ limit: 8 }),
+    getApps({ limit: 8, isFeatured: true }),
     getGlobalSetting(),
   ]).catch(() => [null, null]);
 
@@ -27,54 +26,55 @@ export default async function Home() {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="bg-white py-20 text-center mt-[98px]">
+        <section className="bg-white pt-24 pb-12 text-center overflow-hidden">
           <div className="container-custom">
-            <h1 className="mx-auto max-w-[850px] text-[40px] md:text-[55px] font-[900] leading-[1.1] text-heading">
-              <span className="text-gradient">Screen Mirroring</span> <br className="hidden md:block" /> & TV Remote Apps
+            <h1 className="mx-auto max-w-[900px] animate-slide-up">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Screen Mirroring
+              </span>{" "}
+              & TV Remote Apps
             </h1>
-            <p className="mx-auto mt-6 max-w-[750px] text-[18px] text-muted leading-[1.6]">
+            <p className="mx-auto mt-8 max-w-[800px] text-[20px] text-muted leading-[1.6] animate-slide-up delay-100">
               Mirror the screen of your iPhone, iPad, Android phone & tablet
-              directly to your Smart TV. <br /> Try our professional remote control
+              directly to your Smart TV. <br className="hidden md:block" /> Try our professional remote control
               apps on mobile device to improve smart home control experience.{" "}
-              <strong>No cables required.</strong>
+              <strong className="font-bold text-heading">No cables required.</strong>
             </p>
-            <div className="mt-10">
+            <div className="mt-12 animate-slide-up delay-200">
               <Link href="/app" className="btn-gradient">
                 GET IT NOW
               </Link>
             </div>
-            <p className="mt-6 text-[14px] text-muted">
+            <p className="mt-8 text-[14px] font-medium text-muted/80 uppercase tracking-wider">
               Best choice for 20 million+ users
             </p>
 
             {/* Stats Row */}
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-8 md:gap-16">
-              <div className="flex items-center gap-2">
-                <Image src="/icons/download.svg" alt="download" width={24} height={24} />
-                <span className="text-[16px] font-medium text-heading">{stats.downloads} Downloads</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Image src="/icons/global.svg" alt="global" width={24} height={24} />
-                <span className="text-[16px] font-medium text-heading">{stats.countries} Countries and Regions</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Image src="/icons/users.svg" alt="users" width={24} height={24} />
-                <span className="text-[16px] font-medium text-heading">{stats.customers} Satisfied Customers</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Image src="/icons/service.svg" alt="service" width={24} height={24} />
-                <span className="text-[16px] font-medium text-heading">{stats.supportHours} Customer Service</span>
-              </div>
+            <div className="mt-20 flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
+              {[
+                { label: "Downloads", value: stats.downloads, icon: "download" },
+                { label: "Countries and Regions", value: stats.countries, icon: "global" },
+                { label: "Satisfied Customers", value: stats.customers, icon: "users" },
+                { label: "Customer Service", value: stats.supportHours, icon: "service" },
+              ].map((stat) => (
+                <div key={stat.label} className="flex flex-col items-center gap-3">
+                  <div className="flex items-center gap-3">
+                    <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={32} height={32} />
+                    <span className="text-[24px] font-black text-heading leading-none">{stat.value}</span>
+                  </div>
+                  <span className="text-[14px] font-medium text-muted uppercase tracking-tight">{stat.label}</span>
+                </div>
+              ))}
             </div>
 
             {/* Main Product Image */}
-            <div className="mt-16 flex justify-center">
+            <div className="mt-24 flex justify-center scale-105 transform">
               <Image
                 src="/images/hero-devices.png"
                 alt="BoostVision Apps"
-                width={1000}
-                height={500}
-                className="h-auto w-full max-w-[1000px]"
+                width={1200}
+                height={600}
+                className="h-auto w-full max-w-[1100px]"
                 priority
               />
             </div>
@@ -82,42 +82,42 @@ export default async function Home() {
         </section>
 
         {/* Why Choose Section */}
-        <section className="py-20 text-center">
+        <section className="py-32 bg-section-bg text-center">
           <div className="container-custom">
-            <h2 className="mb-16 text-[40px] font-bold text-heading">
+            <h2 className="section-heading mb-20">
               Why Choose BoostVision Apps?
             </h2>
-            <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
               {[
                 {
                   title: "TV Cast via Wi-Fi Network",
-                  desc: "We are committed to enhancing your Smart TV experience with our advanced wireless solutions.",
+                  desc: "We are committed to enhancing your Smart TV experience with our advanced wireless solutions. Whether you control Smart TV or cast media to TV with our app, they are all wireless and no hardware or cables needed.",
                   icon: "wifi"
                 },
                 {
                   title: "High Quality Screen Mirroring",
-                  desc: "BoostVision streaming apps provide screen mirroring and TV Cast services.",
+                  desc: "BoostVision streaming apps provide screen mirroring and TV Cast services. With our apps, you can easily cast mobile screen or media files from smart phone to TV in low latency and high-definition quality.",
                   icon: "mirror"
                 },
                 {
                   title: "Physical Remote Replacements",
-                  desc: "Lost your TV remote? No worries! Just try our apps and use your phone as a remote control.",
+                  desc: "Lost your TV remote? No worries! Just try our apps and use your phone as a remote control to play, pause, and navigate through the Smart TV. We provide the ability of full control to your TV with phone or tablet.",
                   icon: "remote"
                 },
                 {
                   title: "Multiple TV Compatibility",
-                  desc: "Our apps are designed to work with a wide range of smart TV models.",
+                  desc: "Our apps are designed to work with a wide range of smart TV models. Whether you own a Chromecast, Roku, Firesitck, Samsung, LG, Sony, Vizio, or other smart TVs, our apps can integrate them for a smoother experience.",
                   icon: "compatibility"
                 }
               ].map((item) => (
-                <div key={item.title} className="flex flex-col items-center">
-                  <div className="mb-6 h-20 w-20">
+                <div key={item.title} className="group flex flex-col items-center rounded-3xl bg-white p-10 card-shadow hover:translate-y-[-10px] transition-all duration-300">
+                  <div className="mb-8 h-20 w-20 transform transition-transform group-hover:scale-110">
                     <Image src={`/icons/why-${item.icon}.svg`} alt={item.title} width={80} height={80} />
                   </div>
-                  <h3 className="mb-4 text-[24px] font-semibold text-heading leading-tight">
+                  <h3 className="mb-6 text-[22px] font-bold text-heading leading-[1.3]">
                     {item.title}
                   </h3>
-                  <p className="text-[16px] text-muted leading-relaxed">
+                  <p className="text-[15px] text-muted leading-[1.7]">
                     {item.desc}
                   </p>
                 </div>
@@ -127,69 +127,83 @@ export default async function Home() {
         </section>
 
         {/* Screen Mirroring & TV Cast Apps Section */}
-        <section className="py-20 bg-section-bg">
+        <section className="py-32">
           <div className="container-custom">
-            <h2 className="section-heading">Screen Mirroring & TV Cast Apps</h2>
-            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {(screenMirroringApps.length > 0 ? screenMirroringApps : [
-                { name: "Screen Mirroring App", shortDescription: "Mirror screen & cast media via DLNA protocol.", icon: { url: "/icons/app-mirror.png" }, slug: "screen-mirroring" },
-                { name: "TV Cast for Chromecast", shortDescription: "Mirror screen & cast media to Google Chromecast.", icon: { url: "/icons/app-chromecast.png" }, slug: "tv-cast-for-chromecast" },
-                { name: "Miracast App: Screen Cast", shortDescription: "Mirror screen & cast media to various smart TVs.", icon: { url: "/icons/app-miracast.png" }, slug: "miracast" },
-                { name: "Smart TV Cast App", shortDescription: "Mirror screen & cast media to multiple brands.", icon: { url: "/icons/app-smart-tv.png" }, slug: "universal-tv-cast" }
-              ]).map((app: any) => (
-                <Link key={app.slug} href={`/app/${app.slug}`} className="flex items-start gap-4 rounded-[20px] bg-white p-6 card-shadow hover:translate-y-[-4px] transition-transform">
-                  <div className="h-16 w-16 shrink-0 relative overflow-hidden rounded-xl">
-                    <Image src={app.icon?.url} alt={app.name} fill className="object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-[18px] font-bold text-heading">{app.name}</h4>
-                    <p className="mt-2 text-[14px] text-muted leading-relaxed line-clamp-2">{app.shortDescription}</p>
-                  </div>
-                </Link>
+            <h2 className="section-heading mb-16">Screen Mirroring & TV Cast Apps</h2>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {(screenMirroringApps.length > 0 ? screenMirroringApps : Array(4).fill(null)).map((app: any, i) => (
+                <AppProductCard key={app?.slug || i} app={app} type="mirroring" />
               ))}
             </div>
           </div>
         </section>
 
         {/* Advanced TV Remote Apps Section */}
-        <section className="py-20">
+        <section className="py-32 bg-section-bg">
           <div className="container-custom">
-            <h2 className="section-heading">Advanced TV Remote Apps</h2>
-            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {(tvRemoteApps.length > 0 ? tvRemoteApps : [
-                { name: "Remote for Fire TV & Stick", shortDescription: "Control amazon fire tv & fire stick.", icon: { url: "/icons/app-fire.png" }, slug: "fire-tv-remote" },
-                { name: "Remote for Roku TV & Stick", shortDescription: "Control Roku TV & Roku streaming stick.", icon: { url: "/icons/app-roku.png" }, slug: "roku-tv-remote" },
-                { name: "Remote for Samsung TV", shortDescription: "Control Samsung smart TV.", icon: { url: "/icons/app-samsung.png" }, slug: "samsung-tv-remote" },
-                { name: "Remote for LG TV", shortDescription: "Control LG smart TV with WebOS.", icon: { url: "/icons/app-lg.png" }, slug: "lg-tv-remote" }
-              ]).map((app: any) => (
-                <Link key={app.slug} href={`/app/${app.slug}`} className="flex items-start gap-4 rounded-[20px] bg-white p-6 card-shadow hover:translate-y-[-4px] transition-transform">
-                  <div className="h-16 w-16 shrink-0 relative overflow-hidden rounded-xl">
-                    <Image src={app.icon?.url} alt={app.name} fill className="object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-[18px] font-bold text-heading">{app.name}</h4>
-                    <p className="mt-2 text-[14px] text-muted leading-relaxed line-clamp-2">{app.shortDescription}</p>
-                  </div>
-                </Link>
+            <h2 className="section-heading mb-16">Advanced TV Remote Apps</h2>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {(tvRemoteApps.length > 0 ? tvRemoteApps : Array(4).fill(null)).map((app: any, i) => (
+                <AppProductCard key={app?.slug || i} app={app} type="remote" />
               ))}
             </div>
           </div>
         </section>
 
-        {/* Brands Section */}
-        <section className="footer-gradient py-20 text-white text-center">
+        {/* Feature Highlights - The original site has two distinct side-by-side layouts */}
+        <section className="py-32 bg-white">
           <div className="container-custom">
-            <h2 className="text-white mb-6">Support Most Devices</h2>
-            <p className="mx-auto max-w-[800px] text-white/70 mb-12">
-              With wide compatibility, our products support most of main-stream TV brands.
+             <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24 mb-32">
+                <div className="w-full lg:w-1/2">
+                  <Image src="/images/highlight-mirror.png" alt="Mirroring Highlight" width={600} height={450} className="w-full h-auto" />
+                </div>
+                <div className="w-full lg:w-1/2">
+                   <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
+                      <Image src="/icons/green-label.svg" alt="mirror" width={32} height={32} />
+                   </div>
+                   <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">Screen Mirroring <br /> & TV Cast</h2>
+                   <p className="text-[18px] text-muted leading-[1.8]">
+                      BoostVision provides various screen mirroring solutions for mobile devices, including the mainstream cast technologies like DLNA, Miracast, uPNP and Google Cast. You can cast mobile screen, online meetings, live streams, web video and local files to TV without cable.
+                   </p>
+                </div>
+             </div>
+
+             <div className="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24">
+                <div className="w-full lg:w-1/2">
+                  <Image src="/images/highlight-remote.png" alt="Remote Highlight" width={600} height={450} className="w-full h-auto" />
+                </div>
+                <div className="w-full lg:w-1/2">
+                   <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
+                      <Image src="/icons/blue-label.svg" alt="remote" width={32} height={32} />
+                   </div>
+                   <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">Smart TV <br /> Remote Apps</h2>
+                   <p className="text-[18px] text-muted leading-[1.8]">
+                      Lost Firesitck remote or Roku? Never worry about that. With our versatile remote apps, you can effortless control Roku TV & Roku Stick, Fire TV & Firestick, Samsung, LG webOS, Vizio, Sony TV, and more from anywhere in your room with a single tap.
+                   </p>
+                </div>
+             </div>
+          </div>
+        </section>
+
+        {/* Support Section */}
+        <section className="footer-gradient py-32 text-white text-center">
+          <div className="container-custom">
+            <div className="mb-10 flex justify-center">
+              <div className="h-20 w-20 rounded-3xl bg-white/10 flex items-center justify-center">
+                 <Image src="/icons/device-support.svg" alt="support" width={48} height={48} />
+              </div>
+            </div>
+            <h2 className="text-white mb-6 text-[40px] font-bold">Support Most Devices</h2>
+            <p className="mx-auto max-w-[850px] text-white/70 text-[18px] leading-[1.8] mb-16">
+              With wide compatibility, our products support most of main-stream TV brands. You can enjoy seamless connectivity and stay tuned for even more compatibility updates.
             </p>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {[
                 "Chromecast", "Samsung", "Fire TV", "Roku", "Apple TV", "Hisense",
                 "Sanyo", "Magnavox", "Haier", "JVC TV", "RCA", "Seiki"
               ].map((brand) => (
-                <div key={brand} className="brand-pill">
-                  <span className="text-[16px] font-bold text-heading">{brand}</span>
+                <div key={brand} className="brand-pill border border-white/5 bg-white shadow-none h-16">
+                  <span className="text-[17px] font-black text-heading">{brand}</span>
                 </div>
               ))}
             </div>
@@ -197,25 +211,25 @@ export default async function Home() {
         </section>
 
         {/* Reviews Section */}
-        <section className="py-20 bg-white text-center">
+        <section className="py-32 bg-white text-center">
           <div className="container-custom">
-            <div className="flex justify-center mb-4">
-              <Image src="/icons/stars.svg" alt="stars" width={120} height={24} />
+            <div className="flex justify-center mb-6">
+              <Image src="/icons/stars.svg" alt="stars" width={140} height={28} />
             </div>
-            <h2 className="mb-2">BoostVision Apps Reviews</h2>
-            <p className="text-muted mb-16 font-medium text-[18px]">Excellent Rate：4.8/5.0</p>
+            <h2 className="mb-3 text-[40px] font-bold text-heading">BoostVision Apps Reviews</h2>
+            <p className="text-primary font-black text-[22px] mb-20">Excellent Rate：4.8/5.0</p>
             
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
               {[
-                { name: "Nicole Taylor", text: "It's pretty good, does the job perfectly. Very handy for when the kids have hid the remote again." },
-                { name: "Miguel Miguel", text: "Very good, easy to be able to connect to my fire tv even with bad internet." },
-                { name: "Elon Custodiol", text: "Very good bro, it works like a remote but on cell phone, super convenient!" }
+                { name: "Nicole Taylor", text: "It's pretty good, does the job perfectly. Very handy for when the kids have hid the remote again but can't remember where." },
+                { name: "Miguel Miguel", text: "Very good, easy to be able to connect to my fire tv even with bad internet and be able to switch to the other one that was good and watch it well." },
+                { name: "Elon Custodiol", text: "Very good bro, it works like a remote but on cell phone, can bring it everywhere and super convenient! that's why I give 5 💫" }
               ].map((review) => (
-                <div key={review.name} className="flex flex-col items-center bg-white p-8 rounded-[20px] shadow-xl border border-gray-50">
-                  <p className="text-[16px] text-heading italic mb-6 leading-relaxed">
+                <div key={review.name} className="flex flex-col items-center bg-white p-12 rounded-[30px] card-shadow text-center">
+                  <p className="text-[17px] text-heading font-medium italic mb-10 leading-[1.8]">
                     &quot;{review.text}&quot;
                   </p>
-                  <h4 className="text-[18px] font-bold text-heading">{review.name}</h4>
+                  <h4 className="text-[19px] font-black text-heading">{review.name}</h4>
                 </div>
               ))}
             </div>
@@ -223,12 +237,12 @@ export default async function Home() {
         </section>
 
         {/* Final CTA */}
-        <section className="py-20 text-center bg-white">
+        <section className="py-32 text-center bg-white border-t border-gray-50">
           <div className="container-custom">
-            <h2 className="mb-6 max-w-[800px] mx-auto leading-tight">
+            <h2 className="mb-8 max-w-[900px] mx-auto text-[45px] leading-[1.1] font-black text-heading">
               Free Download BoostVision Screen Mirroring & TV Remote Apps Today!
             </h2>
-            <p className="text-muted mb-10 text-[18px]">
+            <p className="text-muted mb-12 text-[20px] max-w-[700px] mx-auto leading-relaxed">
               Go to our App download center to install screen mirroring and TV remote apps on iPhone and Android now.
             </p>
             <Link href="/app" className="btn-gradient">
@@ -239,5 +253,30 @@ export default async function Home() {
       </main>
       <Footer />
     </>
+  );
+}
+
+function AppProductCard({ app, type }: { app: any, type: 'mirroring' | 'remote' }) {
+  // Placeholder data if app is null
+  const data = app || {
+    name: "Sample App Name",
+    shortDescription: "Description of the app goes here. Usually two lines of text explaining core value.",
+    icon: { url: "/icons/app-placeholder.png" },
+    slug: "#"
+  };
+
+  return (
+    <div className="flex flex-col items-center rounded-[30px] bg-white p-10 text-center card-shadow group hover:translate-y-[-10px] transition-all duration-300">
+      <div className="mb-8 h-24 w-24 relative overflow-hidden rounded-[22px] shadow-lg group-hover:scale-105 transition-transform">
+        <Image src={data.icon?.url} alt={data.name} fill className="object-cover" />
+      </div>
+      <h3 className="mb-4 text-[20px] font-bold text-heading leading-tight min-h-[50px] flex items-center">{data.name}</h3>
+      <p className="mb-8 text-[15px] text-muted leading-relaxed line-clamp-3">
+        {data.shortDescription}
+      </p>
+      <Link href={`/app/${data.slug}`} className="mt-auto text-[16px] font-bold text-primary hover:underline">
+        Learn More
+      </Link>
+    </div>
   );
 }
