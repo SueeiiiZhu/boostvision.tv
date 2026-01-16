@@ -8,12 +8,12 @@ import { getAppBySlug } from "@/lib/strapi/api/apps";
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale } = await params;
-  const app = await getAppBySlug(slug, locale);
+  const { slug } = await params;
+  const app = await getAppBySlug(slug);
 
   if (!app) return { title: "Tutorial Not Found" };
 
@@ -24,12 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TutorialDetailPage({ params }: Props) {
-  const { slug, locale } = await params;
+  const { slug } = await params;
   
   // Fetch app and its tutorials
   const [app, tutorialsResponse] = await Promise.all([
-    getAppBySlug(slug, locale),
-    getTutorials({ appSlug: slug, locale }),
+    getAppBySlug(slug),
+    getTutorials({ appSlug: slug }),
   ]);
 
   if (!app || !tutorialsResponse.data?.length) {
@@ -119,3 +119,4 @@ export default async function TutorialDetailPage({ params }: Props) {
     </>
   );
 }
+

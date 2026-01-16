@@ -1,18 +1,18 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
+import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { RichText } from "@/components/shared";
 import { getAppBySlug } from "@/lib/strapi/api/apps";
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale } = await params;
-  const app = await getAppBySlug(slug, locale);
+  const { slug } = await params;
+  const app = await getAppBySlug(slug);
 
   if (!app) return { title: "App Not Found" };
 
@@ -23,8 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AppDetailPage({ params }: Props) {
-  const { slug, locale } = await params;
-  const app = await getAppBySlug(slug, locale);
+  const { slug } = await params;
+  const app = await getAppBySlug(slug);
 
   if (!app) {
     notFound();

@@ -1,38 +1,28 @@
 import Link from "next/link";
 import Image from "next/image";
-import { useTranslations } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
 import { Header, Footer } from "@/components/layout";
 import { getApps } from "@/lib/strapi/api/apps";
 import { App } from "@/types/strapi";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Navigation' });
-
-  return {
-    title: `Download Screen Mirroring & TV Remote Apps | BoostVision`,
-    description: "Find and download professional screen mirroring and TV remote control apps for Roku, Fire TV, Samsung, LG, and more.",
-    openGraph: {
-      title: "Download Screen Mirroring & TV Remote Apps | BoostVision",
-      description: "Professional apps for screen mirroring and smart TV control.",
-    },
-  };
-}
+export const metadata: Metadata = {
+  title: "Download Screen Mirroring & TV Remote Apps | BoostVision",
+  description: "Find and download professional screen mirroring and TV remote control apps for Roku, Fire TV, Samsung, LG, and more.",
+  openGraph: {
+    title: "Download Screen Mirroring & TV Remote Apps | BoostVision",
+    description: "Professional apps for screen mirroring and smart TV control.",
+  },
+};
 
 interface Props {
-  params: Promise<{ locale: string }>;
   searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function AppsPage({ params, searchParams }: Props) {
-  const { locale } = await params;
+export default async function AppsPage({ searchParams }: Props) {
   const { tab = "screen-mirroring" } = await searchParams;
-  const t = await getTranslations({ locale, namespace: 'Navigation' });
   
-  const appsResponse = await getApps({ limit: 100, locale }).catch(() => null);
+  const appsResponse = await getApps({ limit: 100 }).catch(() => null);
   const apps = appsResponse?.data || [];
 
   const screenMirroringApps = apps.filter(app => app.type === 'screen-mirroring');
@@ -76,7 +66,7 @@ export default async function AppsPage({ params, searchParams }: Props) {
                   alt="mirror" width={24} height={24} 
                   className={cn(tab === "screen-mirroring" && "brightness-0 invert")}
                  />
-                 {t('screenMirroring')}
+                 Screen Mirroring Apps
                </Link>
                
                <Link 
@@ -94,7 +84,7 @@ export default async function AppsPage({ params, searchParams }: Props) {
                   alt="remote" width={24} height={24} 
                   className={cn(tab === "tv-remote" && "brightness-0 invert")}
                  />
-                 {t('tvRemote')}
+                 TV Remote Apps
                </Link>
             </div>
 

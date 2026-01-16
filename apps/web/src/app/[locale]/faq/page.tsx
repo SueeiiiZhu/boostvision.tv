@@ -15,15 +15,13 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  params: Promise<{ locale: string }>;
   searchParams: Promise<{ type?: string }>;
 }
 
-export default async function FAQPage({ params, searchParams }: Props) {
-  const { locale } = await params;
+export default async function FAQPage({ searchParams }: Props) {
   const { type = "screen-mirroring" } = await searchParams;
 
-  const appsResponse = await getApps({ limit: 100, locale }).catch(() => null);
+  const appsResponse = await getApps({ limit: 100 }).catch(() => null);
   const apps = appsResponse?.data || [];
 
   const filteredApps = apps.filter(app => app.type === type);

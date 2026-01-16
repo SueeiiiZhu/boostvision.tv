@@ -80,14 +80,8 @@ export function buildStrapiQuery(params: {
     pageSize?: number;
   };
   fields?: string[];
-  locale?: string;
 }): string {
   const searchParams = new URLSearchParams();
-
-  // Handle locale
-  if (params.locale) {
-    searchParams.set("locale", params.locale);
-  }
 
   // Handle populate
   if (params.populate) {
@@ -154,3 +148,4 @@ export function buildStrapiQuery(params: {
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : "";
 }
+

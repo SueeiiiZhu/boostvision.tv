@@ -14,11 +14,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**', // Allow all https domains for production (or specify Strapi domain)
+        hostname: '**',
       },
     ],
   },
-  // 生产环境优化：忽略部分构建时的 lint 错误以加快构建速度
   typescript: {
     ignoreBuildErrors: false,
   },

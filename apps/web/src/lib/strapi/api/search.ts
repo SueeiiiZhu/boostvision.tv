@@ -6,7 +6,7 @@ export interface SearchResults {
   blogs: BlogPost[];
 }
 
-export async function globalSearch(query: string, locale?: string): Promise<SearchResults> {
+export async function globalSearch(query: string): Promise<SearchResults> {
   if (!query || query.length < 2) {
     return { apps: [], blogs: [] };
   }
@@ -21,7 +21,6 @@ export async function globalSearch(query: string, locale?: string): Promise<Sear
     },
     populate: ["icon"],
     pagination: { pageSize: 5 },
-    locale,
   });
 
   // Search in Blogs (title, excerpt)
@@ -34,7 +33,6 @@ export async function globalSearch(query: string, locale?: string): Promise<Sear
     },
     populate: ["coverImage", "category"],
     pagination: { pageSize: 5 },
-    locale,
   });
 
   const [appsResponse, blogsResponse] = await Promise.all([

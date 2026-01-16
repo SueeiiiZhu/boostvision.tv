@@ -4,22 +4,16 @@ import { RichText } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { Metadata } from "next";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const page = await getPageBySlug("about-us", locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPageBySlug("about-us");
   return {
     title: page?.title || "About Us | BoostVision",
     description: "Learn more about BoostVision and our mission to improve smart home control experience.",
   };
 }
 
-export default async function AboutUsPage({ params }: Props) {
-  const { locale } = await params;
-  const page = await getPageBySlug("about-us", locale);
+export default async function AboutUsPage() {
+  const page = await getPageBySlug("about-us");
 
   return (
     <>

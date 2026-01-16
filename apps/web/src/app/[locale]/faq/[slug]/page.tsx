@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
+import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { RichText } from "@/components/shared";
 import { getFAQs } from "@/lib/strapi/api/faqs";
@@ -8,12 +8,12 @@ import { getAppBySlug } from "@/lib/strapi/api/apps";
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale } = await params;
-  const app = await getAppBySlug(slug, locale);
+  const { slug } = await params;
+  const app = await getAppBySlug(slug);
 
   if (!app) return { title: "FAQ Not Found" };
 
@@ -24,12 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function FAQDetailPage({ params }: Props) {
-  const { slug, locale } = await params;
+  const { slug } = await params;
   
   // Fetch app and its FAQs
   const [app, faqsResponse] = await Promise.all([
-    getAppBySlug(slug, locale),
-    getFAQs({ appSlug: slug, locale }),
+    getAppBySlug(slug),
+    getFAQs({ appSlug: slug }),
   ]);
 
   if (!app || !faqsResponse.data?.length) {
@@ -101,3 +101,4 @@ export default async function FAQDetailPage({ params }: Props) {
     </>
   );
 }
+

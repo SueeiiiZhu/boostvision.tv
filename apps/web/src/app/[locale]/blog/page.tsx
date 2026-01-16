@@ -17,21 +17,18 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  params: Promise<{ locale: string }>;
   searchParams: Promise<{ category?: string }>;
 }
 
-export default async function BlogPage({ params, searchParams }: Props) {
-  const { locale } = await params;
+export default async function BlogPage({ searchParams }: Props) {
   const { category: categorySlug = "all" } = await searchParams;
 
   const [postsResponse, categoriesResponse] = await Promise.all([
     getBlogPosts({ 
       limit: 12, 
-      categorySlug: categorySlug === "all" ? undefined : categorySlug,
-      locale
+      categorySlug: categorySlug === "all" ? undefined : categorySlug 
     }),
-    getBlogCategories(locale),
+    getBlogCategories(),
   ]).catch(() => [null, null]);
 
   const posts = postsResponse?.data || [];

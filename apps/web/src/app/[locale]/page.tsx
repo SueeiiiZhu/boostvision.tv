@@ -1,52 +1,42 @@
 import Image from "next/image";
-import { getTranslations } from 'next-intl/server';
-import { Link } from '@/i18n/routing';
+import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { getApps } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import type { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Index' });
+export const metadata: Metadata = {
+  title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
+  description: "BoostVision provides professional screen mirroring and TV remote control apps for iPhone, iPad, and Android. Support Roku, Fire TV, Samsung, LG, and more.",
+  keywords: ["screen mirroring", "tv remote", "cast to tv", "roku remote", "fire tv remote", "samsung remote", "lg remote"],
+  openGraph: {
+    title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
+    description: "Mirror your phone to any TV and control your Smart TV with ease using BoostVision apps.",
+    url: "https://www.boostvision.tv",
+    siteName: "BoostVision",
+    images: [
+      {
+        url: "/images/og-image.webp",
+        width: 1200,
+        height: 630,
+        alt: "BoostVision Apps",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
+    description: "Professional screen mirroring and TV remote control apps for all smart TVs.",
+    images: ["/images/og-image.webp"],
+  },
+};
 
-  return {
-    title: `BoostVision - ${t('title')}`,
-    description: t('description'),
-    keywords: ["screen mirroring", "tv remote", "cast to tv", "roku remote", "fire tv remote", "samsung remote", "lg remote"],
-    openGraph: {
-      title: `BoostVision - ${t('title')}`,
-      description: t('description'),
-      url: "https://www.boostvision.tv",
-      siteName: "BoostVision",
-      images: [
-        {
-          url: "/images/og-image.webp",
-          width: 1200,
-          height: 630,
-          alt: "BoostVision Apps",
-        },
-      ],
-      locale: locale === 'en' ? 'en_US' : locale,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `BoostVision - ${t('title')}`,
-      description: t('description'),
-      images: ["/images/og-image.webp"],
-    },
-  };
-}
-
-export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Index' });
-  const tc = await getTranslations({ locale, namespace: 'Common' });
-
+export default async function Home() {
   const [appsResponse, globalSetting] = await Promise.all([
-    getApps({ limit: 8, isFeatured: true, locale }),
-    getGlobalSetting(locale),
+    getApps({ limit: 8, isFeatured: true }),
+    getGlobalSetting(),
   ]).catch(() => [null, null]);
 
   const apps = appsResponse?.data || [];
@@ -64,7 +54,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "BoostVision",
-    "url": `https://www.boostvision.tv/${locale}`,
+    "url": "https://www.boostvision.tv",
     "logo": "https://www.boostvision.tv/logo.svg",
     "sameAs": [
       "https://www.facebook.com/boostvision",
@@ -96,26 +86,27 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               & TV Remote Apps
             </h1>
             <p className="mx-auto mt-8 max-w-[800px] text-[20px] text-muted leading-[1.6] animate-slide-up delay-100">
-              {t('description')} <br className="hidden md:block" /> Try our professional remote control
+              Mirror the screen of your iPhone, iPad, Android phone & tablet
+              directly to your Smart TV. <br className="hidden md:block" /> Try our professional remote control
               apps on mobile device to improve smart home control experience.{" "}
               <strong className="font-bold text-heading">No cables required.</strong>
             </p>
             <div className="mt-12 animate-slide-up delay-200">
               <Link href="/app" className="btn-gradient">
-                {t('getItNow')}
+                GET IT NOW
               </Link>
             </div>
             <p className="mt-8 text-[14px] font-medium text-muted/80 uppercase tracking-wider">
-              {t('bestChoice')}
+              Best choice for 20 million+ users
             </p>
 
             {/* Stats Row */}
             <div className="mt-20 flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
               {[
-                { label: tc('downloads'), value: stats.downloads, icon: "download" },
-                { label: tc('countries'), value: stats.countries, icon: "global" },
-                { label: tc('satisfiedCustomers'), value: stats.customers, icon: "users" },
-                { label: tc('customerService'), value: stats.supportHours, icon: "service" },
+                { label: "Downloads", value: stats.downloads, icon: "download" },
+                { label: "Countries and Regions", value: stats.countries, icon: "global" },
+                { label: "Satisfied Customers", value: stats.customers, icon: "users" },
+                { label: "Customer Service", value: stats.supportHours, icon: "service" },
               ].map((stat) => (
                 <div key={stat.label} className="flex flex-col items-center gap-3">
                   <div className="flex items-center gap-3">
@@ -317,7 +308,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               Go to our App download center to install screen mirroring and TV remote apps on iPhone and Android now.
             </p>
             <Link href="/app" className="btn-gradient">
-              {t('getItNow')}
+              GET IT NOW
             </Link>
           </div>
         </section>

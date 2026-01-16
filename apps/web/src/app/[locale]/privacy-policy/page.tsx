@@ -3,22 +3,16 @@ import { RichText } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { Metadata } from "next";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const page = await getPageBySlug("privacy-policy", locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPageBySlug("privacy-policy");
   return {
     title: page?.title || "Privacy Policy | BoostVision",
     description: "Read our privacy policy to understand how we handle your data.",
   };
 }
 
-export default async function PrivacyPolicyPage({ params }: Props) {
-  const { locale } = await params;
-  const page = await getPageBySlug("privacy-policy", locale);
+export default async function PrivacyPolicyPage() {
+  const page = await getPageBySlug("privacy-policy");
 
   return (
     <>

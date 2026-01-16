@@ -5,7 +5,6 @@ export async function getFAQs(params: {
   appSlug?: string;
   category?: string;
   limit?: number;
-  locale?: string;
 } = {}) {
   const query = buildStrapiQuery({
     populate: ["app"],
@@ -17,19 +16,17 @@ export async function getFAQs(params: {
       pageSize: params.limit || 100,
     },
     sort: ["order:asc", "createdAt:desc"],
-    locale: params.locale,
   });
 
   return fetchStrapi<FAQ[]>(`/faqs${query}`);
 }
 
-export async function getFAQBySlug(slug: string, locale?: string) {
+export async function getFAQBySlug(slug: string) {
   const query = buildStrapiQuery({
     populate: ["app", "seo"],
     filters: {
       slug: { $eq: slug },
     },
-    locale,
   });
 
   const response = await fetchStrapi<FAQ[]>(`/faqs${query}`);

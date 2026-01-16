@@ -1,11 +1,10 @@
 import { Header, Footer } from "@/components/layout";
 import { globalSearch } from "@/lib/strapi/api/search";
-import { Link } from "@/i18n/routing";
+import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ locale: string }>;
   searchParams: Promise<{ q?: string }>;
 }
 
@@ -17,10 +16,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
 }
 
-export default async function SearchPage({ params, searchParams }: Props) {
-  const { locale } = await params;
+export default async function SearchPage({ searchParams }: Props) {
   const { q: query = "" } = await searchParams;
-  const results = await globalSearch(query, locale);
+  const results = await globalSearch(query);
 
   const totalResults = results.apps.length + results.blogs.length;
 

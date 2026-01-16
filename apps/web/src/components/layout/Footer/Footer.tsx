@@ -1,4 +1,4 @@
-import { Link } from "@/i18n/routing";
+import Link from "next/link";
 import Image from "next/image";
 
 const screenMirroringLinks = [
@@ -71,7 +71,7 @@ export function Footer() {
             <ul className="flex flex-col gap-3">
               {screenMirroringLinks.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href as any} className="text-[14px] text-white/60 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-[14px] text-white/60 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -85,7 +85,7 @@ export function Footer() {
             <ul className="flex flex-col gap-3">
               {tvRemoteLinks.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href as any} className="text-[14px] text-white/60 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-[14px] text-white/60 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -99,7 +99,7 @@ export function Footer() {
             <ul className="flex flex-col gap-3">
               {resourceLinks.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href as any} className="text-[14px] text-white/60 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-[14px] text-white/60 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -113,7 +113,7 @@ export function Footer() {
             <ul className="flex flex-col gap-3 mb-10">
               {supportLinks.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href as any} className="text-[14px] text-white/60 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-[14px] text-white/60 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>

@@ -8,12 +8,12 @@ import { formatDate } from "@/lib/utils/formatDate";
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, locale } = await params;
-  const post = await getBlogPostBySlug(slug, locale);
+  const { slug } = await params;
+  const post = await getBlogPostBySlug(slug);
 
   if (!post) return { title: "Post Not Found" };
 
@@ -24,8 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const { slug, locale } = await params;
-  const post = await getBlogPostBySlug(slug, locale);
+  const { slug } = await params;
+  const post = await getBlogPostBySlug(slug);
 
   if (!post) {
     notFound();
@@ -62,7 +62,7 @@ export default async function BlogPostPage({ params }: Props) {
             {/* Header */}
             <header className="mb-12 text-center">
               <div className="mb-6 flex items-center justify-center gap-4 text-[15px] font-medium">
-                <Link href={`/blog?category=${post.category?.slug}`} className="text-primary hover:underline">
+                <Link href={`/blog/category/${post.category?.slug}`} className="text-primary hover:underline">
                   {post.category?.name}
                 </Link>
                 <span className="text-gray-300">|</span>

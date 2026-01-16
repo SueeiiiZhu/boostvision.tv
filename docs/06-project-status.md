@@ -50,6 +50,15 @@
   - 完善了 `docs/07-production-deployment.md` 生产部署指南。
   - 优化了 `next.config.ts` 生产环境资源加载与 i18n 支持。
 
+### 🎨 UI & 交互细节 (UI & Interaction)
+- **交互组件**: 
+  - 实现了 App 详情页的 **交互式 Tab 系统**，支持 About, Features, Tutorial, FAQ 的无刷新切换。
+  - 为所有卡片（App, Blog, Why Choose）统一了 **`hover-lift` 交互反馈**，提升了深度感。
+  - 优化了 **Header CTA 按钮**，加入了 `pulse-soft` 呼吸灯动效，增强视觉引导。
+- **动效增强**: 
+  - 封装了常用的 `fade-in`, `slide-up`, `scale-in` 等动画工具类。
+  - 优化了移动端菜单的展开/收起过渡动画，更加平滑自然。
+
 ---
 
 ## 🚧 2. 进行中 / 需完善 (In Progress)

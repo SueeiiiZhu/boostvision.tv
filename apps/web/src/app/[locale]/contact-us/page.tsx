@@ -1,24 +1,18 @@
 import { Header, Footer } from "@/components/layout";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { Metadata } from "next";
-import { Link } from "@/i18n/routing";
+import Link from "next/link";
 
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const page = await getPageBySlug("contact-us", locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPageBySlug("contact-us");
   return {
     title: page?.title || "Contact Us | BoostVision",
     description: "Get in touch with BoostVision for support, business inquiries, or feedback.",
   };
 }
 
-export default async function ContactUsPage({ params }: Props) {
-  const { locale } = await params;
-  const page = await getPageBySlug("contact-us", locale);
+export default async function ContactUsPage() {
+  const page = await getPageBySlug("contact-us");
 
   return (
     <>
