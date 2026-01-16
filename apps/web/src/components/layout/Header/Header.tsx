@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
+import { useTranslations, useLocale } from 'next-intl';
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { SearchInput } from "./SearchInput";
 
 const screenMirroringApps = [
   { name: "TV Cast for Chromecast", href: "/app/tv-cast-for-chromecast" },
@@ -27,9 +29,15 @@ const supportLinks = [
 ];
 
 export function Header() {
+  const t = useTranslations('Navigation');
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +46,20 @@ export function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'pt', name: 'Português' },
+    { code: 'es', name: 'Español' },
+    { code: 'fr', name: 'Français' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'ja', name: '日本語' },
+  ];
+
+  const handleLangChange = (newLocale: string) => {
+    router.replace(pathname, { locale: newLocale });
+    setIsLangOpen(false);
+  };
 
   return (
     <header 
@@ -68,7 +90,7 @@ export function Header() {
             onMouseLeave={() => setActiveDropdown(null)}
           >
             <button className="nav-link flex items-center gap-1">
-              Screen Mirroring
+              {t('screenMirroring')}
               <svg className="h-3 w-3 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
               </svg>
@@ -87,7 +109,7 @@ export function Header() {
                 </Link>
               ))}
               <div className="mt-2 border-t border-gray-50 px-6 pt-2">
-                <Link href="/app" className="text-[14px] font-bold text-primary hover:underline">View All Apps →</Link>
+                <Link href="/app" className="text-[14px] font-bold text-primary hover:underline">{t('viewAll')}</Link>
               </div>
             </div>
           </div>
@@ -99,7 +121,7 @@ export function Header() {
             onMouseLeave={() => setActiveDropdown(null)}
           >
             <button className="nav-link flex items-center gap-1">
-              TV Remote
+              {t('tvRemote')}
               <svg className="h-3 w-3 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
               </svg>
@@ -118,12 +140,12 @@ export function Header() {
                 </Link>
               ))}
               <div className="mt-2 border-t border-gray-50 px-6 pt-2">
-                <Link href="/app" className="text-[14px] font-bold text-primary hover:underline">View All Apps →</Link>
+                <Link href="/app" className="text-[14px] font-bold text-primary hover:underline">{t('viewAll')}</Link>
               </div>
             </div>
           </div>
 
-          <Link href="/blog" className="nav-link">Blog</Link>
+          <Link href="/blog" className="nav-link">{t('blog')}</Link>
 
           {/* Support Dropdown */}
           <div 
@@ -132,7 +154,7 @@ export function Header() {
             onMouseLeave={() => setActiveDropdown(null)}
           >
             <button className="nav-link flex items-center gap-1">
-              Support
+              {t('support')}
               <svg className="h-3 w-3 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
               </svg>
@@ -154,15 +176,41 @@ export function Header() {
           </div>
 
           {/* Language & CTA */}
-          <div className="ml-4 flex items-center gap-6">
-            <button className="flex items-center gap-1 text-[16px] font-bold text-heading hover:text-primary transition-colors">
-              en
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+          <div className="ml-4 flex items-center gap-4">
+            <SearchInput />
+            
+            {/* Language Switcher */}
+            <div className="relative">
+              <button 
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center gap-1 text-[16px] font-bold text-heading hover:text-primary transition-colors uppercase"
+              >
+                {locale}
+                <svg className={cn("h-4 w-4 transition-transform", isLangOpen && "rotate-180")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isLangOpen && (
+                <div className="absolute top-full right-0 mt-2 w-[150px] bg-white shadow-xl rounded-xl border border-gray-100 py-2 animate-fade-in">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLangChange(lang.code)}
+                      className={cn(
+                        "w-full text-left px-4 py-2 text-[14px] font-medium hover:bg-section-bg transition-colors",
+                        locale === lang.code ? "text-primary font-bold" : "text-heading"
+                      )}
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <Link href="/app" className="btn-try-free">
-              Try For Free
+              {t('tryForFree')}
             </Link>
           </div>
         </div>
@@ -186,8 +234,59 @@ export function Header() {
       {isMenuOpen && (
         <div className="fixed inset-0 top-[98px] z-[99] w-full bg-white overflow-y-auto pb-10 lg:hidden animate-fade-in">
           <div className="flex flex-col p-6 gap-2">
+            {/* Mobile Search */}
+            <div className="mb-6">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement).value;
+                  if (q.trim()) {
+                    window.location.href = `/search?q=${encodeURIComponent(q.trim())}`;
+                    setIsMenuOpen(false);
+                  }
+                }}
+                className="relative flex items-center"
+              >
+                <input
+                  name="q"
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-4 pr-12 text-[16px] font-medium text-heading focus:outline-none"
+                />
+                <button 
+                  type="submit"
+                  className="absolute right-2 h-10 w-10 text-muted flex items-center justify-center"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </form>
+            </div>
+
+            {/* Language Switcher Mobile */}
+            <div className="mb-6">
+               <p className="text-[12px] font-bold uppercase tracking-widest text-muted mb-3">Language</p>
+               <div className="flex flex-wrap gap-2">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLangChange(lang.code)}
+                      className={cn(
+                        "px-4 py-2 rounded-lg text-[14px] font-bold border transition-all",
+                        locale === lang.code 
+                          ? "bg-primary border-primary text-white" 
+                          : "bg-gray-50 border-gray-100 text-heading"
+                      )}
+                    >
+                      {lang.code.toUpperCase()}
+                    </button>
+                  ))}
+               </div>
+            </div>
+
             <div className="mb-4">
-              <p className="text-[14px] font-bold uppercase tracking-wider text-muted mb-4">Screen Mirroring</p>
+              <p className="text-[14px] font-bold uppercase tracking-wider text-muted mb-4">{t('screenMirroring')}</p>
               <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-gray-100">
                 {screenMirroringApps.map(app => (
                   <Link key={app.name} href={app.href} className="py-2 text-[16px] font-medium text-heading" onClick={() => setIsMenuOpen(false)}>{app.name}</Link>
@@ -196,7 +295,7 @@ export function Header() {
             </div>
             
             <div className="mb-4">
-              <p className="text-[14px] font-bold uppercase tracking-wider text-muted mb-4">TV Remote</p>
+              <p className="text-[14px] font-bold uppercase tracking-wider text-muted mb-4">{t('tvRemote')}</p>
               <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-gray-100">
                 {tvRemoteApps.map(app => (
                   <Link key={app.name} href={app.href} className="py-2 text-[16px] font-medium text-heading" onClick={() => setIsMenuOpen(false)}>{app.name}</Link>
@@ -204,10 +303,10 @@ export function Header() {
               </div>
             </div>
 
-            <Link href="/blog" className="py-4 text-[18px] font-bold text-heading border-b border-gray-50" onClick={() => setIsMenuOpen(false)}>Blog</Link>
+            <Link href="/blog" className="py-4 text-[18px] font-bold text-heading border-b border-gray-50" onClick={() => setIsMenuOpen(false)}>{t('blog')}</Link>
             
             <div className="mb-8">
-              <p className="text-[14px] font-bold uppercase tracking-wider text-muted py-4">Support</p>
+              <p className="text-[14px] font-bold uppercase tracking-wider text-muted py-4">{t('support')}</p>
               <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-gray-100">
                 {supportLinks.map(link => (
                   <Link key={link.name} href={link.href} className="py-2 text-[16px] font-medium text-heading" onClick={() => setIsMenuOpen(false)}>{link.name}</Link>
@@ -216,7 +315,7 @@ export function Header() {
             </div>
 
             <Link href="/app" className="btn-gradient w-full text-center" onClick={() => setIsMenuOpen(false)}>
-              Try For Free
+              {t('tryForFree')}
             </Link>
           </div>
         </div>

@@ -5,6 +5,7 @@ export async function getBlogPosts(params: {
   categorySlug?: string;
   isFeatured?: boolean;
   limit?: number;
+  locale?: string;
 } = {}) {
   const query = buildStrapiQuery({
     populate: ["coverImage", "category", "author"],
@@ -16,24 +17,38 @@ export async function getBlogPosts(params: {
       pageSize: params.limit || 10,
     },
     sort: ["publishedAt:desc"],
+    locale: params.locale,
   });
 
   return fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
 }
 
-export async function getBlogPostBySlug(slug: string) {
+export async function getBlogPostBySlug(slug: string, locale?: string) {
   const query = buildStrapiQuery({
     populate: ["coverImage", "category", "author", "seo"],
     filters: {
       slug: { $eq: slug },
     },
+    locale,
   });
 
   const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
   return response.data?.[0] || null;
 }
 
-export async function getBlogCategories() {
-  return fetchStrapi<BlogCategory[]>("/blog-categories");
+export async function getBlogCategories(locale?: string) {
+  const query = buildStrapiQuery({ locale });
+  return fetchStrapi<BlogCategory[]>(`/blog-categories${query}`);
 }
 
+export async function getBlogPostSlugs() {
+  const query = buildStrapiQuery({
+    fields: ["slug"],
+    pagination: {
+      pageSize: 1000,
+    },
+  });
+
+  const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
+  return response.data.map((post) => post.slug);
+}
