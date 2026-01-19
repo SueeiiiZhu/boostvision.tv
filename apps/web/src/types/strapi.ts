@@ -173,4 +173,76 @@ export interface Page {
   slug: string;
   content: BlocksContent;
   seo?: any;
+  sections?: Section[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+/**
+ * Page Sections (Dynamic Zones)
+ */
+export type Section = 
+  | HeroSection 
+  | FeatureHighlightSection 
+  | CTASection 
+  | WhyChooseSection 
+  | StatisticsSection 
+  | ReviewsSection;
+
+export interface HeroSection {
+  id: number;
+  __component: 'sections.hero';
+  title: string;
+  subtitle: string;
+  backgroundImage?: StrapiImage;
+  ctaText?: string;
+  ctaLink?: string;
+}
+
+export interface FeatureHighlightSection {
+  id: number;
+  __component: 'sections.feature-highlight';
+  title: string;
+  description: string;
+  image: StrapiImage;
+  imagePosition: 'left' | 'right';
+  labelColor: 'green' | 'blue';
+}
+
+export interface CTASection {
+  id: number;
+  __component: 'sections.cta';
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+}
+
+export interface WhyChooseSection {
+  id: number;
+  __component: 'sections.why-choose';
+  title: string;
+  features: Feature[];
+}
+
+export interface StatisticsSection {
+  id: number;
+  __component: 'sections.statistics';
+  title?: string;
+  stats: Statistics;
+}
+
+export interface ReviewsSection {
+  id: number;
+  __component: 'sections.reviews';
+  title: string;
+  rating: string;
+  reviews: Review[];
+}
+
+export interface Review {
+  id: number;
+  name: string;
+  text: string;
 }

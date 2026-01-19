@@ -3,7 +3,21 @@ import { Page } from "../../../types/strapi";
 
 export async function getPageBySlug(slug: string) {
   const query = buildStrapiQuery({
-    populate: ["seo"],
+    populate: {
+      seo: true,
+      sections: {
+        populate: {
+          backgroundImage: true,
+          image: true,
+          icon: true,
+          features: {
+            populate: ["icon"]
+          },
+          stats: true,
+          reviews: true
+        }
+      }
+    },
     filters: {
       slug: { $eq: slug },
     },
