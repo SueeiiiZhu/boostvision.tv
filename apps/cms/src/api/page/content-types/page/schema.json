@@ -20,7 +20,20 @@
       "required": true
     },
     "content": {
-      "type": "richtext"
+      "type": "blocks"
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero",
+        "sections.why-choose",
+        "sections.feature-highlight",
+        "sections.statistics",
+        "sections.reviews",
+        "sections.cta",
+        "sections.apps-grid",
+        "sections.brands-grid"
+      ]
     },
     "seo": {
       "type": "component",
@@ -29,4 +42,3 @@
     }
   }
 }
-

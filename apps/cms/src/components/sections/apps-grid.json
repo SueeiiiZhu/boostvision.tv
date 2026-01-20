@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_sections_apps_grids",
+  "info": {
+    "displayName": "Apps Grid",
+    "icon": "apps",
+    "description": "Displays a grid of apps filtered by type"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "screen-mirroring",
+        "tv-remote"
+      ],
+      "default": "screen-mirroring"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 4
+    },
+    "backgroundColor": {
+      "type": "enumeration",
+      "enum": [
+        "white",
+        "section-bg"
+      ],
+      "default": "white"
+    }
+  }
+}

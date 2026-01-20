@@ -6,15 +6,39 @@ export async function getPageBySlug(slug: string) {
     populate: {
       seo: true,
       sections: {
-        populate: {
-          backgroundImage: true,
-          image: true,
-          icon: true,
-          features: {
-            populate: ["icon"]
+        on: {
+          'sections.hero': {
+            populate: '*'
           },
-          stats: true,
-          reviews: true
+          'sections.why-choose': {
+            populate: {
+              features: {
+                populate: ['icon']
+              }
+            }
+          },
+          'sections.feature-highlight': {
+            populate: ['image']
+          },
+          'sections.statistics': {
+            populate: {
+              stats: true
+            }
+          },
+          'sections.reviews': {
+            populate: {
+              reviews: true
+            }
+          },
+          'sections.cta': true,
+          'sections.apps-grid': true,
+          'sections.brands-grid': {
+            populate: {
+              brands: {
+                populate: ['icon']
+              }
+            }
+          }
         }
       }
     },

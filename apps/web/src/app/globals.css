@@ -3,14 +3,24 @@
 /* BoostVision Exact Theme - 匹配 https://www.boostvision.tv/ 原站 */
 @theme {
   /* Colors from computed styles */
-  --color-primary: #1e6cf4;          /* rgb(30, 108, 244) */
-  --color-accent: #b8f732;           /* rgb(184, 247, 50) */
-  --color-heading: #000d24;          /* rgb(0, 13, 36) */
-  --color-text: #212529;             /* rgb(33, 37, 41) */
-  --color-muted: #6c757d;            /* Standard Bootstrap muted */
+  --color-primary: #1e6cf4;
+  /* rgb(30, 108, 244) */
+  --color-accent: #b8f732;
+  /* rgb(184, 247, 50) */
+  --color-heading: #000d24;
+  /* rgb(0, 13, 36) */
+  --color-text: #212529;
+  /* rgb(33, 37, 41) */
+  --color-muted: #6c757d;
+  /* Standard Bootstrap muted */
   --color-footer-start: #072a58;
   --color-footer-end: #000911;
   --color-section-bg: #f5f7ff;
+  --color-section-bg-2: #f3f9ff;
+  /* rgb(243, 249, 255) */
+  --background-image-section-bg-3: linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)), linear-gradient(180deg, #072a58 0%, #000911 100%);
+  --background-image-section-bg-cta: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)),
+    linear-gradient(90deg, #1e6cf4 0%, #b8f732 100%);
 
   /* Typography */
   --font-sans: "Roboto", sans-serif;
@@ -24,12 +34,25 @@
   --animate-slide-up: slide-up 0.6s ease-out;
 
   @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
+
   @keyframes slide-up {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   --animate-fade-in: fade-in 0.6s ease-out;
@@ -63,6 +86,7 @@
   border-radius: 50px;
   line-height: 30px;
   transition: all 0.3s ease;
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(30, 108, 244, 0.2);
@@ -97,6 +121,7 @@
   color: var(--color-heading);
   padding: 10px 15px;
   transition: color 0.2s ease;
+
   &:hover {
     color: var(--color-primary);
   }
@@ -113,6 +138,26 @@
 
 @utility card-shadow {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* 柔和遮罩工具类 */
+@utility bg-soft-overlay {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    /* 80% 的白色遮罩，极大冲淡背景色 */
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &>* {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* Base Styles */
@@ -132,7 +177,6 @@ h1 {
   font-weight: 900;
   font-size: 55px;
   line-height: 1.2;
-  color: var(--color-heading);
   margin-bottom: 20px;
 }
 
@@ -140,19 +184,16 @@ h2 {
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 40px;
-  color: var(--color-heading);
 }
 
 h3 {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 24px;
-  color: var(--color-heading);
 }
 
 p {
   font-size: 18px;
-  color: var(--color-muted);
   line-height: 1.6;
 }
 
@@ -162,13 +203,13 @@ p {
 }
 
 .brand-pill {
-  background: white;
+  /* background: white; */
   border-radius: 50px;
-  padding: 10px 25px;
+  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 50px;
+  height: 60px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }

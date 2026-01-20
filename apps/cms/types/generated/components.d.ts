@@ -1,5 +1,36 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface SectionsAppsGrid extends Struct.ComponentSchema {
+  collectionName: 'components_sections_apps_grids';
+  info: {
+    description: 'Displays a grid of apps filtered by type';
+    displayName: 'Apps Grid';
+    icon: 'apps';
+  };
+  attributes: {
+    backgroundColor: Schema.Attribute.Enumeration<['white', 'section-bg']> &
+      Schema.Attribute.DefaultTo<'white'>;
+    limit: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<4>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    type: Schema.Attribute.Enumeration<['screen-mirroring', 'tv-remote']> &
+      Schema.Attribute.DefaultTo<'screen-mirroring'>;
+  };
+}
+
+export interface SectionsBrandsGrid extends Struct.ComponentSchema {
+  collectionName: 'components_sections_brands_grids';
+  info: {
+    description: 'Displays supported device brands';
+    displayName: 'Brands Grid';
+    icon: 'apps';
+  };
+  attributes: {
+    brands: Schema.Attribute.Component<'shared.feature', true>;
+    description: Schema.Attribute.Text;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsCta extends Struct.ComponentSchema {
   collectionName: 'components_sections_ctas';
   info: {
@@ -23,7 +54,7 @@ export interface SectionsFeatureHighlight extends Struct.ComponentSchema {
     icon: 'star';
   };
   attributes: {
-    features: Schema.Attribute.JSON;
+    description: Schema.Attribute.Text;
     image: Schema.Attribute.Media<'images'>;
     imagePosition: Schema.Attribute.Enumeration<['left', 'right']> &
       Schema.Attribute.DefaultTo<'left'>;
@@ -42,8 +73,48 @@ export interface SectionsHero extends Struct.ComponentSchema {
   attributes: {
     backgroundImage: Schema.Attribute.Media<'images'>;
     ctaLink: Schema.Attribute.String;
+    ctaSubtext: Schema.Attribute.String;
     ctaText: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images'>;
+    statistics: Schema.Attribute.Component<'shared.statistics', false>;
     subtitle: Schema.Attribute.Text;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface SectionsReviews extends Struct.ComponentSchema {
+  collectionName: 'components_sections_reviews_sections';
+  info: {
+    displayName: 'Reviews Section';
+    icon: 'star';
+  };
+  attributes: {
+    rating: Schema.Attribute.String;
+    reviews: Schema.Attribute.Component<'shared.review', true>;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface SectionsStatistics extends Struct.ComponentSchema {
+  collectionName: 'components_sections_statistics';
+  info: {
+    displayName: 'Statistics Section';
+    icon: 'chartPie';
+  };
+  attributes: {
+    stats: Schema.Attribute.Component<'shared.statistics', false>;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface SectionsWhyChoose extends Struct.ComponentSchema {
+  collectionName: 'components_sections_why_chooses';
+  info: {
+    displayName: 'Why Choose Section';
+    icon: 'bulletList';
+  };
+  attributes: {
+    features: Schema.Attribute.Component<'shared.feature', true>;
     title: Schema.Attribute.String;
   };
 }
@@ -59,6 +130,18 @@ export interface SharedFeature extends Struct.ComponentSchema {
     description: Schema.Attribute.Text;
     icon: Schema.Attribute.Media<'images'>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedReview extends Struct.ComponentSchema {
+  collectionName: 'components_shared_reviews';
+  info: {
+    displayName: 'Review';
+    icon: 'comment';
+  };
+  attributes: {
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    text: Schema.Attribute.Text & Schema.Attribute.Required;
   };
 }
 
@@ -131,10 +214,16 @@ export interface SharedTutorialStep extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'sections.apps-grid': SectionsAppsGrid;
+      'sections.brands-grid': SectionsBrandsGrid;
       'sections.cta': SectionsCta;
       'sections.feature-highlight': SectionsFeatureHighlight;
       'sections.hero': SectionsHero;
+      'sections.reviews': SectionsReviews;
+      'sections.statistics': SectionsStatistics;
+      'sections.why-choose': SectionsWhyChoose;
       'shared.feature': SharedFeature;
+      'shared.review': SharedReview;
       'shared.seo': SharedSeo;
       'shared.social-link': SharedSocialLink;
       'shared.statistics': SharedStatistics;

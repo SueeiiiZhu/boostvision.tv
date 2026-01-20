@@ -55,7 +55,7 @@ export function Header() {
             alt="BoostVision Logo"
             width={180}
             height={45}
-            className="h-[45px] w-auto"
+            className="h-[20px] w-auto"
             priority
           />
         </Link>

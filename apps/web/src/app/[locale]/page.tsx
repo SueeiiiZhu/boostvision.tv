@@ -45,7 +45,7 @@ export default async function Home() {
   const apps = appsResponse?.data || [];
   const screenMirroringApps = apps.filter(app => app.type === 'screen-mirroring').slice(0, 4);
   const tvRemoteApps = apps.filter(app => app.type === 'tv-remote').slice(0, 4);
-  
+
   const stats = globalSetting?.statistics || {
     downloads: "28,000,000+",
     countries: "200+",
@@ -70,7 +70,7 @@ export default async function Home() {
       "email": "support@boostvision.com.cn"
     }
   };
-
+  console.log(homePage);
   return (
     <>
       <script
@@ -79,7 +79,7 @@ export default async function Home() {
       />
       <Header />
       <main>
-        {homePage?.sections ? (
+        {homePage?.sections && homePage.sections.length > 0 ? (
           <SectionRenderer sections={homePage.sections} />
         ) : (
           <>
@@ -120,7 +120,6 @@ export default async function Home() {
                         <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={32} height={32} />
                         <span className="text-[24px] font-black text-heading leading-none">{stat.value}</span>
                       </div>
-                      <span className="text-[14px] font-medium text-muted uppercase tracking-tight">{stat.label}</span>
                     </div>
                   ))}
                 </div>
@@ -183,68 +182,64 @@ export default async function Home() {
                 </div>
               </div>
             </section>
-          </>
-        )}
 
-        {/* Dynamic Apps Section - These usually stay dynamic but fetched from Strapi Apps collection */}
-        {/* Screen Mirroring & TV Cast Apps Section */}
-        <section className="py-32">
-          <div className="container-custom">
-            <h2 className="section-heading mb-16">Screen Mirroring & TV Cast Apps</h2>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {(screenMirroringApps.length > 0 ? screenMirroringApps : Array(4).fill(null)).map((app: any, i) => (
-                <AppProductCard key={app?.slug || i} app={app} type="mirroring" />
-              ))}
-            </div>
-          </div>
-        </section>
+            {/* Dynamic Apps Section - These usually stay dynamic but fetched from Strapi Apps collection */}
+            {/* Screen Mirroring & TV Cast Apps Section */}
+            <section className="py-32">
+              <div className="container-custom">
+                <h2 className="section-heading mb-16">Screen Mirroring & TV Cast Apps</h2>
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+                  {(screenMirroringApps.length > 0 ? screenMirroringApps : Array(4).fill(null)).map((app: any, i) => (
+                    <AppProductCard key={app?.slug || i} app={app} type="mirroring" />
+                  ))}
+                </div>
+              </div>
+            </section>
 
-        {/* Advanced TV Remote Apps Section */}
-        <section className="py-32 bg-section-bg">
-          <div className="container-custom">
-            <h2 className="section-heading mb-16">Advanced TV Remote Apps</h2>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {(tvRemoteApps.length > 0 ? tvRemoteApps : Array(4).fill(null)).map((app: any, i) => (
-                <AppProductCard key={app?.slug || i} app={app} type="remote" />
-              ))}
-            </div>
-          </div>
-        </section>
+            {/* Advanced TV Remote Apps Section */}
+            <section className="py-32 bg-section-bg">
+              <div className="container-custom">
+                <h2 className="section-heading mb-16">Advanced TV Remote Apps</h2>
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+                  {(tvRemoteApps.length > 0 ? tvRemoteApps : Array(4).fill(null)).map((app: any, i) => (
+                    <AppProductCard key={app?.slug || i} app={app} type="remote" />
+                  ))}
+                </div>
+              </div>
+            </section>
 
-        {homePage?.sections ? null : (
-          <>
             {/* Feature Highlights Fallback */}
             <section className="py-32 bg-white">
               <div className="container-custom">
-                 <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24 mb-32">
-                    <div className="w-full lg:w-1/2">
-                      <Image src="/images/highlight-mirror.webp" alt="Mirroring Highlight" width={600} height={450} className="w-full h-auto" />
+                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24 mb-32">
+                  <div className="w-full lg:w-1/2">
+                    <Image src="/images/highlight-mirror.webp" alt="Mirroring Highlight" width={600} height={450} className="w-full h-auto" />
+                  </div>
+                  <div className="w-full lg:w-1/2">
+                    <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
+                      <Image src="/icons/green-label.svg" alt="mirror" width={32} height={32} />
                     </div>
-                    <div className="w-full lg:w-1/2">
-                       <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
-                          <Image src="/icons/green-label.svg" alt="mirror" width={32} height={32} />
-                       </div>
-                       <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">Screen Mirroring <br /> & TV Cast</h2>
-                       <p className="text-[18px] text-muted leading-[1.8]">
-                          BoostVision provides various screen mirroring solutions for mobile devices, including the mainstream cast technologies like DLNA, Miracast, uPNP and Google Cast. You can cast mobile screen, online meetings, live streams, web video and local files to TV without cable.
-                       </p>
-                    </div>
-                 </div>
+                    <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">Screen Mirroring <br /> & TV Cast</h2>
+                    <p className="text-[18px] text-muted leading-[1.8]">
+                      BoostVision provides various screen mirroring solutions for mobile devices, including the mainstream cast technologies like DLNA, Miracast, uPNP and Google Cast. You can cast mobile screen, online meetings, live streams, web video and local files to TV without cable.
+                    </p>
+                  </div>
+                </div>
 
-                 <div className="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24">
-                    <div className="w-full lg:w-1/2">
-                      <Image src="/images/highlight-remote.webp" alt="Remote Highlight" width={600} height={450} className="w-full h-auto" />
+                <div className="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24">
+                  <div className="w-full lg:w-1/2">
+                    <Image src="/images/highlight-remote.webp" alt="Remote Highlight" width={600} height={450} className="w-full h-auto" />
+                  </div>
+                  <div className="w-full lg:w-1/2">
+                    <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
+                      <Image src="/icons/blue-label.svg" alt="remote" width={32} height={32} />
                     </div>
-                    <div className="w-full lg:w-1/2">
-                       <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
-                          <Image src="/icons/blue-label.svg" alt="remote" width={32} height={32} />
-                       </div>
-                       <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">Smart TV <br /> Remote Apps</h2>
-                       <p className="text-[18px] text-muted leading-[1.8]">
-                          Lost Firesitck remote or Roku? Never worry about that. With our versatile remote apps, you can effortless control Roku TV & Roku Stick, Fire TV & Firestick, Samsung, LG webOS, Vizio, Sony TV, and more from anywhere in your room with a single tap.
-                       </p>
-                    </div>
-                 </div>
+                    <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">Smart TV <br /> Remote Apps</h2>
+                    <p className="text-[18px] text-muted leading-[1.8]">
+                      Lost Firesitck remote or Roku? Never worry about that. With our versatile remote apps, you can effortless control Roku TV & Roku Stick, Fire TV & Firestick, Samsung, LG webOS, Vizio, Sony TV, and more from anywhere in your room with a single tap.
+                    </p>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -253,7 +248,7 @@ export default async function Home() {
               <div className="container-custom">
                 <div className="mb-10 flex justify-center">
                   <div className="h-20 w-20 rounded-3xl bg-white/10 flex items-center justify-center">
-                     <Image src="/icons/device-support.svg" alt="support" width={48} height={48} />
+                    <Image src="/icons/device-support.svg" alt="support" width={48} height={48} />
                   </div>
                 </div>
                 <h2 className="text-white mb-6 text-[40px] font-bold">Support Most Devices</h2>
@@ -292,7 +287,7 @@ export default async function Home() {
                 </div>
                 <h2 className="mb-3 text-[40px] font-bold text-heading">BoostVision Apps Reviews</h2>
                 <p className="text-primary font-black text-[22px] mb-20">Excellent Rate：4.8/5.0</p>
-                
+
                 <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
                   {[
                     { name: "Nicole Taylor", text: "It's pretty good, does the job perfectly. Very handy for when the kids have hid the remote again but can't remember where." },

@@ -8,8 +8,8 @@
     "title": {
       "type": "string"
     },
-    "features": {
-      "type": "json"
+    "description": {
+      "type": "text"
     },
     "image": {
       "type": "media",

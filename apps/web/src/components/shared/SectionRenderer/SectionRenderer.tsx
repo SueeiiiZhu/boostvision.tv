@@ -1,14 +1,22 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection } from '@/types/strapi';
+import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection, AppsGridSection, BrandsGridSection, App } from '@/types/strapi';
 import { cn } from '@/lib/utils';
+import { getApps } from '@/lib/strapi/api/apps';
+import { RichText } from '../RichText';
 
 interface SectionRendererProps {
   sections: Section[];
 }
 
-export const SectionRenderer: React.FC<SectionRendererProps> = ({ sections }) => {
+/**
+ * SectionRenderer - Server Component
+ * Handles dynamic page building from Strapi sections
+ */
+export async function SectionRenderer({ sections }: SectionRendererProps) {
+  if (!sections || sections.length === 0) return null;
+
   return (
     <>
       {sections.map((section, index) => {
@@ -25,20 +33,25 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({ sections }) =>
             return <Statistics key={index} data={section} />;
           case 'sections.reviews':
             return <Reviews key={index} data={section} />;
+          case 'sections.apps-grid':
+            // @ts-expect-error - Server Component in map
+            return <AppsGrid key={index} data={section} />;
+          case 'sections.brands-grid':
+            return <BrandsGrid key={index} data={section} />;
           default:
             return null;
         }
       })}
     </>
   );
-};
+}
 
 const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
   <section className="bg-white pt-24 pb-12 text-center overflow-hidden">
     <div className="container-custom">
       <h1 className="mx-auto max-w-[900px]">
         <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          {data.title.split('&')[0]}
+          {data.title.includes('&') ? data.title.split('&')[0] : data.title}
         </span>
         {data.title.includes('&') && ` & ${data.title.split('&')[1]}`}
       </h1>
@@ -47,15 +60,49 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
       </p>
       {data.ctaText && data.ctaLink && (
         <div className="mt-12">
-          <Link href={data.ctaLink} className="btn-gradient">
+          <Link href={data.ctaLink} className="btn-gradient group inline-flex items-center gap-4 px-12">
             {data.ctaText}
+            <svg
+              className="w-6 h-6 transition-transform group-hover:translate-x-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </Link>
         </div>
       )}
-      {data.backgroundImage && (
+
+      {data.ctaSubtext && (
+        <p className="mt-2 text-[12px] tracking-widest scale-80">
+          {data.ctaSubtext}
+        </p>
+      )}
+
+      {data.statistics && (
+        <div className="mt-20 flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
+          {[
+            { label: "Downloads", value: data.statistics.downloads, icon: "download" },
+            { label: "Countries and Regions", value: data.statistics.countries, icon: "global" },
+            { label: "Satisfied Customers", value: data.statistics.customers, icon: "users" },
+            { label: "Customer Service", value: data.statistics.supportHours, icon: "service" },
+          ].map((stat) => (
+            <div key={stat.label} className="flex flex-col items-center gap-3">
+              <div className="flex items-center gap-3">
+                <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={20} height={20} />
+                <span className="text-[14px] text-heading leading-none">{stat.value}</span>
+              </div>
+              {/* <span className="text-[14px] font-medium text-muted uppercase tracking-tight">{stat.label}</span> */}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {(data.image || data.backgroundImage) && (
         <div className="mt-24 flex justify-center scale-105 transform">
           <Image
-            src={data.backgroundImage.url}
+            src={(data.image || data.backgroundImage)!.url}
             alt={data.title}
             width={1200}
             height={600}
@@ -69,56 +116,80 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
 );
 
 const FeatureHighlight: React.FC<{ data: FeatureHighlightSection }> = ({ data }) => (
-  <div className={cn(
-    "flex flex-col lg:flex-row items-center gap-16 lg:gap-24",
-    data.imagePosition === 'right' && "lg:flex-row-reverse"
-  )}>
-    <div className="w-full lg:w-1/2">
-      <Image src={data.image.url} alt={data.title} width={600} height={450} className="w-full h-auto" />
-    </div>
-    <div className="w-full lg:w-1/2">
+  <section className="py-32 bg-white">
+    <div className="container-custom">
       <div className={cn(
-        "mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl",
-        data.labelColor === 'green' ? "bg-[#e8f3ff]" : "bg-[#e8f3ff]" // Adjust colors based on theme
+        "flex flex-col lg:flex-row items-center gap-16 lg:gap-24",
+        data.imagePosition === 'right' && "lg:flex-row-reverse"
       )}>
-        <Image src={`/icons/${data.labelColor}-label.svg`} alt="icon" width={32} height={32} />
+        <div className="w-full lg:w-1/2">
+          {data.image && <Image src={data.image.url} alt={data.title} width={600} height={450} className="w-full h-auto" />}
+        </div>
+        <div className="w-full lg:w-1/2">
+          <div className={cn(
+            "mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl",
+            data.labelColor === 'green' ? "bg-[#e8f3ff]" : "bg-[#e8f3ff]"
+          )}>
+            <Image src={`/icons/${data.labelColor}-label.svg`} alt="icon" width={32} height={32} />
+          </div>
+          <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">{data.title}</h2>
+          <p className="text-[18px] text-muted leading-[1.8]">
+            {data.description}
+          </p>
+        </div>
       </div>
-      <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">{data.title}</h2>
-      <p className="text-[18px] text-muted leading-[1.8]">
-        {data.description}
-      </p>
     </div>
-  </div>
+  </section>
 );
 
 const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
-  <section className="py-32 text-center bg-white border-t border-gray-50">
-    <div className="container-custom">
-      <h2 className="mb-8 max-w-[900px] mx-auto text-[45px] leading-[1.1] font-black text-heading">
+  <section className="py-32 text-center bg-section-bg-cta relative overflow-hidden">
+    <div className="container-custom relative z-10">
+      <h2 className="mb-8 max-w-[1000px] mx-auto text-[45px] leading-[1.2] font-black text-heading">
         {data.title}
       </h2>
-      <p className="text-muted mb-12 text-[20px] max-w-[700px] mx-auto leading-relaxed">
+      <p className="text-muted/70 mb-16 text-[20px] max-w-[850px] mx-auto leading-relaxed">
         {data.description}
       </p>
-      <Link href={data.buttonLink} className="btn-gradient">
-        {data.buttonText}
+      <Link href={data.buttonLink} className="btn-gradient group inline-flex items-center gap-4 px-12">
+        <span>{data.buttonText}</span>
+        <svg
+          className="w-6 h-6 transition-transform group-hover:translate-x-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
       </Link>
     </div>
   </section>
 );
 
 const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
-  <section className="py-32 bg-section-bg text-center">
+  <section className="py-32 bg-section-bg-2 text-center">
     <div className="container-custom">
-      <h2 className="section-heading mb-20">{data.title}</h2>
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <h2 className="text-[40px] font-black text-heading mb-24">{data.title}</h2>
+      <div className="grid grid-cols-1 gap-x-12 gap-y-20 md:grid-cols-2 lg:grid-cols-4">
         {data.features.map((feature, i) => (
-          <div key={i} className="group flex flex-col items-center rounded-3xl bg-white p-10 card-shadow hover:translate-y-[-10px] transition-all duration-300">
-            <div className="mb-8 h-20 w-20 transform transition-transform group-hover:scale-110">
-              {feature.icon && <Image src={feature.icon.url} alt={feature.title} width={80} height={80} />}
+          <div key={i} className="group flex flex-col items-center">
+            <div className="mb-12 h-[120px] flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
+              {feature.icon && (
+                <Image
+                  src={feature.icon.url}
+                  alt={feature.title}
+                  width={160}
+                  height={120}
+                  className="h-auto w-auto max-h-full max-w-full object-contain"
+                />
+              )}
             </div>
-            <h3 className="mb-6 text-[22px] font-bold text-heading leading-[1.3]">{feature.title}</h3>
-            <p className="text-[15px] text-muted leading-[1.7]">{feature.description}</p>
+            <h3 className="mb-6 text-[22px] font-bold text-heading leading-tight min-h-[60px] flex items-center justify-center">
+              {feature.title}
+            </h3>
+            <p className="text-[16px] text-muted leading-[1.6] max-w-[280px]">
+              {feature.description}
+            </p>
           </div>
         ))}
       </div>
@@ -127,22 +198,25 @@ const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
 );
 
 const Statistics: React.FC<{ data: StatisticsSection }> = ({ data }) => (
-  <div className="mt-20 flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
-    {[
-      { label: "Downloads", value: data.stats.downloads, icon: "download" },
-      { label: "Countries and Regions", value: data.stats.countries, icon: "global" },
-      { label: "Satisfied Customers", value: data.stats.customers, icon: "users" },
-      { label: "Customer Service", value: data.stats.supportHours, icon: "service" },
-    ].map((stat) => (
-      <div key={stat.label} className="flex flex-col items-center gap-3">
-        <div className="flex items-center gap-3">
-          <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={32} height={32} />
-          <span className="text-[24px] font-black text-heading leading-none">{stat.value}</span>
-        </div>
-        <span className="text-[14px] font-medium text-muted uppercase tracking-tight">{stat.label}</span>
+  <section className="py-20">
+    <div className="container-custom">
+      <div className="flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
+        {[
+          { label: "Downloads", value: data.stats.downloads, icon: "download" },
+          { label: "Countries and Regions", value: data.stats.countries, icon: "global" },
+          { label: "Satisfied Customers", value: data.stats.customers, icon: "users" },
+          { label: "Customer Service", value: data.stats.supportHours, icon: "service" },
+        ].map((stat) => (
+          <div key={stat.label} className="flex flex-col items-center gap-3">
+            <div className="flex items-center gap-3">
+              <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={32} height={32} />
+            </div>
+            <span className="text-[14px] font-medium text-muted uppercase tracking-tight">{stat.value}</span>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
+    </div>
+  </section>
 );
 
 const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
@@ -166,3 +240,70 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
     </div>
   </section>
 );
+
+async function AppsGrid({ data }: { data: AppsGridSection }) {
+  const res = await getApps({ type: data.type, limit: data.limit });
+  const apps = res.data || [];
+
+  return (
+    <section className={cn("py-32", data.backgroundColor === 'section-bg' ? "bg-section-bg" : "bg-white")}>
+      <div className="container-custom">
+        <div className="flex flex-col items-center mb-20">
+          <h2 className="text-[40px] text-primary mb-6">{data.title}</h2>
+          <div className="h-1.5 w-16 bg-primary rounded-full"></div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-x-12 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
+          {apps.map((app) => (
+            <AppListCard key={app.id} app={app} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const BrandsGrid: React.FC<{ data: BrandsGridSection }> = ({ data }) => (
+  <section className="py-32 text-white text-center bg-section-bg-3">
+    <div className="container-custom">
+      <div className="mb-10 flex justify-center">
+        <div className="h-20 w-20 rounded-3xl bg-white/10 flex items-center justify-center">
+          <Image src="/icons/device-support.svg" alt="support" width={48} height={48} />
+        </div>
+      </div>
+      <h3 className="text-white mb-6 text-[20px] font-bold">{data.title}</h3>
+      <p className="mx-auto max-w-[850px] text-white/70 text-[18px] leading-[1.8] mb-16">
+        {data.description}
+      </p>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {data.brands.map((brand, i) => (
+          <div key={i} className="brand-pill h-16 px-4">
+            {brand.icon ? (
+              <Image src={brand.icon.url} alt={brand.title} width={120} height={40} className="h-full w-auto object-contain" />
+            ) : (
+              <span className="text-[17px] font-black text-heading">{brand.title}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+function AppListCard({ app }: { app: App }) {
+  return (
+    <Link href={`/app/${app.slug}`} className="group flex items-start gap-6 transition-transform hover:translate-y-[-4px]">
+      <div className="h-20 w-20 shrink-0 relative overflow-hidden rounded-[20px] shadow-lg border border-gray-100">
+        <Image src={app.icon?.url || "/icons/app-placeholder.webp"} alt={app.name} fill className="object-cover" />
+      </div>
+      <div className="flex flex-col pt-1">
+        <h3 className="mb-3 text-[20px] font-bold text-heading leading-tight group-hover:text-primary transition-colors">
+          {app.name}
+        </h3>
+        <p className="text-[15px] text-muted leading-relaxed line-clamp-3">
+          {app.shortDescription}
+        </p>
+      </div>
+    </Link>
+  );
+}

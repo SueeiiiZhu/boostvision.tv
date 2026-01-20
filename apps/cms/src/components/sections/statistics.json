@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_sections_statistics",
+  "info": {
+    "displayName": "Statistics Section",
+    "icon": "chartPie"
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "stats": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.statistics"
+    }
+  }
+}

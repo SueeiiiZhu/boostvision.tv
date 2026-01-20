@@ -21,6 +21,21 @@
     },
     "ctaLink": {
       "type": "string"
+    },
+    "ctaSubtext": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "statistics": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.statistics"
     }
   }
 }

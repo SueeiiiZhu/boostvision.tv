@@ -188,7 +188,9 @@ export type Section =
   | CTASection 
   | WhyChooseSection 
   | StatisticsSection 
-  | ReviewsSection;
+  | ReviewsSection
+  | AppsGridSection
+  | BrandsGridSection;
 
 export interface HeroSection {
   id: number;
@@ -196,8 +198,11 @@ export interface HeroSection {
   title: string;
   subtitle: string;
   backgroundImage?: StrapiImage;
+  image?: StrapiImage; // The device mockup image
   ctaText?: string;
   ctaLink?: string;
+  ctaSubtext?: string;
+  statistics?: Statistics;
 }
 
 export interface FeatureHighlightSection {
@@ -239,6 +244,23 @@ export interface ReviewsSection {
   title: string;
   rating: string;
   reviews: Review[];
+}
+
+export interface AppsGridSection {
+  id: number;
+  __component: 'sections.apps-grid';
+  title: string;
+  type: 'screen-mirroring' | 'tv-remote';
+  limit: number;
+  backgroundColor: 'white' | 'section-bg';
+}
+
+export interface BrandsGridSection {
+  id: number;
+  __component: 'sections.brands-grid';
+  title: string;
+  description: string;
+  brands: Feature[];
 }
 
 export interface Review {

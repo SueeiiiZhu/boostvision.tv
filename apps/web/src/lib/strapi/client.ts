@@ -48,7 +48,12 @@ export async function fetchStrapi<T>(
       `Bearer ${STRAPI_TOKEN}`;
   }
 
-  const res = await fetch(`${STRAPI_URL}/api${endpoint}`, {
+  // Normalize URL to avoid double slashes
+  const baseUrl = STRAPI_URL.replace(/\/$/, "");
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = `${baseUrl}/api${cleanEndpoint}`;
+
+  const res = await fetch(url, {
     ...fetchOptions,
     headers,
     next: {
@@ -65,86 +70,64 @@ export async function fetchStrapi<T>(
     throw new Error(error.message);
   }
 
-  return res.json();
+  const json = await res.json();
+  return transformMediaUrls(json);
 }
 
 /**
- * Build Strapi query string from parameters
+ * Recursively transform relative Strapi URLs to absolute ones
  */
-export function buildStrapiQuery(params: {
-  populate?: string | string[] | Record<string, unknown>;
-  filters?: Record<string, unknown>;
-  sort?: string | string[];
-  pagination?: {
-    page?: number;
-    pageSize?: number;
-  };
-  fields?: string[];
-}): string {
+function transformMediaUrls(data: any): any {
+  if (!data) return data;
+
+  if (Array.isArray(data)) {
+    return data.map((item) => transformMediaUrls(item));
+  }
+
+  if (typeof data === "object") {
+    const newData: any = { ...data };
+
+    for (const key in newData) {
+      if (
+        key === "url" &&
+        typeof newData[key] === "string" &&
+        newData[key].startsWith("/")
+      ) {
+        const baseUrl = STRAPI_URL.replace(/\/$/, "");
+        newData[key] = `${baseUrl}${newData[key]}`;
+      } else {
+        newData[key] = transformMediaUrls(newData[key]);
+      }
+    }
+    return newData;
+  }
+
+  return data;
+}
+
+/**
+ * Build Strapi query string from parameters (Standard Bracket Notation)
+ */
+export function buildStrapiQuery(params: any): string {
   const searchParams = new URLSearchParams();
 
-  // Handle populate
-  if (params.populate) {
-    if (typeof params.populate === "string") {
-      searchParams.set("populate", params.populate);
-    } else if (Array.isArray(params.populate)) {
-      params.populate.forEach((p, i) => {
-        searchParams.set(`populate[${i}]`, p);
+  const flatten = (obj: any, prefix = "") => {
+    if (obj === null || obj === undefined) return;
+
+    if (Array.isArray(obj)) {
+      obj.forEach((val, i) => {
+        flatten(val, prefix ? `${prefix}[${i}]` : `[${i}]`);
+      });
+    } else if (typeof obj === "object" && !(obj instanceof Date)) {
+      Object.entries(obj).forEach(([key, val]) => {
+        flatten(val, prefix ? `${prefix}[${key}]` : key);
       });
     } else {
-      searchParams.set("populate", JSON.stringify(params.populate));
+      searchParams.set(prefix, String(obj));
     }
-  }
+  };
 
-  // Handle filters
-  if (params.filters) {
-    Object.entries(params.filters).forEach(([key, value]) => {
-      if (typeof value === "object" && value !== null) {
-        Object.entries(value as Record<string, unknown>).forEach(
-          ([operator, operatorValue]) => {
-            searchParams.set(
-              `filters[${key}][${operator}]`,
-              String(operatorValue)
-            );
-          }
-        );
-      } else {
-        searchParams.set(`filters[${key}]`, String(value));
-      }
-    });
-  }
-
-  // Handle sort
-  if (params.sort) {
-    if (typeof params.sort === "string") {
-      searchParams.set("sort", params.sort);
-    } else {
-      params.sort.forEach((s, i) => {
-        searchParams.set(`sort[${i}]`, s);
-      });
-    }
-  }
-
-  // Handle pagination
-  if (params.pagination) {
-    if (params.pagination.page) {
-      searchParams.set("pagination[page]", String(params.pagination.page));
-    }
-    if (params.pagination.pageSize) {
-      searchParams.set(
-        "pagination[pageSize]",
-        String(params.pagination.pageSize)
-      );
-    }
-  }
-
-  // Handle fields
-  if (params.fields) {
-    params.fields.forEach((f, i) => {
-      searchParams.set(`fields[${i}]`, f);
-    });
-  }
-
+  flatten(params);
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : "";
 }

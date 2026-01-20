@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_sections_why_chooses",
+  "info": {
+    "displayName": "Why Choose Section",
+    "icon": "bulletList"
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.feature"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_sections_brands_grids",
+  "info": {
+    "displayName": "Brands Grid",
+    "icon": "apps",
+    "description": "Displays supported device brands"
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "brands": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.feature"
+    }
+  }
+}
