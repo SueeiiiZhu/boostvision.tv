@@ -1,4 +1,3 @@
-import { Header, Footer } from "@/components/layout";
 import { RichText, SectionRenderer } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { Metadata } from "next";
@@ -16,7 +15,6 @@ export default async function PrivacyPolicyPage() {
 
   return (
     <>
-      <Header />
       <main className="bg-white">
         {/* Banner */}
         <section className="bg-section-bg py-20 text-center">
@@ -44,10 +42,9 @@ export default async function PrivacyPolicyPage() {
             </div>
           </div>
         </section>
-        
+
         {page?.sections && <SectionRenderer sections={page.sections} />}
       </main>
-      <Footer />
     </>
   );
 }

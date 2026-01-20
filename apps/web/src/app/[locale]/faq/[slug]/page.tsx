@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
 import { RichText } from "@/components/shared";
 import { getFAQs } from "@/lib/strapi/api/faqs";
 import { getAppBySlug } from "@/lib/strapi/api/apps";
@@ -40,7 +39,6 @@ export default async function FAQDetailPage({ params }: Props) {
 
   return (
     <>
-      <Header />
       <main className="bg-white pb-32">
         {/* Header Section */}
         <section className="bg-section-bg py-20">
@@ -97,7 +95,6 @@ export default async function FAQDetailPage({ params }: Props) {
            </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

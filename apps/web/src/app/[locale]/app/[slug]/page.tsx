@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
 import { RichText } from "@/components/shared";
 import { getAppBySlug } from "@/lib/strapi/api/apps";
 import { Metadata } from "next";
@@ -55,7 +54,6 @@ export default async function AppDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header />
       <main className="bg-white">
         {/* Breadcrumbs */}
         <div className="bg-section-bg py-6">
@@ -190,7 +188,6 @@ export default async function AppDetailPage({ params }: Props) {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

@@ -6,13 +6,24 @@
     "pluralName": "navigations",
     "displayName": "Navigation"
   },
+  "options": {
+    "draftAndPublish": false
+  },
   "attributes": {
-    "mainMenu": {
-      "type": "json"
+    "headerMenu": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.header-item"
     },
-    "footerMenus": {
-      "type": "json"
+    "footerColumns": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.nav-section"
+    },
+    "bottomMenu": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
     }
   }
 }
-

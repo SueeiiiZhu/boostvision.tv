@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Header, Footer } from "@/components/layout";
 import { RichText } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { Metadata } from "next";
@@ -17,7 +16,6 @@ export default async function AboutUsPage() {
 
   return (
     <>
-      <Header />
       <main className="bg-white">
         {/* Banner */}
         <section className="bg-section-bg py-24 text-center">
@@ -88,7 +86,6 @@ export default async function AboutUsPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Header, Footer } from "@/components/layout";
 import { getBlogPosts, getBlogCategories } from "@/lib/strapi/api/blog";
 import { BlogPost } from "@/types/strapi";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -36,7 +35,6 @@ export default async function BlogPage({ searchParams }: Props) {
 
   return (
     <>
-      <Header />
       <main className="bg-white">
         {/* Banner */}
         <section className="bg-section-bg py-24 text-center">
@@ -113,7 +111,6 @@ export default async function BlogPage({ searchParams }: Props) {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

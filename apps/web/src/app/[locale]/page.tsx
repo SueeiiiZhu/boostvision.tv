@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
+
 import { SectionRenderer } from "@/components/shared";
 import { getApps } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
@@ -77,7 +77,6 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header />
       <main>
         {homePage?.sections && homePage.sections.length > 0 ? (
           <SectionRenderer sections={homePage.sections} />
@@ -322,7 +321,6 @@ export default async function Home() {
           </>
         )}
       </main>
-      <Footer />
     </>
   );
 }

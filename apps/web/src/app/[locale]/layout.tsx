@@ -4,6 +4,9 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { getNavigation } from "@/lib/strapi/api/navigation";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { Header, Footer } from "@/components/layout";
 import "../globals.css";
 
 const roboto = Roboto({
@@ -40,11 +43,19 @@ export default async function RootLayout({
   // Providing all messages to the client side
   const messages = await getMessages();
 
+  // Fetch navigation and global settings for the layout
+  const [navigation, globalSetting] = await Promise.all([
+    getNavigation(locale),
+    getGlobalSetting(locale)
+  ]).catch(() => [null, null]);
+
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`}>
       <body className="antialiased">
         <NextIntlClientProvider messages={messages}>
+          <Header navigation={navigation as any} globalSetting={globalSetting as any} />
           {children}
+          <Footer navigation={navigation as any} globalSetting={globalSetting as any} />
         </NextIntlClientProvider>
       </body>
     </html>

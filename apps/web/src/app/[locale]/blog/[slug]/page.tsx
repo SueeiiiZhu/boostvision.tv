@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
 import { RichText } from "@/components/shared";
 import { getBlogPostBySlug } from "@/lib/strapi/api/blog";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -55,7 +54,6 @@ export default async function BlogPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header />
       <main className="bg-white">
         <article className="py-20">
           <div className="container-custom max-w-[900px]">
@@ -122,7 +120,6 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </article>
       </main>
-      <Footer />
     </>
   );
 }

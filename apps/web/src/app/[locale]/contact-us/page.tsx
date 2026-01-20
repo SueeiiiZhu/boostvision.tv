@@ -1,4 +1,3 @@
-import { Header, Footer } from "@/components/layout";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -16,7 +15,6 @@ export default async function ContactUsPage() {
 
   return (
     <>
-      <Header />
       <main className="bg-white">
         {/* Banner */}
         <section className="bg-section-bg py-24 text-center">
@@ -80,7 +78,6 @@ export default async function ContactUsPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

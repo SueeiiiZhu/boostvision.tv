@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Header, Footer } from "@/components/layout";
 import { getApps } from "@/lib/strapi/api/apps";
 import { App } from "@/types/strapi";
 import { cn } from "@/lib/utils";
@@ -21,7 +20,7 @@ interface Props {
 
 export default async function AppsPage({ searchParams }: Props) {
   const { tab = "screen-mirroring" } = await searchParams;
-  
+
   const appsResponse = await getApps({ limit: 100 }).catch(() => null);
   const apps = appsResponse?.data || [];
 
@@ -32,7 +31,6 @@ export default async function AppsPage({ searchParams }: Props) {
 
   return (
     <>
-      <Header />
       <main className="bg-white">
         {/* Banner */}
         <section className="bg-section-bg py-24 text-center">
@@ -51,41 +49,41 @@ export default async function AppsPage({ searchParams }: Props) {
           <div className="container-custom">
             {/* Tabs (Using Link for SEO friendly navigation) */}
             <div className="mb-20 flex flex-col md:flex-row justify-center gap-6">
-               <Link 
+              <Link
                 href="/app?tab=screen-mirroring"
                 scroll={false}
                 className={cn(
                   "flex items-center justify-center gap-3 rounded-full px-12 py-5 text-[18px] font-black transition-all shadow-2xl",
-                  tab === "screen-mirroring" 
-                    ? "bg-primary text-white hover:translate-y-[-4px]" 
+                  tab === "screen-mirroring"
+                    ? "bg-primary text-white hover:translate-y-[-4px]"
                     : "bg-white border-2 border-gray-100 text-heading hover:bg-section-bg"
                 )}
-               >
-                 <Image 
-                  src="/icons/mirror-tab.svg" 
-                  alt="mirror" width={24} height={24} 
+              >
+                <Image
+                  src="/icons/mirror-tab.svg"
+                  alt="mirror" width={24} height={24}
                   className={cn(tab === "screen-mirroring" && "brightness-0 invert")}
-                 />
-                 Screen Mirroring Apps
-               </Link>
-               
-               <Link 
+                />
+                Screen Mirroring Apps
+              </Link>
+
+              <Link
                 href="/app?tab=tv-remote"
                 scroll={false}
                 className={cn(
                   "flex items-center justify-center gap-3 rounded-full px-12 py-5 text-[18px] font-black transition-all shadow-2xl",
-                  tab === "tv-remote" 
-                    ? "bg-primary text-white hover:translate-y-[-4px]" 
+                  tab === "tv-remote"
+                    ? "bg-primary text-white hover:translate-y-[-4px]"
                     : "bg-white border-2 border-gray-100 text-heading hover:bg-section-bg"
                 )}
-               >
-                 <Image 
-                  src="/icons/remote-tab.svg" 
-                  alt="remote" width={24} height={24} 
+              >
+                <Image
+                  src="/icons/remote-tab.svg"
+                  alt="remote" width={24} height={24}
                   className={cn(tab === "tv-remote" && "brightness-0 invert")}
-                 />
-                 TV Remote Apps
-               </Link>
+                />
+                TV Remote Apps
+              </Link>
             </div>
 
             {/* Content Section */}
@@ -109,8 +107,8 @@ export default async function AppsPage({ searchParams }: Props) {
                 <Link href="/tutorial" className="text-primary hover:underline font-bold">How-to Guides</Link> or{" "}
                 <Link href="/faq" className="text-primary hover:underline font-bold">F.A.Q</Link>
               </p>
-              <a 
-                href="mailto:support@boostvision.com.cn" 
+              <a
+                href="mailto:support@boostvision.com.cn"
                 className="inline-block text-[24px] font-black text-primary border-b-2 border-primary/20 hover:border-primary transition-all pb-1"
               >
                 support@boostvision.com.cn
@@ -119,7 +117,6 @@ export default async function AppsPage({ searchParams }: Props) {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }
@@ -129,11 +126,11 @@ function AppCatalogCard({ app }: { app: App }) {
     <div className="group flex flex-col items-center rounded-[40px] bg-white p-12 text-center card-shadow transition-all duration-300 hover:translate-y-[-12px]">
       <Link href={`/app/${app.slug}`} className="mb-8 block">
         <div className="h-[120px] w-[120px] relative overflow-hidden rounded-[30px] shadow-2xl transition-transform duration-500 group-hover:scale-105">
-          <Image 
-            src={app.icon?.url || "/icons/app-placeholder.webp"} 
-            alt={app.name} 
-            fill 
-            className="object-cover" 
+          <Image
+            src={app.icon?.url || "/icons/app-placeholder.webp"}
+            alt={app.name}
+            fill
+            className="object-cover"
           />
         </div>
       </Link>
@@ -143,7 +140,7 @@ function AppCatalogCard({ app }: { app: App }) {
       <p className="mb-10 text-[16px] text-muted leading-[1.7] line-clamp-4">
         {app.shortDescription}
       </p>
-      
+
       <div className="mt-auto flex flex-col items-center gap-4 w-full">
         <div className="flex gap-3">
           {app.appStoreUrl && (

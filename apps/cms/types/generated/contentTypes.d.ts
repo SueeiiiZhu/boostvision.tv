@@ -700,6 +700,9 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     defaultSeo: Schema.Attribute.Component<'shared.seo', false>;
     favicon: Schema.Attribute.Media<'images'>;
+    footerLogo: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     footerText: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -714,6 +717,9 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
     socialLinks: Schema.Attribute.Component<'shared.social-link', true>;
     statistics: Schema.Attribute.Component<'shared.statistics', false>;
     supportEmail: Schema.Attribute.Email;
+    trademarkDisclaimer: Schema.Attribute.Text;
+    tryForFreeLink: Schema.Attribute.String;
+    tryForFreeText: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -731,17 +737,18 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    bottomMenu: Schema.Attribute.Component<'shared.link', true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    footerMenus: Schema.Attribute.JSON;
+    footerColumns: Schema.Attribute.Component<'shared.nav-section', true>;
+    headerMenu: Schema.Attribute.Component<'shared.header-item', true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::navigation.navigation'
     > &
       Schema.Attribute.Private;
-    mainMenu: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

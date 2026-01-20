@@ -133,6 +133,45 @@ export interface SharedFeature extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedHeaderItem extends Struct.ComponentSchema {
+  collectionName: 'components_shared_header_items';
+  info: {
+    description: 'Can be a single link or a dropdown with multiple links';
+    displayName: 'Header Item';
+    icon: 'menu';
+  };
+  attributes: {
+    href: Schema.Attribute.String;
+    links: Schema.Attribute.Component<'shared.link', true>;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedLink extends Struct.ComponentSchema {
+  collectionName: 'components_shared_links';
+  info: {
+    displayName: 'Link';
+    icon: 'link';
+  };
+  attributes: {
+    href: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedNavSection extends Struct.ComponentSchema {
+  collectionName: 'components_shared_nav_sections';
+  info: {
+    description: 'A group of links with a title';
+    displayName: 'Navigation Section';
+    icon: 'listUl';
+  };
+  attributes: {
+    links: Schema.Attribute.Component<'shared.link', true>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedReview extends Struct.ComponentSchema {
   collectionName: 'components_shared_reviews';
   info: {
@@ -223,6 +262,9 @@ declare module '@strapi/strapi' {
       'sections.statistics': SectionsStatistics;
       'sections.why-choose': SectionsWhyChoose;
       'shared.feature': SharedFeature;
+      'shared.header-item': SharedHeaderItem;
+      'shared.link': SharedLink;
+      'shared.nav-section': SharedNavSection;
       'shared.review': SharedReview;
       'shared.seo': SharedSeo;
       'shared.social-link': SharedSocialLink;

@@ -1,4 +1,3 @@
-import { Header, Footer } from "@/components/layout";
 import { globalSearch } from "@/lib/strapi/api/search";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,7 +23,6 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <>
-      <Header />
       <main className="bg-white min-h-screen">
         {/* Banner */}
         <section className="bg-section-bg py-20">
@@ -123,7 +121,6 @@ export default async function SearchPage({ searchParams }: Props) {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

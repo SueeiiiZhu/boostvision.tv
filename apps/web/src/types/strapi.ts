@@ -11,6 +11,7 @@ export interface StrapiResponse<T> {
       pageSize: number;
       pageCount: number;
       total: number;
+      totalCount: number;
     };
   };
 }
@@ -55,7 +56,7 @@ export interface App {
   isFeatured: boolean;
   order: number;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   publishedAt: string;
 }
 
@@ -106,11 +107,16 @@ export interface GlobalSetting {
   siteName: string;
   siteDescription: string;
   logo: StrapiImage;
+  footerLogo: StrapiImage;
   favicon: StrapiImage;
   contactEmail: string;
   supportEmail: string;
   socialLinks: SocialLink[];
   statistics: Statistics;
+  footerText?: string;
+  trademarkDisclaimer?: string;
+  tryForFreeText?: string;
+  tryForFreeLink?: string;
 }
 
 export interface SocialLink {
@@ -164,6 +170,37 @@ export interface FAQ {
 }
 
 /**
+ * Navigation Components
+ */
+export interface NavLink {
+  id: number;
+  name: string;
+  href: string;
+}
+
+export interface HeaderItem {
+  id: number;
+  name: string;
+  href?: string;
+  links: NavLink[];
+}
+
+export interface NavSection {
+  id: number;
+  title: string;
+  links: NavLink[];
+}
+
+/**
+ * Navigation Single Type
+ */
+export interface Navigation {
+  headerMenu: HeaderItem[];
+  footerColumns: NavSection[];
+  bottomMenu: NavLink[];
+}
+
+/**
  * Generic Page Content Type
  */
 export interface Page {
@@ -175,19 +212,19 @@ export interface Page {
   seo?: any;
   sections?: Section[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   publishedAt: string;
 }
 
 /**
  * Page Sections (Dynamic Zones)
  */
-export type Section = 
-  | HeroSection 
-  | FeatureHighlightSection 
-  | CTASection 
-  | WhyChooseSection 
-  | StatisticsSection 
+export type Section =
+  | HeroSection
+  | FeatureHighlightSection
+  | CTASection
+  | WhyChooseSection
+  | StatisticsSection
   | ReviewsSection
   | AppsGridSection
   | BrandsGridSection;
@@ -198,7 +235,7 @@ export interface HeroSection {
   title: string;
   subtitle: string;
   backgroundImage?: StrapiImage;
-  image?: StrapiImage; // The device mockup image
+  image?: StrapiImage;
   ctaText?: string;
   ctaLink?: string;
   ctaSubtext?: string;

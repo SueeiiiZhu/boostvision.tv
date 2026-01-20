@@ -9,6 +9,7 @@
   "options": {
     "draftAndPublish": false
   },
+  "pluginOptions": {},
   "attributes": {
     "siteName": {
       "type": "string",
@@ -20,12 +21,26 @@
     "logo": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "footerLogo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     },
     "favicon": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "contactEmail": {
       "type": "email"
@@ -35,22 +50,30 @@
     },
     "socialLinks": {
       "type": "component",
-      "repeatable": true,
-      "component": "shared.social-link"
+      "component": "shared.social-link",
+      "repeatable": true
     },
     "footerText": {
       "type": "text"
     },
+    "trademarkDisclaimer": {
+      "type": "text"
+    },
+    "tryForFreeText": {
+      "type": "string"
+    },
+    "tryForFreeLink": {
+      "type": "string"
+    },
     "statistics": {
       "type": "component",
-      "repeatable": false,
-      "component": "shared.statistics"
+      "component": "shared.statistics",
+      "repeatable": false
     },
     "defaultSeo": {
       "type": "component",
-      "repeatable": false,
-      "component": "shared.seo"
+      "component": "shared.seo",
+      "repeatable": false
     }
   }
 }
-

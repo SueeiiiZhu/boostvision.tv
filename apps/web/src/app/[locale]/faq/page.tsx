@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Header, Footer } from "@/components/layout";
 import { getApps } from "@/lib/strapi/api/apps";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
@@ -28,7 +27,6 @@ export default async function FAQPage({ searchParams }: Props) {
 
   return (
     <>
-      <Header />
       <main className="bg-white">
         {/* Banner */}
         <section className="bg-section-bg py-24 text-center">
@@ -111,7 +109,6 @@ export default async function FAQPage({ searchParams }: Props) {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

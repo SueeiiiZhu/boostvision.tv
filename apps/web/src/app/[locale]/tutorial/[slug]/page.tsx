@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
 import { RichText } from "@/components/shared";
 import { getTutorials } from "@/lib/strapi/api/tutorials";
 import { getAppBySlug } from "@/lib/strapi/api/apps";
@@ -40,7 +39,6 @@ export default async function TutorialDetailPage({ params }: Props) {
 
   return (
     <>
-      <Header />
       <main className="bg-white pb-32">
         {/* Header Section */}
         <section className="bg-section-bg py-20">
@@ -115,7 +113,6 @@ export default async function TutorialDetailPage({ params }: Props) {
            </Link>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

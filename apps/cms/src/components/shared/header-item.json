@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_header_items",
+  "info": {
+    "displayName": "Header Item",
+    "icon": "menu",
+    "description": "Can be a single link or a dropdown with multiple links"
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "description": "Leave empty if this is just a dropdown trigger"
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    }
+  }
+}

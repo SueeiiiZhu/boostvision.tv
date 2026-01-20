@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_nav_sections",
+  "info": {
+    "displayName": "Navigation Section",
+    "icon": "listUl",
+    "description": "A group of links with a title"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    }
+  }
+}
