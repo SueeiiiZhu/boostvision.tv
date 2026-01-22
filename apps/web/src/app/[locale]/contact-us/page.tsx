@@ -1,6 +1,7 @@
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPageBySlug("contact-us");
@@ -14,70 +15,128 @@ export default async function ContactUsPage() {
   const page = await getPageBySlug("contact-us");
 
   return (
-    <>
-      <main className="bg-white">
-        {/* Banner */}
-        <section className="bg-section-bg py-24 text-center">
-          <div className="container-custom">
-            <h1 className="mb-6 text-[45px] font-black text-heading leading-tight">
-              {page?.title || "Contact Us"}
-            </h1>
-            <p className="mx-auto max-w-[800px] text-[20px] text-muted leading-relaxed">
-              We're here to help you. Reach out to us for any questions or feedback.
-            </p>
-          </div>
-        </section>
+    <main className="bg-white pb-24">
+      {/* Page Title */}
+      <section className="pt-24 pb-12 text-center">
+        <div className="container-custom">
+          <h1 className="text-[48px] font-medium text-heading leading-tight mb-0">
+            {page?.title || "Contact Us"}
+          </h1>
+        </div>
+      </section>
 
-        {/* Contact Methods */}
-        <section className="py-24">
-          <div className="container-custom max-w-[1000px]">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-               {/* Support Card */}
-               <div className="rounded-[40px] bg-white p-12 border border-gray-100 card-shadow text-center flex flex-col items-center">
-                  <div className="mb-8 h-20 w-20 rounded-3xl bg-[#e8f3ff] flex items-center justify-center">
-                     <svg className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                     </svg>
-                  </div>
-                  <h3 className="text-[26px] font-black text-heading mb-4">Support Inquiry</h3>
-                  <p className="text-muted mb-8 leading-relaxed">
-                    Need help with an app? Have a technical question? Our support team is available 24/7.
-                  </p>
-                  <a href="mailto:support@boostvision.com.cn" className="text-[20px] font-bold text-primary hover:underline">
-                    support@boostvision.com.cn
-                  </a>
-               </div>
-
-               {/* Business Card */}
-               <div className="rounded-[40px] bg-white p-12 border border-gray-100 card-shadow text-center flex flex-col items-center">
-                  <div className="mb-8 h-20 w-20 rounded-3xl bg-[#f5fcf0] flex items-center justify-center">
-                     <svg className="h-10 w-10 text-[#82c91e]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                     </svg>
-                  </div>
-                  <h3 className="text-[26px] font-black text-heading mb-4">Business Inquiry</h3>
-                  <p className="text-muted mb-8 leading-relaxed">
-                    Interested in partnerships or business collaboration? We'd love to hear from you.
-                  </p>
-                  <a href="mailto:business@boostvision.com.cn" className="text-[20px] font-bold text-[#82c91e] hover:underline">
-                    business@boostvision.com.cn
-                  </a>
-               </div>
+      <div className="container-custom max-w-[1140px]">
+        {/* Get Answers in Document */}
+        <section className="py-16">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-full max-w-[350px] aspect-square">
+                <Image
+                  src="/images/contact-us/faq.svg"
+                  alt="FAQ"
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
-
-            {/* Additional Info */}
-            <div className="mt-20 rounded-[40px] bg-section-bg p-12 text-center">
-               <h3 className="text-[24px] font-bold text-heading mb-6">Frequently Asked Questions</h3>
-               <p className="text-muted mb-10 text-[18px]">
-                 You might find an instant answer in our comprehensive FAQ section.
-               </p>
-               <Link href="/faq" className="btn-gradient px-12">
-                 Visit FAQ Center
-               </Link>
+            <div className="flex-1">
+              <h2 className="text-[32px] font-medium text-heading mb-6 text-center lg:text-left">
+                Get Answers in Document
+              </h2>
+              <p className="text-[16px] font-light text-muted leading-relaxed mb-10 text-center lg:text-left">
+                The fastest way to find the answer to your question is to seek through the frequently asked questions that we documented.
+              </p>
+              <div className="flex justify-center lg:justify-start">
+                <Link href="/faq" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
+                  Go to F.A.Q.
+                </Link>
+              </div>
             </div>
           </div>
         </section>
-      </main>
-    </>
+
+        <hr className="my-12 border-gray-100" />
+
+        {/* Following our Social Media */}
+        <section className="py-16">
+          <div className="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-20">
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-full max-w-[350px] aspect-square">
+                <Image
+                  src="/images/contact-us/contact-social-media.svg"
+                  alt="Social Media"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-[32px] font-medium text-heading mb-6 text-center lg:text-left">
+                Following our Social Media
+              </h2>
+              <p className="text-[16px] font-light text-muted leading-relaxed mb-10 text-center lg:text-left">
+                We are generating useful content across the internet, follow us and keep in touch through social media.
+              </p>
+              <div className="flex justify-center lg:justify-start gap-8">
+                <a href="https://www.facebook.com/boostvisionapps" target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg hover:translate-y-[-4px] transition-transform">
+                  <Image src="/images/contact-us/facebook.svg" alt="Facebook" width={24} height={24} />
+                </a>
+                <a href="https://twitter.com/BoostVisio86997" target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg hover:translate-y-[-4px] transition-transform">
+                  <Image src="/images/contact-us/twitter.svg" alt="Twitter" width={24} height={24} />
+                </a>
+                <a href="https://www.youtube.com/@boostvision1021" target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg hover:translate-y-[-4px] transition-transform">
+                  <Image src="/images/contact-us/youtube.svg" alt="YouTube" width={24} height={24} />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-12 border-gray-100" />
+
+        {/* Still Find no Solution? */}
+        <section className="py-16">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-full max-w-[350px] aspect-square">
+                <Image
+                  src="/images/contact-us/contact-email.svg"
+                  alt="Email Us"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-[32px] font-medium text-heading mb-6 text-center lg:text-left">
+                Still Find no Solution?
+              </h2>
+              <p className="text-[16px] font-light text-muted leading-relaxed mb-10 text-center lg:text-left">
+                Always feel free to contact us through our customer service E-mail, we will back you up with professional solutions.
+              </p>
+              <div className="flex justify-center lg:justify-start">
+                <a href="mailto:support@boostvision.com.cn" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
+                  E-mail us
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-12 border-gray-100" />
+
+        {/* Coordinate Section */}
+        <section className="py-24 text-center">
+          <h2 className="text-[36px] font-medium text-heading mb-12">
+            Coordinate your Smart TV and Smart Phone Now
+          </h2>
+          <div className="flex justify-center">
+            <Link href="/app" className="btn-gradient text-[24px] px-12 py-5 rounded-[50px] font-normal">
+              GET IT NOW
+            </Link>
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }

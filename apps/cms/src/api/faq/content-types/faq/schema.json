@@ -14,8 +14,13 @@
       "type": "string",
       "required": true
     },
+    "slug": {
+      "type": "uid",
+      "targetField": "question",
+      "required": true
+    },
     "answer": {
-      "type": "richtext"
+      "type": "blocks"
     },
     "app": {
       "type": "relation",
@@ -29,6 +34,19 @@
     "order": {
       "type": "integer",
       "default": 0
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero",
+        "sections.tutorial-accordion",
+        "sections.cta"
+      ]
+    },
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo"
     }
   }
 }

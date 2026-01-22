@@ -20,7 +20,7 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
   // 兼容处理：如果是字符串，则尝试作为 HTML 渲染
   if (typeof content === 'string') {
     return (
-      <div 
+      <div
         className={cn(
           "prose prose-lg max-w-none rich-text prose-a:text-primary prose-a:no-underline hover:prose-a:underline",
           variant === 'blue-circle' && "rich-text-blue-circle",
@@ -64,21 +64,24 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
               />
             </div>
           ),
-          link: ({ children, url }) => {
-            const isInternal = url.startsWith("/") || url.startsWith("https://www.boostvision.tv");
+          link: (props: any) => {
+            const { children, url, href } = props;
+            const targetUrl = url || href || "";
+            const isInternal = targetUrl.startsWith("/") || targetUrl.startsWith("https://www.boostvision.tv");
+
             if (isInternal) {
               return (
-                <Link href={url} className="text-primary hover:underline">
+                <Link href={targetUrl} className="text-primary hover:underline font-bold">
                   {children}
                 </Link>
               );
             }
             return (
               <a
-                href={url}
+                href={targetUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary hover:underline font-bold"
               >
                 {children}
               </a>
@@ -102,7 +105,7 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
             if (format === "ordered") {
               return <ol className="list-decimal pl-6 my-6 space-y-4">{children}</ol>;
             }
-            
+
             return (
               <ul className={cn(
                 "pl-6 my-6 space-y-4 text-[17px] text-muted leading-[1.8]",
@@ -122,6 +125,17 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
           ),
           code: ({ children }) => (
             <code className="bg-gray-100 rounded px-2 py-1 text-[14px] font-mono text-heading">
+              {children}
+            </code>
+          ),
+        }}
+        modifiers={{
+          bold: ({ children }) => <strong className="font-bold text-heading">{children}</strong>,
+          italic: ({ children }) => <em className="italic">{children}</em>,
+          underline: ({ children }) => <u className="underline">{children}</u>,
+          strikethrough: ({ children }) => <del className="line-through">{children}</del>,
+          code: ({ children }) => (
+            <code className="bg-gray-100 rounded px-1.5 py-0.5 text-[14px] font-mono text-heading">
               {children}
             </code>
           ),

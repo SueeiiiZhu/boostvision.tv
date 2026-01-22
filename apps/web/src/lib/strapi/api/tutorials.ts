@@ -3,12 +3,21 @@ import { Tutorial } from "../../../types/strapi";
 
 export async function getTutorials(params: {
   appSlug?: string;
+  appType?: 'screen-mirroring' | 'tv-remote';
   limit?: number;
 } = {}) {
   const query = buildStrapiQuery({
-    populate: ["app", "steps", "steps.image"],
+    populate: {
+      app: {
+        populate: ['icon']
+      },
+      steps: {
+        populate: ['image']
+      }
+    },
     filters: {
       ...(params.appSlug && { app: { slug: { $eq: params.appSlug } } }),
+      ...(params.appType && { app: { type: { $eq: params.appType } } }),
     },
     pagination: {
       pageSize: params.limit || 100,
@@ -21,7 +30,35 @@ export async function getTutorials(params: {
 
 export async function getTutorialBySlug(slug: string) {
   const query = buildStrapiQuery({
-    populate: ["app", "steps", "steps.image", "seo"],
+    populate: {
+      app: {
+        populate: {
+          icon: true,
+          downloadLinks: {
+            populate: ['badge']
+          }
+        }
+      },
+      sections: {
+        on: {
+          'sections.hero': {
+            populate: ['backgroundImage', 'image']
+          },
+          'sections.tutorial-accordion': {
+            populate: {
+              items: true // blocks fields like iosContent/androidContent are automatic
+            }
+          },
+          'sections.cta': {
+            populate: ['links']
+          }
+        }
+      },
+      steps: {
+        populate: ['image']
+      },
+      seo: true
+    },
     filters: {
       slug: { $eq: slug },
     },

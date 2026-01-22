@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_shared_tutorial_items",
+  "info": {
+    "displayName": "Tutorial Item",
+    "icon": "list",
+    "description": "One accordion item in a tutorial"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "content": {
+      "type": "blocks"
+    },
+    "showDownloadButtons": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

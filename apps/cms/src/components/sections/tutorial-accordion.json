@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_tutorial_accordions",
+  "info": {
+    "displayName": "Tutorial Accordion",
+    "icon": "list",
+    "description": "Accordion list of tutorial steps"
+  },
+  "attributes": {
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.tutorial-item"
+    }
+  }
+}

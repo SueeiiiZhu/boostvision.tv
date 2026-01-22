@@ -126,6 +126,18 @@ export interface SectionsStatistics extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsTutorialAccordion extends Struct.ComponentSchema {
+  collectionName: 'components_sections_tutorial_accordions';
+  info: {
+    description: 'Accordion list of tutorial steps';
+    displayName: 'Tutorial Accordion';
+    icon: 'list';
+  };
+  attributes: {
+    items: Schema.Attribute.Component<'shared.tutorial-item', true>;
+  };
+}
+
 export interface SectionsWhyChoose extends Struct.ComponentSchema {
   collectionName: 'components_sections_why_chooses';
   info: {
@@ -288,6 +300,21 @@ export interface SharedStatistics extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedTutorialItem extends Struct.ComponentSchema {
+  collectionName: 'components_shared_tutorial_items';
+  info: {
+    description: 'One accordion item in a tutorial';
+    displayName: 'Tutorial Item';
+    icon: 'list';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    showDownloadButtons: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedTutorialStep extends Struct.ComponentSchema {
   collectionName: 'components_shared_tutorial_steps';
   info: {
@@ -313,6 +340,7 @@ declare module '@strapi/strapi' {
       'sections.hero': SectionsHero;
       'sections.reviews': SectionsReviews;
       'sections.statistics': SectionsStatistics;
+      'sections.tutorial-accordion': SectionsTutorialAccordion;
       'sections.why-choose': SectionsWhyChoose;
       'shared.app-badge': SharedAppBadge;
       'shared.download-link': SharedDownloadLink;
@@ -324,6 +352,7 @@ declare module '@strapi/strapi' {
       'shared.seo': SharedSeo;
       'shared.social-link': SharedSocialLink;
       'shared.statistics': SharedStatistics;
+      'shared.tutorial-item': SharedTutorialItem;
       'shared.tutorial-step': SharedTutorialStep;
     }
   }

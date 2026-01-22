@@ -151,11 +151,13 @@ export interface Tutorial {
   documentId: string;
   title: string;
   slug: string;
-  content: BlocksContent;
+  content: BlocksContent | string;
   videoUrl?: string;
   videoEmbed?: string;
   app?: App;
   steps: TutorialStep[];
+  sections?: Section[];
+  seo?: any;
   order: number;
 }
 
@@ -163,8 +165,21 @@ export interface TutorialStep {
   id: number;
   stepNumber: number;
   title: string;
-  description: BlocksContent;
+  description: BlocksContent | string;
   image?: StrapiImage;
+}
+
+export interface TutorialItem {
+  id: number;
+  title: string;
+  content: BlocksContent;
+  showDownloadButtons: boolean;
+}
+
+export interface TutorialAccordionSection {
+  id: number;
+  __component: 'sections.tutorial-accordion';
+  items: TutorialItem[];
 }
 
 /**
@@ -174,9 +189,12 @@ export interface FAQ {
   id: number;
   documentId: string;
   question: string;
-  answer: BlocksContent;
+  slug: string;
+  answer: BlocksContent | string;
   app?: App;
   category: string;
+  sections?: Section[];
+  seo?: any;
   order: number;
 }
 
@@ -239,7 +257,8 @@ export type Section =
   | ReviewsSection
   | AppsGridSection
   | BrandsGridSection
-  | AppsFilterSection;
+  | AppsFilterSection
+  | TutorialAccordionSection;
 
 export interface HeroSection {
   id: number;

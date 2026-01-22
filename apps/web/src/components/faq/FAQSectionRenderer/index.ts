@@ -1,0 +1,1 @@
+export { FAQSectionRenderer } from './FAQSectionRenderer';
