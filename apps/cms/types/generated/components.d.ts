@@ -1,5 +1,22 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface SectionsAppsFilter extends Struct.ComponentSchema {
+  collectionName: 'components_sections_apps_filters';
+  info: {
+    description: 'Tabs for filtering apps';
+    displayName: 'Apps Filter';
+    icon: 'filter';
+  };
+  attributes: {
+    screenMirroringIcon: Schema.Attribute.Media<'images'>;
+    screenMirroringLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Screen Mirroring Apps'>;
+    tvRemoteIcon: Schema.Attribute.Media<'images'>;
+    tvRemoteLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'TV Remote Apps'>;
+  };
+}
+
 export interface SectionsAppsGrid extends Struct.ComponentSchema {
   collectionName: 'components_sections_apps_grids';
   info: {
@@ -41,6 +58,7 @@ export interface SectionsCta extends Struct.ComponentSchema {
     buttonLink: Schema.Attribute.String;
     buttonText: Schema.Attribute.String;
     description: Schema.Attribute.Text;
+    links: Schema.Attribute.Component<'shared.link', true>;
     showAppStoreLinks: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<true>;
     title: Schema.Attribute.String;
@@ -60,6 +78,7 @@ export interface SectionsFeatureHighlight extends Struct.ComponentSchema {
       Schema.Attribute.DefaultTo<'left'>;
     labelColor: Schema.Attribute.Enumeration<['green', 'blue']> &
       Schema.Attribute.DefaultTo<'green'>;
+    richText: Schema.Attribute.Blocks;
     title: Schema.Attribute.String;
   };
 }
@@ -116,6 +135,39 @@ export interface SectionsWhyChoose extends Struct.ComponentSchema {
   attributes: {
     features: Schema.Attribute.Component<'shared.feature', true>;
     title: Schema.Attribute.String;
+  };
+}
+
+export interface SharedAppBadge extends Struct.ComponentSchema {
+  collectionName: 'components_shared_app_badges';
+  info: {
+    description: 'Download link with badge image';
+    displayName: 'App Badge';
+    icon: 'picture';
+  };
+  attributes: {
+    image: Schema.Attribute.Media<'images'>;
+    url: Schema.Attribute.String;
+  };
+}
+
+export interface SharedDownloadLink extends Struct.ComponentSchema {
+  collectionName: 'components_shared_download_links';
+  info: {
+    description: 'Unified configuration for platform, URL and badge image';
+    displayName: 'Download Link';
+    icon: 'link';
+  };
+  attributes: {
+    badge: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    generateQRCode: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    isClickable: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    platform: Schema.Attribute.Enumeration<
+      ['Google Play', 'App Store', 'Amazon']
+    > &
+      Schema.Attribute.Required;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -253,6 +305,7 @@ export interface SharedTutorialStep extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'sections.apps-filter': SectionsAppsFilter;
       'sections.apps-grid': SectionsAppsGrid;
       'sections.brands-grid': SectionsBrandsGrid;
       'sections.cta': SectionsCta;
@@ -261,6 +314,8 @@ declare module '@strapi/strapi' {
       'sections.reviews': SectionsReviews;
       'sections.statistics': SectionsStatistics;
       'sections.why-choose': SectionsWhyChoose;
+      'shared.app-badge': SharedAppBadge;
+      'shared.download-link': SharedDownloadLink;
       'shared.feature': SharedFeature;
       'shared.header-item': SharedHeaderItem;
       'shared.link': SharedLink;

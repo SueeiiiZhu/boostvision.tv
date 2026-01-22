@@ -7,7 +7,13 @@ export async function getApps(params: {
   limit?: number;
 } = {}) {
   const query = buildStrapiQuery({
-    populate: ["icon", "features"],
+    populate: {
+      icon: true,
+      features: true,
+      downloadLinks: {
+        populate: ['badge']
+      }
+    },
     filters: {
       ...(params.type && { type: { $eq: params.type } }),
       ...(params.isFeatured !== undefined && { isFeatured: { $eq: params.isFeatured } }),
@@ -23,7 +29,56 @@ export async function getApps(params: {
 
 export async function getAppBySlug(slug: string) {
   const query = buildStrapiQuery({
-    populate: ["icon", "screenshots", "heroImage", "features", "seo"],
+    populate: {
+      icon: true,
+      screenshots: true,
+      heroImage: true,
+      downloadLinks: {
+        populate: ['badge']
+      },
+      features: {
+        populate: ['icon']
+      },
+      sections: {
+        on: {
+          'sections.hero': {
+            populate: ['backgroundImage', 'image', 'statistics']
+          },
+          'sections.why-choose': {
+            populate: {
+              features: {
+                populate: ['icon']
+              }
+            }
+          },
+          'sections.feature-highlight': {
+            populate: ['image']
+          },
+          'sections.statistics': {
+            populate: {
+              stats: true
+            }
+          },
+          'sections.reviews': {
+            populate: {
+              reviews: true
+            }
+          },
+          'sections.cta': {
+            populate: ['links']
+          },
+          'sections.apps-grid': true,
+          'sections.brands-grid': {
+            populate: {
+              brands: {
+                populate: ['icon']
+              }
+            }
+          }
+        }
+      },
+      seo: true
+    },
     filters: {
       slug: { $eq: slug },
     },

@@ -21,6 +21,7 @@
   --background-image-section-bg-3: linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)), linear-gradient(180deg, #072a58 0%, #000911 100%);
   --background-image-section-bg-cta: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)),
     linear-gradient(90deg, #1e6cf4 0%, #b8f732 100%);
+  --background-image-app-hero: linear-gradient(360deg, #072a58 0, #000911 100%);
 
   /* Typography */
   --font-sans: "Roboto", sans-serif;
@@ -175,7 +176,7 @@ body {
 h1 {
   font-family: var(--font-heading);
   font-weight: 900;
-  font-size: 55px;
+  /* font-size: 55px; */
   line-height: 1.2;
   margin-bottom: 20px;
 }
@@ -183,21 +184,50 @@ h1 {
 h2 {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 40px;
+  /* font-size: 40px; */
 }
 
 h3 {
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 24px;
+  /* font-size: 24px; */
 }
 
 p {
-  font-size: 18px;
+  /* font-size: 18px; */
   line-height: 1.6;
 }
 
 /* Original Site Gradients & Backgrounds */
+/* Rich Text & Typography Overrides */
+.rich-text a {
+  color: var(--color-primary) !important;
+  /* 强制使用 Primary Blue */
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  font-weight: 700;
+}
+
+.rich-text a:hover {
+  text-decoration-color: var(--color-primary);
+}
+
+.rich-text-blue-circle ul {
+  list-style-type: disc;
+}
+
+.rich-text-blue-circle ul li::marker {
+  color: var(--color-primary);
+}
+
+.rich-text-gray-square ul {
+  list-style-type: square;
+}
+
+.rich-text-gray-square ul li::marker {
+  color: rgba(108, 117, 125, 0.6);
+}
+
 .footer-gradient {
   background: linear-gradient(var(--color-footer-start) 0%, var(--color-footer-end) 100%);
 }

@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_sections_apps_filters",
+  "info": {
+    "displayName": "Apps Filter",
+    "icon": "filter",
+    "description": "Tabs for filtering apps"
+  },
+  "attributes": {
+    "screenMirroringLabel": {
+      "type": "string",
+      "default": "Screen Mirroring Apps"
+    },
+    "screenMirroringIcon": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "tvRemoteLabel": {
+      "type": "string",
+      "default": "TV Remote Apps"
+    },
+    "tvRemoteIcon": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

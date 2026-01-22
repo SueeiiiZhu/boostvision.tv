@@ -20,6 +20,11 @@
     "showAppStoreLinks": {
       "type": "boolean",
       "default": true
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
     }
   }
 }

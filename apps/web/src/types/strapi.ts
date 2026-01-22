@@ -40,16 +40,16 @@ export interface App {
   id: number;
   documentId: string;
   name: string;
+  displayTitle?: string;
+  sections?: Section[];
+  downloadLinks?: DownloadLink[];
   slug: string;
   type: 'screen-mirroring' | 'tv-remote';
   shortDescription: string;
-  description: BlocksContent;
+  description: BlocksContent | string; // 兼容旧数据（string）和新数据（BlocksContent）
   icon: StrapiImage;
   screenshots: StrapiImage[];
   heroImage: StrapiImage;
-  appStoreUrl: string;
-  googlePlayUrl: string;
-  amazonUrl: string;
   downloadCount: string;
   rating: number;
   features: Feature[];
@@ -58,6 +58,15 @@ export interface App {
   createdAt: string;
   updatedAt?: string;
   publishedAt: string;
+}
+
+export interface DownloadLink {
+  id: number;
+  platform: 'Google Play' | 'App Store' | 'Amazon';
+  url: string;
+  badge: StrapiImage;
+  isClickable: boolean;
+  generateQRCode: boolean;
 }
 
 export interface Feature {
@@ -106,6 +115,8 @@ export interface Author {
 export interface GlobalSetting {
   siteName: string;
   siteDescription: string;
+  googlePlayBadge?: StrapiImage;
+  appStoreBadge?: StrapiImage;
   logo: StrapiImage;
   footerLogo: StrapiImage;
   favicon: StrapiImage;
@@ -227,7 +238,8 @@ export type Section =
   | StatisticsSection
   | ReviewsSection
   | AppsGridSection
-  | BrandsGridSection;
+  | BrandsGridSection
+  | AppsFilterSection;
 
 export interface HeroSection {
   id: number;
@@ -247,6 +259,7 @@ export interface FeatureHighlightSection {
   __component: 'sections.feature-highlight';
   title: string;
   description: string;
+  richText?: BlocksContent;
   image: StrapiImage;
   imagePosition: 'left' | 'right';
   labelColor: 'green' | 'blue';
@@ -259,6 +272,7 @@ export interface CTASection {
   description: string;
   buttonText: string;
   buttonLink: string;
+  links?: NavLink[];
 }
 
 export interface WhyChooseSection {
@@ -298,6 +312,15 @@ export interface BrandsGridSection {
   title: string;
   description: string;
   brands: Feature[];
+}
+
+export interface AppsFilterSection {
+  id: number;
+  __component: 'sections.apps-filter';
+  screenMirroringLabel: string;
+  screenMirroringIcon?: StrapiImage;
+  tvRemoteLabel: string;
+  tvRemoteIcon?: StrapiImage;
 }
 
 export interface Review {

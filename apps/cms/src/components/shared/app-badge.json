@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_shared_app_badges",
+  "info": {
+    "displayName": "App Badge",
+    "icon": "picture",
+    "description": "Download link with badge image"
+  },
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "url": {
+      "type": "string"
+    }
+  }
+}

@@ -30,7 +30,9 @@ export async function getPageBySlug(slug: string) {
               reviews: true
             }
           },
-          'sections.cta': true,
+          'sections.cta': {
+            populate: ['links']
+          },
           'sections.apps-grid': true,
           'sections.brands-grid': {
             populate: {
@@ -38,6 +40,9 @@ export async function getPageBySlug(slug: string) {
                 populate: ['icon']
               }
             }
+          },
+          'sections.apps-filter': {
+            populate: ['screenMirroringIcon', 'tvRemoteIcon']
           }
         }
       }

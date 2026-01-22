@@ -35,7 +35,6 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
   }, [pathname]);
 
   const headerMenu = navigation?.headerMenu || [];
-  console.log(headerMenu, globalSetting)
   return (
     <header
       className={cn(

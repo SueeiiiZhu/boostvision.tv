@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_shared_download_links",
+  "info": {
+    "displayName": "Download Link",
+    "icon": "link",
+    "description": "Unified configuration for platform, URL and badge image"
+  },
+  "attributes": {
+    "platform": {
+      "type": "enumeration",
+      "enum": ["Google Play", "App Store", "Amazon"],
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "badge": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"],
+      "required": true
+    },
+    "isClickable": {
+      "type": "boolean",
+      "default": true
+    },
+    "generateQRCode": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

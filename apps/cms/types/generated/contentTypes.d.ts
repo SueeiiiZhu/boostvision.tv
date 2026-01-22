@@ -442,16 +442,15 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    amazonUrl: Schema.Attribute.String;
-    appStoreUrl: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
+    description: Schema.Attribute.Blocks;
+    displayTitle: Schema.Attribute.String;
     downloadCount: Schema.Attribute.String;
+    downloadLinks: Schema.Attribute.Component<'shared.download-link', true>;
     faqs: Schema.Attribute.Relation<'oneToMany', 'api::faq.faq'>;
     features: Schema.Attribute.Component<'shared.feature', true>;
-    googlePlayUrl: Schema.Attribute.String;
     heroImage: Schema.Attribute.Media<'images'>;
     icon: Schema.Attribute.Media<'images'>;
     isFeatured: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -474,6 +473,18 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
         number
       >;
     screenshots: Schema.Attribute.Media<'images', true>;
+    sections: Schema.Attribute.DynamicZone<
+      [
+        'sections.hero',
+        'sections.why-choose',
+        'sections.feature-highlight',
+        'sections.statistics',
+        'sections.reviews',
+        'sections.cta',
+        'sections.apps-grid',
+        'sections.brands-grid',
+      ]
+    >;
     seo: Schema.Attribute.Component<'shared.seo', false>;
     shortDescription: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
@@ -694,6 +705,7 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    appStoreBadge: Schema.Attribute.Media<'images'>;
     contactEmail: Schema.Attribute.Email;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -704,6 +716,7 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
       'images' | 'files' | 'videos' | 'audios'
     >;
     footerText: Schema.Attribute.Text;
+    googlePlayBadge: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -785,6 +798,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.cta',
         'sections.apps-grid',
         'sections.brands-grid',
+        'sections.apps-filter',
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;

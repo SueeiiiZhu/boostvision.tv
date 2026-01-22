@@ -16,6 +16,27 @@
       "required": true,
       "maxLength": 100
     },
+    "displayTitle": {
+      "type": "string"
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero",
+        "sections.why-choose",
+        "sections.feature-highlight",
+        "sections.statistics",
+        "sections.reviews",
+        "sections.cta",
+        "sections.apps-grid",
+        "sections.brands-grid"
+      ]
+    },
+    "downloadLinks": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.download-link"
+    },
     "slug": {
       "type": "uid",
       "targetField": "name",
@@ -31,7 +52,7 @@
       "maxLength": 255
     },
     "description": {
-      "type": "text"
+      "type": "blocks"
     },
     "icon": {
       "type": "media",
@@ -47,15 +68,6 @@
       "type": "media",
       "multiple": false,
       "allowedTypes": ["images"]
-    },
-    "appStoreUrl": {
-      "type": "string"
-    },
-    "googlePlayUrl": {
-      "type": "string"
-    },
-    "amazonUrl": {
-      "type": "string"
     },
     "downloadCount": {
       "type": "string"

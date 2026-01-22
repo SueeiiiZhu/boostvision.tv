@@ -1,9 +1,11 @@
+import { RichText, QRCode } from "@/components/shared";
+import { AppSectionRenderer } from "@/components/app/AppSectionRenderer";
+import { getAppBySlug } from "@/lib/strapi/api/apps";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { RichText } from "@/components/shared";
-import { getAppBySlug } from "@/lib/strapi/api/apps";
-import { Metadata } from "next";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -23,7 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function AppDetailPage({ params }: Props) {
   const { slug } = await params;
-  const app = await getAppBySlug(slug);
+  const [app, globalSetting] = await Promise.all([
+    getAppBySlug(slug),
+    getGlobalSetting()
+  ]);
 
   if (!app) {
     notFound();
@@ -55,138 +60,229 @@ export default async function AppDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className="bg-white">
-        {/* Breadcrumbs */}
-        <div className="bg-section-bg py-6">
-          <div className="container-custom">
-            <div className="flex items-center gap-2 text-[14px] font-medium text-muted">
-              <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-              <span>/</span>
-              <Link href="/app" className="hover:text-primary transition-colors">Apps</Link>
-              <span>/</span>
-              <span className="text-heading font-bold">{app.name}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Hero Section */}
-        <section className="py-24">
-          <div className="container-custom">
-            <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-start lg:gap-20">
-              {/* Left: App Icon & Primary Info */}
-              <div className="flex flex-col items-center lg:items-start text-center lg:text-left lg:w-2/3">
-                <div className="flex flex-col items-center gap-10 md:flex-row md:items-start">
-                  <div className="h-[160px] w-[160px] shrink-0 relative overflow-hidden rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] animate-fade-in">
-                    <Image
-                      src={app.icon?.url || "/icons/app-placeholder.webp"}
-                      alt={app.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-center animate-slide-up">
-                    <h1 className="text-[40px] font-black text-heading leading-tight mb-4">
-                      {app.name}
+        {/* 如果有动态配置的 sections，优先使用 */}
+        {app.sections && app.sections.length > 0 ? (
+          <AppSectionRenderer sections={app.sections} app={app} />
+        ) : (
+          <>
+            {/* Hero Section - Two Column Layout */}
+            <section className="pt-24 pb-20 bg-white">
+              <div className="container-custom">
+                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+                  {/* Left Column: Text Content */}
+                  <div className="flex-1 text-left">
+                    <h1 className="text-[25px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
+                      {app.displayTitle || app.name}
                     </h1>
-                    <p className="text-[18px] text-muted leading-relaxed mb-8 max-w-[600px]">
+                    <p className="text-[16px] text-muted/80 leading-relaxed mb-10 max-w-[500px]">
                       {app.shortDescription}
                     </p>
 
-                    <div className="flex flex-wrap justify-center gap-4 md:justify-start">
-                      {app.appStoreUrl && (
-                        <a href={app.appStoreUrl} target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
-                          <Image src="/images/app-store-badge.png" alt="App Store" width={180} height={54} />
-                        </a>
-                      )}
-                      {app.googlePlayUrl && (
-                        <a href={app.googlePlayUrl} target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
-                          <Image src="/images/google-play-badge.png" alt="Google Play" width={180} height={54} />
-                        </a>
-                      )}
-                    </div>
-
-                    <div className="mt-8 flex items-center justify-center gap-8 md:justify-start">
-                      <div className="flex flex-col items-center md:items-start">
-                        <span className="text-[20px] font-black text-heading">4.8 <span className="text-primary">★</span></span>
-                        <span className="text-[12px] font-bold text-muted uppercase tracking-widest">Rating</span>
-                      </div>
-                      <div className="h-10 w-[1px] bg-gray-100 hidden md:block"></div>
-                      <div className="flex flex-col items-center md:items-start">
-                        <span className="text-[20px] font-black text-heading">{app.downloadCount || "10M+"}</span>
-                        <span className="text-[12px] font-bold text-muted uppercase tracking-widest">Downloads</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Main Content Tabs Placeholder (Original site uses tabs here) */}
-                <div className="mt-20 w-full">
-                  <div className="mb-10 flex border-b border-gray-100 overflow-x-auto scrollbar-hide">
-                    <button className="border-b-4 border-primary px-8 py-4 text-[18px] font-black text-heading">About</button>
-                    <button className="px-8 py-4 text-[18px] font-bold text-muted hover:text-heading transition-colors">Features</button>
-                    <button className="px-8 py-4 text-[18px] font-bold text-muted hover:text-heading transition-colors">Tutorial</button>
-                    <button className="px-8 py-4 text-[18px] font-bold text-muted hover:text-heading transition-colors">FAQ</button>
-                  </div>
-
-                  <div className="prose prose-lg max-w-none mb-16">
-                    <RichText content={app.description} />
-                  </div>
-
-                  {/* Features Highlights Grid */}
-                  {app.features && app.features.length > 0 && (
-                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                      {app.features.map((feature) => (
-                        <div key={feature.id} className="flex gap-6 p-8 rounded-[30px] bg-section-bg border border-gray-50 group hover:bg-white hover:card-shadow transition-all duration-300">
-                          {feature.icon?.url && (
-                            <div className="h-12 w-12 shrink-0 transform group-hover:scale-110 transition-transform">
-                              <Image src={feature.icon.url} alt={feature.title} width={48} height={48} />
-                            </div>
-                          )}
-                          <div>
-                            <h4 className="text-[20px] font-bold text-heading mb-3">{feature.title}</h4>
-                            <p className="text-[15px] text-muted leading-relaxed">{feature.description}</p>
-                          </div>
+                    {/* Stats Section */}
+                    <div className="flex flex-col gap-4 mb-12">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-6 h-6 text-primary">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
                         </div>
-                      ))}
+                        <span className="text-[18px] font-black text-heading uppercase tracking-wide">
+                          {app.downloadCount || "3+ Million"} Downloads
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-6 h-6 text-accent">
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                          </svg>
+                        </div>
+                        <span className="text-[18px] font-black text-heading uppercase tracking-wide">
+                          Decent App Store Rate: <span className="text-primary">{app.rating || "4.8"}★</span>
+                        </span>
+                      </div>
                     </div>
-                  )}
+
+                    {/* Download Buttons */}
+                    <div className="flex flex-wrap gap-6">
+                      {app.downloadLinks && app.downloadLinks.length > 0 ? (
+                        app.downloadLinks.map((link) => {
+                          const ButtonContent = (
+                            <div className="relative group/qr">
+                              <Image
+                                src={link.badge.url}
+                                alt={link.platform}
+                                width={180} height={54}
+                                className="h-[54px] w-auto"
+                              />
+                              {link.generateQRCode && (
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-50">
+                                  <QRCode data={link.url} size={120} />
+                                </div>
+                              )}
+                            </div>
+                          );
+
+                          if (!link.isClickable) {
+                            return (
+                              <div key={link.id} className="cursor-not-allowed">
+                                {ButtonContent}
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                              {ButtonContent}
+                            </a>
+                          );
+                        })
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Hero Image */}
+                  <div className="flex-1 relative animate-fade-in">
+                    {app.heroImage ? (
+                      <Image
+                        src={app.heroImage.url}
+                        alt={app.name}
+                        width={600}
+                        height={450}
+                        className="w-full h-auto object-contain"
+                        priority
+                      />
+                    ) : (
+                      <div className="aspect-[4/3] bg-section-bg rounded-[40px] flex items-center justify-center">
+                        <Image src="/logo.svg" alt="Placeholder" width={200} height={50} className="opacity-20" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Right: Screenshots Sidebar */}
-            <div className="w-full lg:w-1/3">
-              <div className="sticky top-28 rounded-[40px] bg-section-bg p-10 border border-gray-50">
-                <h3 className="text-[24px] font-black text-heading mb-8 flex items-center gap-3">
-                  <span className="h-8 w-1 bg-primary rounded-full"></span>
-                  Screenshots
-                </h3>
-                <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide lg:flex-col lg:overflow-visible lg:pb-0">
-                  {app.screenshots?.length > 0 ? app.screenshots.map((shot, i) => (
-                    <div key={i} className="min-w-[260px] relative aspect-[9/16] overflow-hidden rounded-[30px] shadow-xl lg:min-w-0 transition-transform hover:scale-[1.02]">
-                      <Image src={shot.url} alt={`screenshot ${i}`} fill className="object-cover" />
+            {/* Features Grid Section (Using Why Choose Style) */}
+            {app.features && app.features.length > 0 && (
+              <section className="py-32 bg-[#f8faff] text-center">
+                <div className="container-custom">
+                  <h2 className="text-[40px] font-black text-heading mb-24 tracking-tight">
+                    Wireless Cast with the {app.name}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+                    {app.features.slice(0, 4).map((feature) => (
+                      <div key={feature.id} className="group flex flex-col items-center rounded-[40px] bg-white p-12 card-shadow hover:translate-y-[-12px] transition-all duration-500">
+                        <div className="mb-10 h-24 w-24 flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
+                          {feature.icon?.url && (
+                            <Image
+                              src={feature.icon.url}
+                              alt={feature.title}
+                              width={96}
+                              height={96}
+                              className="h-full w-full object-contain"
+                            />
+                          )}
+                        </div>
+                        <h3 className="mb-6 text-[22px] font-black text-heading leading-tight min-h-[60px] flex items-center justify-center">
+                          {feature.title}
+                        </h3>
+                        <p className="text-[16px] text-muted leading-[1.6] max-w-[280px]">
+                          {feature.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* App Description Section */}
+            {app.description && (
+              <section className="py-32 bg-white">
+                <div className="container-custom max-w-[950px] mx-auto text-left prose prose-lg prose-headings:font-black prose-headings:text-heading prose-p:text-muted/90 prose-p:text-[17px] prose-p:leading-[1.8]">
+                  <RichText content={app.description} />
+                </div>
+              </section>
+            )}
+
+            {/* Device Brands Section */}
+            <section className="py-32 bg-white text-center">
+              <div className="container-custom">
+                <h2 className="text-[40px] font-black text-heading mb-6 tracking-tight">
+                  {app.name} Support all Smart TVs & Sticks
+                </h2>
+                <p className="text-[18px] text-muted mb-20 max-w-[850px] mx-auto leading-relaxed">
+                  Stream your favorite media to the big screen with ease. It offers wide compatibility with popular TV brands and devices.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-12 items-center justify-items-center opacity-60">
+                  {['Samsung TV', 'Chromecast', 'LG TV', 'Roku TV', 'Fire TV'].map((brand, i) => (
+                    <div key={i} className="flex flex-col items-center gap-4 group hover:opacity-100 transition-opacity">
+                      <div className="h-12 w-auto relative">
+                        <span className="text-[24px] font-black text-heading/40 group-hover:text-primary transition-colors">{brand}</span>
+                      </div>
                     </div>
-                  )) : (
-                    <div className="aspect-[9/16] rounded-[30px] bg-gray-100 flex items-center justify-center text-muted font-bold">No Screenshots</div>
-                  )}
+                  ))}
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </section>
 
-        {/* Global CTA */}
-        <section className="py-32 text-center bg-section-bg">
-          <div className="container-custom">
-            <h2 className="text-[35px] font-black text-heading mb-6">Experience {app.name} Today!</h2>
-            <p className="text-[18px] text-muted mb-12 max-w-[600px] mx-auto leading-relaxed">
-              Join millions of satisfied users and upgrade your home entertainment experience now.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6">
-              {app.appStoreUrl && <a href={app.appStoreUrl} className="btn-gradient px-12">Get on App Store</a>}
-              {app.googlePlayUrl && <a href={app.googlePlayUrl} className="btn-gradient px-12 bg-heading">Get on Google Play</a>}
-            </div>
-          </div>
-        </section>
+            {/* Screenshots Section */}
+            {app.screenshots && app.screenshots.length > 0 && (
+              <section className="py-32 bg-[#f8faff] overflow-hidden">
+                <div className="container-custom">
+                  <h2 className="text-[40px] font-black text-heading text-center mb-20 tracking-tight">App Screenshots</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                    {app.screenshots.map((shot, i) => (
+                      <div key={i} className="relative aspect-[9/19.5] overflow-hidden rounded-[35px] shadow-2xl hover:translate-y-[-10px] transition-transform duration-500">
+                        <Image src={shot.url} alt={`${app.name} screenshot ${i + 1}`} fill className="object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* Final CTA Section */}
+            <section className="py-32 text-center bg-section-bg-3 text-white">
+              <div className="container-custom">
+                <h2 className="text-[42px] md:text-[50px] font-black mb-10 leading-[1.1] max-w-[950px] mx-auto tracking-tight">
+                  Free Download {app.name} on Android or iPhone, iPad Today!
+                </h2>
+                <p className="text-[20px] text-white/70 mb-14 max-w-[850px] mx-auto leading-relaxed">
+                  Get and install the {app.name} and start screencasting from iPhone, iPad or Android phone to TV now
+                </p>
+
+                <div className="flex flex-wrap justify-center gap-6 mb-20">
+                  {app.downloadLinks && app.downloadLinks.length > 0 ? (
+                    app.downloadLinks.map((link) => (
+                      <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                        <Image
+                          src={link.badge.url}
+                          alt={link.platform}
+                          width={220} height={66}
+                          className="h-[66px] w-auto"
+                        />
+                      </a>
+                    ))
+                  ) : null}
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-12 mb-16">
+                  <Link href="/tutorial" className="text-[20px] font-black border-b-2 border-white/20 hover:border-white transition-all pb-1 uppercase tracking-wider">Tutorial</Link>
+                  <Link href="/faq" className="text-[20px] font-black border-b-2 border-white/20 hover:border-white transition-all pb-1 uppercase tracking-wider">F.A.Q.</Link>
+                </div>
+
+                <div className="max-w-[800px] mx-auto pt-10 border-t border-white/10">
+                  <p className="text-[16px] text-white/40 leading-relaxed">
+                    If you have any thoughts and questions, you can contact us at: <br />
+                    <a href="mailto:support@boostvision.com.cn" className="text-white/60 hover:text-white transition-colors font-bold underline decoration-white/20 underline-offset-4">support@boostvision.com.cn</a>
+                  </p>
+                </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
     </>
   );

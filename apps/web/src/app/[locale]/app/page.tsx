@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getApps } from "@/lib/strapi/api/apps";
-import { App } from "@/types/strapi";
+import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { App, HeroSection, CTASection, AppsFilterSection } from "@/types/strapi";
+import { QRCode } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
@@ -21,8 +23,19 @@ interface Props {
 export default async function AppsPage({ searchParams }: Props) {
   const { tab = "screen-mirroring" } = await searchParams;
 
-  const appsResponse = await getApps({ limit: 100 }).catch(() => null);
+  // 并行获取 App 列表和页面配置数据
+  const [appsResponse, pageData] = await Promise.all([
+    getApps({ limit: 100 }).catch(() => null),
+    getPageBySlug("app").catch(() => null)
+  ]);
+
   const apps = appsResponse?.data || [];
+  const sections = pageData?.sections || [];
+
+  // 从动态区域中寻找 Hero 和 CTA 配置
+  const heroSection = sections.find(s => s.__component === 'sections.hero') as HeroSection | undefined;
+  const ctaSection = sections.find(s => s.__component === 'sections.cta') as CTASection | undefined;
+  const filterSection = sections.find(s => s.__component === 'sections.apps-filter') as AppsFilterSection | undefined;
 
   const screenMirroringApps = apps.filter(app => app.type === 'screen-mirroring');
   const tvRemoteApps = apps.filter(app => app.type === 'tv-remote');
@@ -33,13 +46,13 @@ export default async function AppsPage({ searchParams }: Props) {
     <>
       <main className="bg-white">
         {/* Banner */}
-        <section className="bg-section-bg py-24 text-center">
+        <section className="bg-app-hero py-24 text-center">
           <div className="container-custom">
-            <h1 className="mb-6 text-[45px] font-black text-heading leading-[1.2]">
-              Download Screen Mirroring & TV Remote Apps ｜BoostVision
-            </h1>
-            <p className="mx-auto max-w-[800px] text-[20px] text-muted leading-relaxed">
-              Download screen mirroring & TV remote apps for free at App Store and Google Play Store.
+            <h2 className="mb-6 !text-[35px] text-white font-black text-heading leading-[1.2]">
+              {heroSection?.title || "Download Screen Mirroring & TV Remote Apps ｜BoostVision"}
+            </h2>
+            <p className="mx-auto max-w-[800px] text-[20px] text-white/70 leading-relaxed">
+              {heroSection?.subtitle || "Download screen mirroring & TV remote apps for free at App Store and Google Play Store."}
             </p>
           </div>
         </section>
@@ -60,11 +73,11 @@ export default async function AppsPage({ searchParams }: Props) {
                 )}
               >
                 <Image
-                  src="/icons/mirror-tab.svg"
+                  src={filterSection?.screenMirroringIcon?.url || "/icons/mirror-tab.svg"}
                   alt="mirror" width={24} height={24}
                   className={cn(tab === "screen-mirroring" && "brightness-0 invert")}
                 />
-                Screen Mirroring Apps
+                {filterSection?.screenMirroringLabel || "Screen Mirroring Apps"}
               </Link>
 
               <Link
@@ -78,11 +91,11 @@ export default async function AppsPage({ searchParams }: Props) {
                 )}
               >
                 <Image
-                  src="/icons/remote-tab.svg"
+                  src={filterSection?.tvRemoteIcon?.url || "/icons/remote-tab.svg"}
                   alt="remote" width={24} height={24}
                   className={cn(tab === "tv-remote" && "brightness-0 invert")}
                 />
-                TV Remote Apps
+                {filterSection?.tvRemoteLabel || "TV Remote Apps"}
               </Link>
             </div>
 
@@ -101,18 +114,50 @@ export default async function AppsPage({ searchParams }: Props) {
 
             {/* Bottom Support CTA */}
             <div className="mt-32 rounded-[40px] bg-section-bg p-16 text-center">
-              <h3 className="text-[32px] font-black text-heading mb-6">Still have questions?</h3>
-              <p className="text-[18px] text-muted mb-10 max-w-[700px] mx-auto leading-relaxed">
-                If you have any thoughts and questions, you can contact us at: <br className="hidden md:block" />
-                <Link href="/tutorial" className="text-primary hover:underline font-bold">How-to Guides</Link> or{" "}
-                <Link href="/faq" className="text-primary hover:underline font-bold">F.A.Q</Link>
+              <h3 className="text-[32px] font-black text-heading mb-12">
+                {ctaSection?.title || "Still have questions?"}
+              </h3>
+
+              {/* Links as Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
+                {ctaSection?.links && ctaSection.links.length > 0 ? (
+                  ctaSection.links.map((link) => (
+                    <Link
+                      key={link.id}
+                      href={link.href}
+                      className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                    >
+                      {link.name}
+                    </Link>
+                  ))
+                ) : (
+                  <>
+                    <Link
+                      href="/tutorial"
+                      className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                    >
+                      How-to Guides
+                    </Link>
+                    <Link
+                      href="/faq"
+                      className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                    >
+                      F.A.Q
+                    </Link>
+                  </>
+                )}
+              </div>
+
+              {/* Description with Email */}
+              <p className="text-[18px] text-muted leading-relaxed">
+                {ctaSection?.description || "If you have any thoughts and questions, you can contact us at:"}{" "}
+                <a
+                  href={ctaSection?.buttonLink ? (ctaSection.buttonLink.startsWith('mailto:') ? ctaSection.buttonLink : `mailto:${ctaSection.buttonLink}`) : "mailto:support@boostvision.com.cn"}
+                  className="text-primary hover:underline font-bold"
+                >
+                  {ctaSection?.buttonText || "support@boostvision.com.cn"}
+                </a>
               </p>
-              <a
-                href="mailto:support@boostvision.com.cn"
-                className="inline-block text-[24px] font-black text-primary border-b-2 border-primary/20 hover:border-primary transition-all pb-1"
-              >
-                support@boostvision.com.cn
-              </a>
             </div>
           </div>
         </section>
@@ -142,23 +187,40 @@ function AppCatalogCard({ app }: { app: App }) {
       </p>
 
       <div className="mt-auto flex flex-col items-center gap-4 w-full">
-        <div className="flex gap-3">
-          {app.appStoreUrl && (
-            <a href={app.appStoreUrl} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-              <Image src="/images/app-store-badge.png" alt="App Store" width={140} height={42} />
-            </a>
-          )}
-          {app.googlePlayUrl && (
-            <a href={app.googlePlayUrl} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
-              <Image src="/images/google-play-badge.png" alt="Google Play" width={140} height={42} />
-            </a>
+        <div className="flex flex-row flex-nowrap justify-center gap-2">
+          {app.downloadLinks && app.downloadLinks.length > 0 ? (
+            app.downloadLinks.map((link) => {
+              const ButtonContent = (
+                <div className="relative group/qr hover:z-50 transition-all">
+                  <Image src={link.badge.url} alt={link.platform} width={120} height={36} className="h-[36px] w-auto" />
+                  {link.generateQRCode && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-50">
+                      <QRCode data={link.url} size={80} />
+                    </div>
+                  )}
+                </div>
+              );
+
+              if (!link.isClickable) {
+                return (
+                  <div key={link.id} className="opacity-50 cursor-not-allowed">
+                    {ButtonContent}
+                  </div>
+                );
+              }
+
+              return (
+                <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                  {ButtonContent}
+                </a>
+              );
+            })
+          ) : (
+            <>
+              {/* Fallback or empty */}
+            </>
           )}
         </div>
-        {app.amazonUrl && (
-          <a href={app.amazonUrl} target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold text-muted hover:text-primary transition-colors uppercase tracking-widest">
-            Available on Amazon
-          </a>
-        )}
       </div>
     </div>
   );

@@ -9,15 +9,47 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface RichTextProps {
-  content: BlocksContent;
+  content: BlocksContent | string;
   className?: string;
+  variant?: 'default' | 'blue-circle' | 'gray-square';
 }
 
-export function RichText({ content, className }: RichTextProps) {
+export function RichText({ content, className, variant = 'default' }: RichTextProps) {
   if (!content) return null;
 
+  // 兼容处理：如果是字符串，则尝试作为 HTML 渲染
+  if (typeof content === 'string') {
+    return (
+      <div 
+        className={cn(
+          "prose prose-lg max-w-none rich-text prose-a:text-primary prose-a:no-underline hover:prose-a:underline",
+          variant === 'blue-circle' && "rich-text-blue-circle",
+          variant === 'gray-square' && "rich-text-gray-square",
+          className
+        )}
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+    );
+  }
+
+  // 确保 content 是数组格式（Blocks 格式）
+  if (!Array.isArray(content)) {
+    console.error('RichText: content is not an array:', content);
+    return null;
+  }
+
+  // 确保数组不为空
+  if (content.length === 0) {
+    return null;
+  }
+
   return (
-    <div className={cn("prose prose-lg max-w-none rich-text", className)}>
+    <div className={cn(
+      "prose prose-lg max-w-none rich-text prose-a:text-primary prose-a:no-underline hover:prose-a:underline",
+      variant === 'blue-circle' && "rich-text-blue-circle",
+      variant === 'gray-square' && "rich-text-gray-square",
+      className
+    )}>
       <BlocksRenderer
         content={content}
         blocks={{
@@ -68,9 +100,17 @@ export function RichText({ content, className }: RichTextProps) {
           },
           list: ({ children, format }) => {
             if (format === "ordered") {
-              return <ol className="list-decimal pl-6 my-6 space-y-2">{children}</ol>;
+              return <ol className="list-decimal pl-6 my-6 space-y-4">{children}</ol>;
             }
-            return <ul className="list-disc pl-6 my-6 space-y-2">{children}</ul>;
+            
+            return (
+              <ul className={cn(
+                "pl-6 my-6 space-y-4 text-[17px] text-muted leading-[1.8]",
+                variant === 'blue-circle' ? "list-disc marker:text-primary" : "list-[square] marker:text-muted/60"
+              )}>
+                {children}
+              </ul>
+            );
           },
           paragraph: ({ children }) => (
             <p className="text-[17px] text-muted leading-[1.8] mb-6">{children}</p>

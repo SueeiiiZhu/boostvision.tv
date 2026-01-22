@@ -45,3 +45,7 @@ apps/cms/dist
 # Misc
 *.tsbuildinfo
 
+# Cursor
+.cursorrules
+.promptrules
+.playwright-mcp/*
