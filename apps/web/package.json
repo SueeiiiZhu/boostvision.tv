@@ -11,6 +11,7 @@
   "dependencies": {
     "@strapi/blocks-react-renderer": "^1.0.2",
     "clsx": "^2.1.1",
+    "marked": "^17.0.1",
     "next": "16.1.2",
     "next-intl": "^4.7.0",
     "next-qrcode": "2.5.1",
@@ -26,6 +27,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

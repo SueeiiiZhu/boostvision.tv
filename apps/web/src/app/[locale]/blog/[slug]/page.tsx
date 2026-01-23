@@ -3,11 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText } from "@/components/shared";
 import { getBlogPostBySlug } from "@/lib/strapi/api/blog";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { formatDate } from "@/lib/utils/formatDate";
+import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -23,11 +25,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const { slug, locale } = await params;
+  const [post, globalSetting] = await Promise.all([
+    getBlogPostBySlug(slug),
+    getGlobalSetting(locale),
+  ]);
 
   if (!post) {
     notFound();
+  }
+
+  // 提取目录 (Table of Contents)
+  const toc: { id: string; title: string; level: number }[] = [];
+  if (typeof post.content === 'string') {
+    const headerMatches = post.content.matchAll(/^(##|###) (.*$)/gim);
+    for (const match of headerMatches) {
+      const level = match[1].length; // 2 for ##, 3 for ###
+      const title = match[2].trim();
+      const id = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      toc.push({ id, title, level });
+    }
   }
 
   const jsonLd = {
@@ -56,66 +73,94 @@ export default async function BlogPostPage({ params }: Props) {
       />
       <main className="bg-white">
         <article className="py-20">
-          <div className="container-custom max-w-[900px]">
-            {/* Header */}
-            <header className="mb-12 text-center">
-              <div className="mb-6 flex items-center justify-center gap-4 text-[15px] font-medium">
-                <Link href={`/blog/category/${post.category?.slug}`} className="text-primary hover:underline">
-                  {post.category?.name}
-                </Link>
-                <span className="text-gray-300">|</span>
-                <span className="text-muted">{formatDate(post.publishedAt)}</span>
-                <span className="text-gray-300">|</span>
-                <span className="text-muted">{post.readTime || 5} min read</span>
+          <div className="container-custom max-w-[1200px]">
+            <div className="flex flex-col lg:flex-row gap-12">
+              {/* Main Content Area */}
+              <div className="flex-1 max-w-[850px]">
+                {/* Header */}
+                <header className="mb-12">
+                  {/* <div className="mb-6 flex items-center gap-4 text-[15px] font-medium">
+                    <Link href={`/blog/category/${post.category?.slug}`} className="text-primary hover:underline">
+                      {post.category?.name}
+                    </Link>
+                    <span className="text-gray-300">|</span>
+                    <span className="text-muted">{formatDate(post.publishedAt)}</span>
+                    <span className="text-gray-300">|</span>
+                    <span className="text-muted">{post.readTime || 5} min read</span>
+                  </div> */}
+                  <h1 className="text-[42px] font-black text-heading leading-[1.3] mb-8">
+                    {post.title}
+                  </h1>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 relative overflow-hidden rounded-full border border-gray-100">
+                        <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
+                      </div>
+                      <span className="font-bold text-heading">{post.author?.name}</span>
+                    </div>
+                    <span className="text-gray-300">|</span>
+                    <span className="text-muted text-[15px]">{formatDate(post.publishedAt)}</span>
+                  </div>
+                </header>
+
+                {/* Content */}
+                <div className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
+                  <RichText content={post.content} />
+                </div>
+
+                {/* Author Bio Section */}
+                <div className="mt-20 flex flex-col md:flex-row items-center gap-10 md:gap-0 rounded-[20px] border border-gray-200 p-10 md:p-12">
+                  <div className="flex flex-col items-center shrink-0 md:pr-12 md:min-w-[200px]">
+                    <div className="h-28 w-28 relative overflow-hidden rounded-full shadow-sm mb-4">
+                      <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
+                    </div>
+                    <span className="font-bold text-heading text-[20px] text-center">{post.author?.name}</span>
+                  </div>
+
+                  <div className="hidden md:block self-stretch w-px bg-gray-200" />
+
+                  <div className="flex-1 md:pl-12 text-center md:text-left">
+                    <p className="text-[18px] text-muted leading-[1.8]">
+                      {post.author?.bio}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h1 className="text-[42px] font-black text-heading leading-[1.3] mb-8">
-                {post.title}
-              </h1>
-              <div className="flex items-center justify-center gap-3">
-                 <div className="h-10 w-10 relative overflow-hidden rounded-full border border-gray-100">
-                   <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
-                 </div>
-                 <span className="font-bold text-heading">{post.author?.name}</span>
-              </div>
-            </header>
 
-            {/* Featured Image */}
-            <div className="mb-12 relative aspect-[16/9] w-full overflow-hidden rounded-[30px] shadow-2xl">
-              <Image 
-                src={post.coverImage?.url || "/images/blog-placeholder.webp"} 
-                alt={post.title} 
-                fill 
-                className="object-cover" 
-                priority
-              />
-            </div>
-
-            {/* Content */}
-            <div className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
-               <RichText content={post.content} />
-            </div>
-
-            {/* Author Bio Section */}
-            <div className="mt-20 flex items-center gap-8 rounded-[30px] bg-section-bg p-10 border border-gray-100">
-               <div className="h-24 w-24 shrink-0 relative overflow-hidden rounded-full shadow-md">
-                  <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
-               </div>
-               <div>
-                  <h4 className="text-[20px] font-bold text-heading mb-2">Written by {post.author?.name}</h4>
-                  <p className="text-[16px] text-muted leading-relaxed">{post.author?.bio}</p>
-               </div>
-            </div>
-
-            {/* Support CTA */}
-            <div className="mt-20 rounded-[30px] footer-gradient p-12 text-center text-white">
-               <h3 className="text-white text-[30px] font-bold mb-4">Still have questions?</h3>
-               <p className="text-white/80 text-[18px] mb-8">
-                 If you have any thoughts and questions, you can contact us at: <br />
-                 Tutorial or FAQ
-               </p>
-               <a href="mailto:support@boostvision.com.cn" className="text-[22px] font-bold text-white hover:underline">
-                 support@boostvision.com.cn
-               </a>
+              {/* Sidebar - Table of Contents */}
+              <aside className="hidden lg:block w-[300px] shrink-0">
+                <div className="sticky top-[120px]">
+                  <div className="rounded-[30px] bg-section-bg p-8 border border-gray-100">
+                    <h4 className="text-[20px] font-black text-heading mb-6">
+                      {globalSetting?.tocTitle || "Contents"}
+                    </h4>
+                    <nav>
+                      <ul className="space-y-4">
+                        {toc.map((item) => (
+                          <li
+                            key={item.id}
+                            className={cn(
+                              item.level === 3 && "ml-4"
+                            )}
+                          >
+                            <a
+                              href={`#${item.id}`}
+                              className={cn(
+                                "block transition-colors leading-snug",
+                                item.level === 2
+                                  ? "text-[16px] font-bold text-muted hover:text-primary"
+                                  : "text-[14px] font-medium text-muted/80 hover:text-primary"
+                              )}
+                            >
+                              {item.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              </aside>
             </div>
           </div>
         </article>

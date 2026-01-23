@@ -17,19 +17,16 @@ export default async function PrivacyPolicyPage() {
     <>
       <main className="bg-white">
         {/* Banner */}
-        <section className="bg-section-bg py-20 text-center">
+        <section className="py-20 text-center">
           <div className="container-custom">
             <h1 className="mb-4 text-[40px] font-black text-heading">
               {page?.title || "Privacy Policy"}
             </h1>
-            <p className="text-muted">
-              Last Updated: {page?.updatedAt ? new Date(page.updatedAt).toLocaleDateString() : "January 15, 2026"}
-            </p>
           </div>
         </section>
 
         {/* Content */}
-        <section className="py-20">
+        <section className="py-0 mt-0">
           <div className="container-custom max-w-[900px]">
             <div className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
               {page?.content ? (

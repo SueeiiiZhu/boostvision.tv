@@ -128,6 +128,7 @@ export interface GlobalSetting {
   trademarkDisclaimer?: string;
   tryForFreeText?: string;
   tryForFreeLink?: string;
+  tocTitle?: string;
 }
 
 export interface SocialLink {
@@ -237,7 +238,7 @@ export interface Page {
   documentId: string;
   title: string;
   slug: string;
-  content: BlocksContent;
+  content: BlocksContent | string;
   seo?: any;
   sections?: Section[];
   createdAt: string;

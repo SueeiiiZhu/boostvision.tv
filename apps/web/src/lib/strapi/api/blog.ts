@@ -7,7 +7,13 @@ export async function getBlogPosts(params: {
   limit?: number;
 } = {}) {
   const query = buildStrapiQuery({
-    populate: ["coverImage", "category", "author"],
+    populate: {
+      coverImage: true,
+      category: true,
+      author: {
+        populate: ["avatar"],
+      },
+    },
     filters: {
       ...(params.categorySlug && { category: { slug: { $eq: params.categorySlug } } }),
       ...(params.isFeatured !== undefined && { isFeatured: { $eq: params.isFeatured } }),
@@ -23,7 +29,14 @@ export async function getBlogPosts(params: {
 
 export async function getBlogPostBySlug(slug: string) {
   const query = buildStrapiQuery({
-    populate: ["coverImage", "category", "author", "seo"],
+    populate: {
+      coverImage: true,
+      category: true,
+      author: {
+        populate: ["avatar"],
+      },
+      seo: true,
+    },
     filters: {
       slug: { $eq: slug },
     },

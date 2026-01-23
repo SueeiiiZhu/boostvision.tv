@@ -8,6 +8,59 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+// 简单的 Markdown 转换函数，处理基本标签
+function parseMarkdown(markdown: string) {
+  if (!markdown) return "";
+
+  let html = markdown
+    // 处理标题，增加 ID 用于锚点跳转
+    .replace(/^### (.*$)/gim, (match, title) => {
+      const cleanTitle = title.replace(/\\/g, '');
+      const id = cleanTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      return `<h3 id="${id}" class="text-[24px] font-bold text-heading mt-10 mb-4">${cleanTitle}</h3>`;
+    })
+    .replace(/^## (.*$)/gim, (match, title) => {
+      const cleanTitle = title.replace(/\\/g, '');
+      const id = cleanTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      return `<h2 id="${id}" class="text-[32px] font-bold text-heading mt-12 mb-6">${cleanTitle}</h2>`;
+    })
+    .replace(/^# (.*$)/gim, (match, title) => {
+      const cleanTitle = title.replace(/\\/g, '');
+      const id = cleanTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      return `<h1 id="${id}" class="text-[40px] font-black text-heading mb-8">${cleanTitle}</h1>`;
+    })
+    // 处理图片
+    .replace(/!\[(.*?)\]\((.*?)\)/gim, (match, alt, url) => {
+      const cleanAlt = alt.replace(/\\/g, '');
+      return `<div class="my-8 flex justify-center"><img src="${url}" alt="${cleanAlt}" class="rounded-2xl shadow-lg max-w-full h-auto" /></div>`;
+    })
+    // 处理链接
+    .replace(/\[(.*?)\]\((.*?)\)/gim, (match, text, url) => {
+      const unescapedText = text.replace(/\\/g, '');
+      return `<a href='${url}' class='text-primary hover:underline font-bold'>${unescapedText}</a>`;
+    })
+    // 处理加粗
+    .replace(/\*\*(.*?)\*\*/gim, (match, content) => `<strong class="font-black text-heading">${content.replace(/\\/g, '')}</strong>`)
+    .replace(/__(.*?)__/gim, (match, content) => `<strong class="font-black text-heading">${content.replace(/\\/g, '')}</strong>`)
+    // 处理斜体
+    .replace(/\*(.*?)\*/gim, (match, content) => `<em class="italic">${content.replace(/\\/g, '')}</em>`)
+    .replace(/_(.*?)_/gim, (match, content) => `<em class="italic">${content.replace(/\\/g, '')}</em>`)
+    // 处理列表
+    .replace(/^\* (.*$)/gim, '<li class="ml-6 list-disc">$1</li>')
+    .replace(/^\- (.*$)/gim, '<li class="ml-6 list-disc">$1</li>');
+
+  // 将没有被标题或列表包裹的行包裹在 <p> 中
+  const lines = html.split('\n');
+  const wrappedLines = lines.map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('<h') || trimmed.startsWith('<li') || trimmed.startsWith('<div')) return trimmed;
+    return `<p class="text-[17px] text-muted leading-[1.8] mb-6">${trimmed}</p>`;
+  });
+
+  return wrappedLines.join('');
+}
+
 interface RichTextProps {
   content: BlocksContent | string;
   className?: string;
@@ -17,8 +70,15 @@ interface RichTextProps {
 export function RichText({ content, className, variant = 'default' }: RichTextProps) {
   if (!content) return null;
 
-  // 兼容处理：如果是字符串，则尝试作为 HTML 渲染
+  // 兼容处理：如果是字符串，则尝试作为 Markdown/HTML 渲染
   if (typeof content === 'string') {
+    const isMarkdown = content.includes('#') ||
+      content.includes('**') ||
+      content.includes('__') ||
+      content.includes('[') ||
+      content.includes('![');
+    const htmlContent = isMarkdown ? parseMarkdown(content) : content;
+
     return (
       <div
         className={cn(
@@ -27,7 +87,7 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
           variant === 'gray-square' && "rich-text-gray-square",
           className
         )}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
     );
   }
