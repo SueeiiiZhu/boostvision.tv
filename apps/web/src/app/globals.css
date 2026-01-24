@@ -141,6 +141,59 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
+/* Blog Download Banner - Standard CSS */
+.blog-download-banner {
+  margin-block: 3rem;
+  padding: 2.5rem;
+  border-radius: 2rem;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.blog-download-banner .banner-title {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 900;
+  color: var(--color-heading);
+  margin-bottom: 2rem;
+  font-family: var(--font-heading);
+}
+
+.blog-download-banner .banner-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.blog-download-banner .app-store-badge {
+  content: url('/icons/AppStore.svg');
+  height: 56px;
+  width: auto;
+}
+
+.blog-download-banner .google-play-badge {
+  content: url('/icons/GooglePlay.svg');
+  height: 56px;
+  width: auto;
+}
+
+.blog-download-banner .banner-buttons a {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.blog-download-banner .banner-buttons a:hover {
+  transform: scale(1.05);
+}
+
+.blog-download-banner .banner-buttons a:active {
+  transform: scale(0.95);
+}
+
 /* 柔和遮罩工具类 */
 @utility bg-soft-overlay {
   position: relative;
