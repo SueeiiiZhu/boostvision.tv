@@ -24,19 +24,19 @@ function parseMarkdown(markdown: string) {
   html = html
     // 处理标题
     .replace(/^### (.*$)/gim, (match, title) => {
-      const cleanTitle = title.replace(/\\/g, '');
-      const id = cleanTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      return `<h3 id="${id}" class="text-[24px] font-bold text-heading mt-10 mb-4">${cleanTitle}</h3>`;
+      const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
+      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      return `<h3 id="${id}" class="text-[24px] font-bold text-heading mt-10 mb-4">${displayTitle}</h3>`;
     })
     .replace(/^## (.*$)/gim, (match, title) => {
-      const cleanTitle = title.replace(/\\/g, '');
-      const id = cleanTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      return `<h2 id="${id}" class="text-[32px] font-bold text-heading mt-12 mb-6">${cleanTitle}</h2>`;
+      const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
+      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      return `<h2 id="${id}" class="text-[32px] font-bold text-heading mt-12 mb-6">${displayTitle}</h2>`;
     })
     .replace(/^# (.*$)/gim, (match, title) => {
-      const cleanTitle = title.replace(/\\/g, '');
-      const id = cleanTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      return `<h1 id="${id}" class="text-[40px] font-black text-heading mb-8">${cleanTitle}</h1>`;
+      const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
+      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      return `<h1 id="${id}" class="text-[40px] font-black text-heading mb-8">${displayTitle}</h1>`;
     })
     // 图片/链接/加粗/斜体
     .replace(/!\[(.*?)\]\((.*?)\)/gim, (match, alt, url) => {

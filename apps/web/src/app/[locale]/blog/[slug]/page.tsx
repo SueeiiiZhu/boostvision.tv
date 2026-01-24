@@ -38,12 +38,26 @@ export default async function BlogPostPage({ params }: Props) {
   // 提取目录 (Table of Contents)
   const toc: { id: string; title: string; level: number }[] = [];
   if (typeof post.content === 'string') {
-    const headerMatches = post.content.matchAll(/^(##|###) (.*$)/gim);
+    // 1. 首先尝试匹配标准的 ## 和 ### 标题
+    const headerMatches = Array.from(post.content.matchAll(/^(##|###) (.*$)/gim));
+
     for (const match of headerMatches) {
-      const level = match[1].length; // 2 for ##, 3 for ###
-      const title = match[2].trim();
-      const id = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      toc.push({ id, title, level });
+      const level = match[1].length;
+      const rawTitle = match[2].trim();
+      // 清理标题中的 ** 和 __ 标记，使目录显示纯文本
+      const displayTitle = rawTitle.replace(/\*\*|\__/g, '');
+      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      toc.push({ id, title: displayTitle, level });
+    }
+
+    // 2. 如果没有找到标准的 # 标题，尝试捕获单独一行的加粗文本作为标题（兼容不规范写法）
+    if (toc.length === 0) {
+      const boldHeaderMatches = Array.from(post.content.matchAll(/^\*\*(.*?)\*\*\s*$/gim));
+      for (const match of boldHeaderMatches) {
+        const displayTitle = match[1].trim();
+        const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+        toc.push({ id, title: displayTitle, level: 2 });
+      }
     }
   }
 
