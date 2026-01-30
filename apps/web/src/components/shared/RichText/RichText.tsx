@@ -12,41 +12,55 @@ import { cn } from "@/lib/utils";
 function parseMarkdown(markdown: string) {
   if (!markdown) return "";
 
-  // 1. 提取被 <raw-html> 包裹的内容
+  // 1. 提取被 <raw-html> 包裹的内容及后续需要保护的标签
   // 使用纯字母占位符 XHTMLBLOCKXnX，绝对避开 Markdown 的 _ 或 * 语法
   const rawBlocks: string[] = [];
+  
+  // 保护 raw-html
   let html = markdown.replace(/<raw-html>([\s\S]*?)<\/raw-html>/gim, (match, content) => {
     rawBlocks.push(content.trim());
     return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
   });
 
-  // 2. 执行正常的 Markdown 解析
+  // 2. 执行 Markdown 解析，并将生成的 HTML 标签立即存入保护区
   html = html
-    // 处理标题
+    // 处理标题，并存入保护区
     .replace(/^### (.*$)/gim, (match, title) => {
       const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
       const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      return `<h3 id="${id}" class="text-[24px] font-bold text-heading mt-10 mb-4">${displayTitle}</h3>`;
+      const tag = `<h3 id="${id}" class="text-[24px] font-bold text-heading mt-10 mb-4">${displayTitle}</h3>`;
+      rawBlocks.push(tag);
+      return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
     })
     .replace(/^## (.*$)/gim, (match, title) => {
       const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
       const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      return `<h2 id="${id}" class="text-[32px] font-bold text-heading mt-12 mb-6">${displayTitle}</h2>`;
+      const tag = `<h2 id="${id}" class="text-[32px] font-bold text-heading mt-12 mb-6">${displayTitle}</h2>`;
+      rawBlocks.push(tag);
+      return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
     })
     .replace(/^# (.*$)/gim, (match, title) => {
       const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
       const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      return `<h1 id="${id}" class="text-[40px] font-black text-heading mb-8">${displayTitle}</h1>`;
+      const tag = `<h1 id="${id}" class="text-[40px] font-black text-heading mb-8">${displayTitle}</h1>`;
+      rawBlocks.push(tag);
+      return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
     })
-    // 图片/链接/加粗/斜体
+    // 图片渲染 - 存入保护区，防止 src 中的下划线被误当做斜体解析
     .replace(/!\[(.*?)\]\((.*?)\)/gim, (match, alt, url) => {
       const cleanAlt = alt.replace(/\\/g, '');
-      return `<div class="my-8 flex justify-center"><img src="${url}" alt="${cleanAlt}" class="rounded-2xl shadow-lg max-w-full h-auto" /></div>`;
+      const tag = `<div class="my-8 flex justify-center"><img src="${url}" alt="${cleanAlt}" class="rounded-2xl shadow-lg max-w-full h-auto" /></div>`;
+      rawBlocks.push(tag);
+      return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
     })
+    // 链接渲染 - 存入保护区
     .replace(/\[(.*?)\]\((.*?)\)/gim, (match, text, url) => {
       const unescapedText = text.replace(/\\/g, '');
-      return `<a href='${url}' class='text-primary hover:underline font-bold'>${unescapedText}</a>`;
+      const tag = `<a href='${url}' class='text-primary hover:underline font-bold'>${unescapedText}</a>`;
+      rawBlocks.push(tag);
+      return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
     })
+    // 剩下的普通文本处理 加粗/斜体/列表
     .replace(/\*\*(.*?)\*\*/gim, (match, content) => `<strong class="font-black text-heading">${content.replace(/\\/g, '')}</strong>`)
     .replace(/__(.*?)__/gim, (match, content) => `<strong class="font-black text-heading">${content.replace(/\\/g, '')}</strong>`)
     .replace(/\*(.*?)\*/gim, (match, content) => `<em class="italic">${content.replace(/\\/g, '')}</em>`)
@@ -59,19 +73,16 @@ function parseMarkdown(markdown: string) {
   const wrappedLines = lines.map(line => {
     const trimmed = line.trim();
     if (!trimmed) return '';
-    // 跳过标题、列表、div 以及我们的特殊占位符
-    if (
-      trimmed.startsWith('<h') || 
-      trimmed.startsWith('<li') || 
-      trimmed.startsWith('<div') || 
-      trimmed.startsWith('XHTMLBLOCKX')
-    ) return trimmed;
+    // 跳过已经受保护的块级内容
+    if (trimmed.startsWith('XHTMLBLOCKX')) return trimmed;
+    // 跳过列表项（已经在前面转换过了）
+    if (trimmed.startsWith('<li')) return trimmed;
     return `<p class="text-[17px] text-muted leading-[1.8] mb-6">${trimmed}</p>`;
   });
 
   html = wrappedLines.join('\n');
 
-  // 4. 最后精准还原 <raw-html> 内容
+  // 4. 最后精准还原所有受保护的内容
   rawBlocks.forEach((content, index) => {
     const placeholder = `XHTMLBLOCKX${index}X`;
     html = html.split(placeholder).join(content);
@@ -143,7 +154,7 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
           list: ({ children, format }) => {
             if (format === "ordered") return <ol className="list-decimal pl-6 my-6 space-y-4">{children}</ol>;
             return (
-              <ul className={cn("pl-6 my-6 space-y-4 text-[17px] text-muted leading-[1.8]", variant === 'blue-circle' ? "list-disc marker:text-primary" : "list-[square] marker:text-muted/60")}>
+              <ul className={cn("pl-6 my-6 space-y-4 text-[17px] text-muted Birding-snug", variant === 'blue-circle' ? "list-disc marker:text-primary" : "list-[square] marker:text-muted/60")}>
                 {children}
               </ul>
             );

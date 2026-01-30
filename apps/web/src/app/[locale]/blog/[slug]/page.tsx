@@ -26,14 +26,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug, locale } = await params;
-  const [post, globalSetting] = await Promise.all([
-    getBlogPostBySlug(slug),
-    getGlobalSetting(locale),
-  ]);
+
+  // 增加错误捕获，防止 API 失败导致整页崩溃
+  let post = null;
+  let globalSetting = null;
+
+  try {
+    const [postData, globalData] = await Promise.all([
+      getBlogPostBySlug(slug),
+      getGlobalSetting(locale),
+    ]);
+    post = postData;
+    globalSetting = globalData;
+  } catch (error) {
+    console.error("Data fetching error in BlogPostPage:", error);
+  }
 
   if (!post) {
     notFound();
   }
+
+  // 使用 Strapi 后台配置的相关文章，增加空值保护
+  const relatedPosts = post?.relatedPosts || [];
 
   // 提取目录 (Table of Contents)
   const toc: { id: string; title: string; level: number }[] = [];
@@ -144,38 +158,71 @@ export default async function BlogPostPage({ params }: Props) {
               {/* Sidebar - Table of Contents */}
               <aside className="hidden lg:block w-[300px] shrink-0">
                 <div className="sticky top-[120px]">
-                  <div className="rounded-[30px] bg-section-bg p-8 border border-gray-100">
-                    <h4 className="text-[20px] font-black text-heading mb-6">
-                      {globalSetting?.tocTitle || "Contents"}
-                    </h4>
-                    <nav>
-                      <ul className="space-y-4">
-                        {toc.map((item) => (
-                          <li
-                            key={item.id}
-                            className={cn(
-                              item.level === 3 && "ml-4"
-                            )}
-                          >
-                            <a
-                              href={`#${item.id}`}
+                  {/* Table of Contents */}
+                  {toc.length > 0 && (
+                    <div className="rounded-[30px] bg-section-bg p-8 border border-gray-100">
+                      <h4 className="text-[20px] font-black text-heading mb-6">
+                        {globalSetting?.tocTitle || "Contents"}
+                      </h4>
+                      <nav>
+                        <ul className="space-y-4">
+                          {toc.map((item) => (
+                            <li
+                              key={item.id}
                               className={cn(
-                                "block transition-colors leading-snug",
-                                item.level === 2
-                                  ? "text-[16px] font-bold text-muted hover:text-primary"
-                                  : "text-[14px] font-medium text-muted/80 hover:text-primary"
+                                item.level === 3 && "ml-4"
                               )}
                             >
-                              {item.title}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </nav>
-                  </div>
+                              <a
+                                href={`#${item.id}`}
+                                className={cn(
+                                  "block transition-colors leading-snug",
+                                  item.level === 2
+                                    ? "text-[16px] font-bold text-muted hover:text-primary"
+                                    : "text-[14px] font-medium text-muted/80 hover:text-primary"
+                                )}
+                              >
+                                {item.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
+                    </div>
+                  )}
                 </div>
               </aside>
             </div>
+
+            {/* Related Blogs Section - Moved outside the flex container to span full width */}
+            {relatedPosts.length > 0 && (
+              <div className="mt-20 pt-20 border-t border-gray-100">
+                <h4 className="text-[32px] font-black text-heading mb-10">
+                  {globalSetting?.relatedPostsTitle || "Related Blogs"}
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                  {relatedPosts.map((p) => (
+                    <div key={p.id} className="group">
+                      <Link href={`/blog/${p.slug}`} className="block">
+                        {p.coverImage && (
+                          <div className="aspect-[16/10] relative overflow-hidden rounded-[24px] mb-5 shadow-sm group-hover:shadow-md transition-all duration-300">
+                            <Image
+                              src={p.coverImage.url}
+                              alt={p.title}
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            />
+                          </div>
+                        )}
+                        <h5 className="text-[20px] font-bold text-heading leading-[1.4] group-hover:text-primary transition-colors line-clamp-2">
+                          {p.title}
+                        </h5>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </article>
       </main>

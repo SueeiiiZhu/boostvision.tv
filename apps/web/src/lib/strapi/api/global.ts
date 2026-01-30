@@ -2,12 +2,17 @@ import { fetchStrapi, buildStrapiQuery } from "../client";
 import { GlobalSetting } from "../../../types/strapi";
 
 export async function getGlobalSetting(locale: string = 'en') {
-  const query = buildStrapiQuery({
-    locale,
-    populate: ["logo", "favicon", "footerLogo", "socialLinks", "statistics", "googlePlayBadge", "appStoreBadge"],
-  });
+  try {
+    const query = buildStrapiQuery({
+      locale,
+      populate: ["logo", "favicon", "footerLogo", "socialLinks", "statistics", "googlePlayBadge", "appStoreBadge", "tocTitle", "relatedPostsTitle"],
+    });
 
-  const response = await fetchStrapi<GlobalSetting>(`/global-setting${query}`);
-  return response.data;
+    const response = await fetchStrapi<GlobalSetting>(`/global-setting${query}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch global settings:", error);
+    return null;
+  }
 }
 

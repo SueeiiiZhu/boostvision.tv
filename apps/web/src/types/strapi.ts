@@ -84,7 +84,7 @@ export interface BlogPost {
   documentId: string;
   title: string;
   slug: string;
-  content: BlocksContent;
+  content: BlocksContent | string;
   excerpt: string;
   coverImage: StrapiImage;
   category: BlogCategory;
@@ -92,6 +92,7 @@ export interface BlogPost {
   publishedAt: string;
   readTime: number;
   isFeatured: boolean;
+  relatedPosts?: BlogPost[];
 }
 
 export interface BlogCategory {
@@ -129,6 +130,7 @@ export interface GlobalSetting {
   tryForFreeText?: string;
   tryForFreeLink?: string;
   tocTitle?: string;
+  relatedPostsTitle?: string;
 }
 
 export interface SocialLink {

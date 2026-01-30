@@ -730,11 +730,13 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     logo: Schema.Attribute.Media<'images'>;
     publishedAt: Schema.Attribute.DateTime;
+    relatedPostsTitle: Schema.Attribute.String;
     siteDescription: Schema.Attribute.Text;
     siteName: Schema.Attribute.String & Schema.Attribute.Required;
     socialLinks: Schema.Attribute.Component<'shared.social-link', true>;
     statistics: Schema.Attribute.Component<'shared.statistics', false>;
     supportEmail: Schema.Attribute.Email;
+    tocTitle: Schema.Attribute.String;
     trademarkDisclaimer: Schema.Attribute.Text;
     tryForFreeLink: Schema.Attribute.String;
     tryForFreeText: Schema.Attribute.String;

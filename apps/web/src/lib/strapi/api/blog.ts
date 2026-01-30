@@ -35,6 +35,9 @@ export async function getBlogPostBySlug(slug: string) {
       author: {
         populate: ["avatar"],
       },
+      relatedPosts: {
+        populate: ["coverImage"],
+      },
       seo: true,
     },
     filters: {

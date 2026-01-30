@@ -79,6 +79,12 @@
     "tryForFreeLink": {
       "type": "string"
     },
+    "tocTitle": {
+      "type": "string"
+    },
+    "relatedPostsTitle": {
+      "type": "string"
+    },
     "statistics": {
       "type": "component",
       "component": "shared.statistics",
