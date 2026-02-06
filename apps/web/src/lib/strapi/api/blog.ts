@@ -5,6 +5,7 @@ export async function getBlogPosts(params: {
   categorySlug?: string;
   isFeatured?: boolean;
   limit?: number;
+  page?: number;
 } = {}) {
   const query = buildStrapiQuery({
     populate: {
@@ -19,6 +20,7 @@ export async function getBlogPosts(params: {
       ...(params.isFeatured !== undefined && { isFeatured: { $eq: params.isFeatured } }),
     },
     pagination: {
+      page: params.page || 1,
       pageSize: params.limit || 10,
     },
     sort: ["publishedAt:desc"],
