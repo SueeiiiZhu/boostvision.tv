@@ -486,10 +486,7 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;
-    shortDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 255;
-      }>;
+    shortDescription: Schema.Attribute.Text;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
     supportedDevices: Schema.Attribute.JSON;
     targetBrands: Schema.Attribute.Relation<

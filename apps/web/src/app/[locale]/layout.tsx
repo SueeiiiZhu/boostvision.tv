@@ -24,6 +24,15 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "BoostVision - Screen Mirroring & TV Remote Apps",
   description: "Mirror the screen of your iPhone, iPad, Android phone & tablet directly to your Smart TV. Try our professional remote control apps.",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/cropped-1766643131-boostvision-favicon-192x192.png', sizes: '192x192', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/cropped-1766643131-boostvision-favicon-180x180.png', sizes: '180x180', type: 'image/png' }
+    ],
+  },
 };
 
 export default async function RootLayout({

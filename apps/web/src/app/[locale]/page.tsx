@@ -70,7 +70,7 @@ export default async function Home() {
       "email": "support@boostvision.com.cn"
     }
   };
-  console.log(homePage);
+
   return (
     <>
       <script
@@ -85,7 +85,7 @@ export default async function Home() {
             {/* Hero Section Fallback */}
             <section className="bg-white pt-24 pb-12 text-center overflow-hidden">
               <div className="container-custom">
-                <h1 className="mx-auto max-w-[900px] animate-slide-up">
+                <h1 className="mx-auto max-w-[900px] font-[family-name:var(--font-heading)] text-[36px] font-black leading-tight tracking-tight sm:text-[44px] md:text-[52px] lg:text-[58px] animate-slide-up">
                   <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                     Screen Mirroring
                   </span>{" "}

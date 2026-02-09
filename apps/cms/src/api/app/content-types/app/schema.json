@@ -52,8 +52,7 @@
       ]
     },
     "shortDescription": {
-      "type": "text",
-      "maxLength": 255
+      "type": "text"
     },
     "description": {
       "type": "blocks"
