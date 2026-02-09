@@ -22,7 +22,9 @@
     "logo": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "apps": {
       "type": "relation",
@@ -40,4 +42,3 @@
     }
   }
 }
-

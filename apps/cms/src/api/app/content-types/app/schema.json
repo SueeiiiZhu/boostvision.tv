@@ -10,11 +10,12 @@
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
     "name": {
       "type": "string",
-      "required": true,
-      "maxLength": 100
+      "maxLength": 100,
+      "required": true
     },
     "displayTitle": {
       "type": "string"
@@ -34,8 +35,8 @@
     },
     "downloadLinks": {
       "type": "component",
-      "repeatable": true,
-      "component": "shared.download-link"
+      "component": "shared.download-link",
+      "repeatable": true
     },
     "slug": {
       "type": "uid",
@@ -44,11 +45,14 @@
     },
     "type": {
       "type": "enumeration",
-      "enum": ["screen-mirroring", "tv-remote"],
-      "required": true
+      "required": true,
+      "enum": [
+        "screen-mirroring",
+        "tv-remote"
+      ]
     },
     "shortDescription": {
-      "type": "string",
+      "type": "text",
       "maxLength": 255
     },
     "description": {
@@ -57,17 +61,23 @@
     "icon": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "screenshots": {
       "type": "media",
       "multiple": true,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "heroImage": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "downloadCount": {
       "type": "string"
@@ -79,8 +89,8 @@
     },
     "features": {
       "type": "component",
-      "repeatable": true,
-      "component": "shared.feature"
+      "component": "shared.feature",
+      "repeatable": true
     },
     "supportedDevices": {
       "type": "json"
@@ -113,9 +123,8 @@
     },
     "seo": {
       "type": "component",
-      "repeatable": false,
-      "component": "shared.seo"
+      "component": "shared.seo",
+      "repeatable": false
     }
   }
 }
-

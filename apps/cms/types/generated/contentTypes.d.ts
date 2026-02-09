@@ -486,7 +486,7 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;
-    shortDescription: Schema.Attribute.String &
+    shortDescription: Schema.Attribute.Text &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 255;
       }>;
@@ -1163,6 +1163,7 @@ export interface PluginUploadFile extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     ext: Schema.Attribute.String;
+    focalPoint: Schema.Attribute.JSON;
     folder: Schema.Attribute.Relation<'manyToOne', 'plugin::upload.folder'> &
       Schema.Attribute.Private;
     folderPath: Schema.Attribute.String &
