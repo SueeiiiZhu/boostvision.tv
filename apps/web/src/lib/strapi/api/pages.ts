@@ -53,6 +53,12 @@ export async function getPageBySlug(slug: string) {
   });
 
   const response = await fetchStrapi<Page[]>(`/pages${query}`);
+
+  // Debug logging
+  console.log('[getPageBySlug] Slug:', slug);
+  console.log('[getPageBySlug] Response:', JSON.stringify(response, null, 2));
+  console.log('[getPageBySlug] Data length:', response.data?.length);
+
   return response.data?.[0] || null;
 }
 
