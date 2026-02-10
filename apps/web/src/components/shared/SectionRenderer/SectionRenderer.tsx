@@ -34,7 +34,6 @@ export async function SectionRenderer({ sections }: SectionRendererProps) {
           case 'sections.reviews':
             return <Reviews key={index} data={section} />;
           case 'sections.apps-grid':
-            // @ts-expect-error - Server Component in map
             return <AppsGrid key={index} data={section} />;
           case 'sections.brands-grid':
             return <BrandsGrid key={index} data={section} />;

@@ -5,7 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-export function SearchInput() {
+interface SearchInputProps {
+  isMobile?: boolean;
+  onSearch?: () => void;
+}
+
+export function SearchInput({ isMobile = false, onSearch }: SearchInputProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const router = useRouter();
@@ -28,9 +33,35 @@ export function SearchInput() {
     if (query.trim()) {
       router.push(`/search?q=${encodeURIComponent(query.trim())}`);
       setIsOpen(false);
+      onSearch?.();
     }
   };
 
+  // Mobile version: always show input
+  if (isMobile) {
+    return (
+      <form onSubmit={handleSubmit} className="relative flex items-center w-full">
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search apps, blogs..."
+          className="w-full rounded-full border-2 border-primary bg-white py-2 pl-4 pr-12 text-[14px] font-medium text-heading focus:outline-none"
+        />
+        <button
+          type="submit"
+          className="absolute right-2 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </form>
+    );
+  }
+
+  // Desktop version: toggle button with overlay
   return (
     <div className="relative flex items-center">
       {/* Search Button / Toggle */}
@@ -58,7 +89,7 @@ export function SearchInput() {
             placeholder="Search apps, blogs..."
             className="w-full rounded-full border-2 border-primary bg-white py-2 pl-4 pr-12 text-[14px] font-medium text-heading focus:outline-none shadow-lg"
           />
-          <button 
+          <button
             type="submit"
             className="absolute right-2 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-colors"
           >
