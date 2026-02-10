@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { RichText } from "@/components/shared";
+import { BlogCard } from "../_components/BlogCard";
 import { getBlogPostBySlug } from "@/lib/strapi/api/blog";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -201,24 +201,8 @@ export default async function BlogPostPage({ params }: Props) {
                   {globalSetting?.relatedPostsTitle || "Related Blogs"}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                  {relatedPosts.map((p) => (
-                    <div key={p.id} className="group">
-                      <Link href={`/blog/${p.slug}`} className="block">
-                        {p.coverImage && (
-                          <div className="aspect-[16/10] relative overflow-hidden rounded-[24px] mb-5 shadow-sm group-hover:shadow-md transition-all duration-300">
-                            <Image
-                              src={p.coverImage.url}
-                              alt={p.title}
-                              fill
-                              className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                          </div>
-                        )}
-                        <h5 className="text-[20px] font-bold text-heading leading-[1.4] group-hover:text-primary transition-colors line-clamp-2">
-                          {p.title}
-                        </h5>
-                      </Link>
-                    </div>
+                  {relatedPosts.map((post) => (
+                    <BlogCard key={post.id} post={post} />
                   ))}
                 </div>
               </div>

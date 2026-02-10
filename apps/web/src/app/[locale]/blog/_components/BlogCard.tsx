@@ -10,7 +10,7 @@ interface BlogCardProps {
 export function BlogCard({ post }: BlogCardProps) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-[30px] bg-white card-shadow transition-all duration-300 hover:translate-y-[-10px]">
-      <Link href={`/blog/${post.slug}`} className="relative h-[240px] w-full overflow-hidden">
+      <Link href={`/blog/${post.slug}`} className="relative h-[240px] w-full overflow-hidden" target="_blank" rel="noopener noreferrer">
         <Image
           src={post.coverImage?.url}
           alt={post.title}
@@ -27,7 +27,7 @@ export function BlogCard({ post }: BlogCardProps) {
       </Link>
       <div className="flex flex-col p-10">
         <h3 className="mb-6 text-[22px] font-bold text-heading leading-[1.4] line-clamp-2 min-h-[62px] group-hover:text-primary transition-colors">
-          <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+          <Link href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">{post.title}</Link>
         </h3>
         <div className="mt-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
