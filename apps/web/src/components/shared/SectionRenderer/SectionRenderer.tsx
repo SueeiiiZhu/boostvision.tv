@@ -48,13 +48,18 @@ export async function SectionRenderer({ sections }: SectionRendererProps) {
 const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
   <section className="bg-white pt-24 pb-12 text-center overflow-hidden">
     <div className="container-custom">
-      <h1 className="mx-auto max-w-[900px]">
+      <h1 className="mx-auto max-w-[900px] text-[25px] md:text-[55px] font-black leading-tight">
         <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           {data.title.includes('&') ? data.title.split('&')[0] : data.title}
         </span>
-        {data.title.includes('&') && ` & ${data.title.split('&')[1]}`}
+        {data.title.includes('&') && (
+          <>
+            <br className="hidden md:block" />
+            {` & ${data.title.split('&')[1]}`}
+          </>
+        )}
       </h1>
-      <p className="mx-auto mt-8 max-w-[800px] text-[20px] text-muted leading-[1.6]">
+      <p className="mx-auto mt-8 max-w-[800px] text-[16px] text-muted leading-[1.6]">
         {data.subtitle}
       </p>
       {data.ctaText && data.ctaLink && (

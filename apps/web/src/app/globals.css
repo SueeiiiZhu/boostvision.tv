@@ -27,6 +27,10 @@
   --font-sans: "Roboto", sans-serif;
   --font-heading: "Poppins", sans-serif;
 
+  /* Font Sizes */
+  --font-size-55: 55px;
+  --font-size-40: 40px;
+
   /* Spacing & Sizing */
   --header-height: 98px;
 

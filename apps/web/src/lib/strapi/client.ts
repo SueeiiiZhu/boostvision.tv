@@ -53,25 +53,43 @@ export async function fetchStrapi<T>(
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   const url = `${baseUrl}/api${cleanEndpoint}`;
 
-  const res = await fetch(url, {
-    ...fetchOptions,
-    headers,
-    next: {
-      revalidate,
-    },
-  });
+  try {
+    const res = await fetch(url, {
+      ...fetchOptions,
+      headers,
+      next: {
+        revalidate,
+      },
+    });
 
-  if (!res.ok) {
-    const error: StrapiError = await res.json().catch(() => ({
-      status: res.status,
-      name: "UnknownError",
-      message: `Failed to fetch: ${endpoint}`,
-    }));
-    throw new Error(error.message);
+    console.log(`[Strapi] ${endpoint} - Status: ${res.status}`);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[Strapi] Error fetching ${endpoint}:`, {
+        status: res.status,
+        statusText: res.statusText,
+        url,
+        response: errorText
+      });
+
+      let errorMessage = `Failed to fetch ${endpoint} (${res.status})`;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.error?.message || errorMessage;
+      } catch {
+        // errorText is not JSON
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const json = await res.json();
+    return transformMediaUrls(json);
+  } catch (error) {
+    console.error(`[Strapi] Exception fetching ${endpoint}:`, error);
+    throw error;
   }
-
-  const json = await res.json();
-  return transformMediaUrls(json);
 }
 
 /**

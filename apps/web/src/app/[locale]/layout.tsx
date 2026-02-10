@@ -53,10 +53,20 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   // Fetch navigation and global settings for the layout
-  const [navigation, globalSetting] = await Promise.all([
-    getNavigation(locale),
-    getGlobalSetting(locale)
-  ]).catch(() => [null, null]);
+  let navigation = null;
+  let globalSetting = null;
+
+  try {
+    navigation = await getNavigation(locale);
+  } catch (err) {
+    console.error('Navigation fetch error:', err);
+  }
+
+  try {
+    globalSetting = await getGlobalSetting(locale);
+  } catch (err) {
+    console.error('Global settings fetch error:', err);
+  }
 
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`}>

@@ -5,7 +5,7 @@ export async function getGlobalSetting(locale: string = 'en') {
   try {
     const query = buildStrapiQuery({
       locale,
-      populate: ["logo", "favicon", "footerLogo", "socialLinks", "statistics", "googlePlayBadge", "appStoreBadge", "tocTitle", "relatedPostsTitle"],
+      populate: ["logo", "favicon", "footerLogo", "socialLinks", "statistics", "googlePlayBadge", "appStoreBadge"],
     });
 
     const response = await fetchStrapi<GlobalSetting>(`/global-setting${query}`);
