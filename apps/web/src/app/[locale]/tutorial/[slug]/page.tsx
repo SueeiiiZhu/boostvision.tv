@@ -30,7 +30,7 @@ export default async function TutorialDetailPage({ params }: Props) {
   if (!tutorial) {
     notFound();
   }
-  console.log(tutorial);
+
   const app = tutorial.app;
 
   return (
