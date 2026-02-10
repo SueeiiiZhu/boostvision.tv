@@ -13,6 +13,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PrivacyPolicyPage() {
   const page = await getPageBySlug("privacy-policy");
 
+  // Debug: log the page data
+  console.log('Privacy Policy Page Data:', JSON.stringify(page, null, 2));
+
   return (
     <>
       <main className="bg-white">
