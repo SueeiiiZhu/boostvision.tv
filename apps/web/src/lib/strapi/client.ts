@@ -53,6 +53,11 @@ export async function fetchStrapi<T>(
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   const url = `${baseUrl}/api${cleanEndpoint}`;
 
+  // Debug logging
+  console.log('[Strapi Client] Fetching:', url);
+  console.log('[Strapi Client] Token exists:', !!STRAPI_TOKEN);
+  console.log('[Strapi Client] Base URL:', STRAPI_URL);
+
   const res = await fetch(url, {
     ...fetchOptions,
     headers,
@@ -67,6 +72,8 @@ export async function fetchStrapi<T>(
       name: "UnknownError",
       message: `Failed to fetch: ${endpoint}`,
     }));
+    console.error('[Strapi Client] Error:', error);
+    console.error('[Strapi Client] Status:', res.status);
     throw new Error(error.message);
   }
 
