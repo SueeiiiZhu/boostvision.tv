@@ -715,8 +715,6 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     defaultSeo: Schema.Attribute.Component<'shared.seo', false>;
-    downloadsLabel: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Downloads'>;
     favicon: Schema.Attribute.Media<'images'>;
     footerLogo: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'

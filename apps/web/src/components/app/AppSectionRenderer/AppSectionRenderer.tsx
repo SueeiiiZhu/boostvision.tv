@@ -65,7 +65,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                 <Image src="/icons/downloads.svg" alt="download" width={20} height={20} className="w-5 h-5" />
                             </div>
                             <span className="text-[18px] font-black tracking-wide">
-                                {app.downloadCount || "3+ Million"} {globalSetting?.downloadsLabel || "Downloads"}
+                                {app.downloadCount || "3+ Million"}
                             </span>
                         </div>
                         <div className="flex items-center gap-3">

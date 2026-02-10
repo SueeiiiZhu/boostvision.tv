@@ -131,7 +131,6 @@ export interface GlobalSetting {
   tryForFreeLink?: string;
   tocTitle?: string;
   relatedPostsTitle?: string;
-  downloadsLabel?: string;
   appStoreRateLabel?: string;
 }
 

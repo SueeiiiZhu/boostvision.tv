@@ -89,7 +89,7 @@ export default async function AppDetailPage({ params }: Props) {
                           </svg>
                         </div>
                         <span className="text-[18px] font-black text-heading uppercase tracking-wide">
-                          {app.downloadCount || "3+ Million"} {globalSetting?.downloadsLabel || "Downloads"}
+                          {app.downloadCount || "3+ Million"} Downloads
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
