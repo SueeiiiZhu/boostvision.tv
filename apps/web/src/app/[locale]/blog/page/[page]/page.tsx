@@ -9,6 +9,9 @@ interface Props {
   params: Promise<{ page: string }>;
 }
 
+// Allow dynamic params for pages beyond those generated at build time
+export const dynamicParams = true;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { page } = await params;
   const pageNumber = parseInt(page, 10);
