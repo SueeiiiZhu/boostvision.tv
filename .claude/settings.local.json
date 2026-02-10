@@ -3,7 +3,10 @@
     "allow": [
       "Bash(ls:*)",
       "WebSearch",
-      "Bash(pnpm upgrade:*)"
+      "Bash(pnpm upgrade:*)",
+      "Bash(pnpm why:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm install:*)"
     ]
   }
 }

@@ -9,7 +9,8 @@ interface Props {
   params: Promise<{ page: string }>;
 }
 
-// Allow dynamic params for pages beyond those generated at build time
+// Force dynamic rendering to avoid DYNAMIC_SERVER_USAGE errors
+export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
