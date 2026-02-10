@@ -85,6 +85,14 @@
     "relatedPostsTitle": {
       "type": "string"
     },
+    "downloadsLabel": {
+      "type": "string",
+      "default": "Downloads"
+    },
+    "appStoreRateLabel": {
+      "type": "string",
+      "default": "Decent App Store Rate:"
+    },
     "statistics": {
       "type": "component",
       "component": "shared.statistics",

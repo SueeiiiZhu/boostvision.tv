@@ -708,11 +708,15 @@ export interface ApiGlobalSettingGlobalSetting extends Struct.SingleTypeSchema {
   };
   attributes: {
     appStoreBadge: Schema.Attribute.Media<'images'>;
+    appStoreRateLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Decent App Store Rate:'>;
     contactEmail: Schema.Attribute.Email;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     defaultSeo: Schema.Attribute.Component<'shared.seo', false>;
+    downloadsLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Downloads'>;
     favicon: Schema.Attribute.Media<'images'>;
     footerLogo: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
