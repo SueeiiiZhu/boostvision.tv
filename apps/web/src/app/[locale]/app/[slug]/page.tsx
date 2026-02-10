@@ -62,7 +62,7 @@ export default async function AppDetailPage({ params }: Props) {
       <main className="bg-white">
         {/* 如果有动态配置的 sections，优先使用 */}
         {app.sections && app.sections.length > 0 ? (
-          <AppSectionRenderer sections={app.sections} app={app} />
+          <AppSectionRenderer sections={app.sections} app={app} globalSetting={globalSetting} />
         ) : (
           <>
             {/* Hero Section - Two Column Layout */}
@@ -89,7 +89,7 @@ export default async function AppDetailPage({ params }: Props) {
                           </svg>
                         </div>
                         <span className="text-[18px] font-black text-heading uppercase tracking-wide">
-                          {app.downloadCount || "3+ Million"} Downloads
+                          {app.downloadCount || "3+ Million"} {globalSetting?.downloadsLabel || "Downloads"}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
@@ -99,7 +99,7 @@ export default async function AppDetailPage({ params }: Props) {
                           </svg>
                         </div>
                         <span className="text-[18px] font-black text-heading uppercase tracking-wide">
-                          Decent App Store Rate: <span className="text-primary">{app.rating || "4.8"}★</span>
+                          {globalSetting?.appStoreRateLabel || "Decent App Store Rate:"} <span className="text-primary">{app.rating || "4.8"}★</span>
                         </span>
                       </div>
                     </div>

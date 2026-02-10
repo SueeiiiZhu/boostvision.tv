@@ -1,20 +1,21 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App } from '@/types/strapi';
+import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText, QRCode } from '@/components/shared';
 
 interface AppSectionRendererProps {
     sections: Section[];
     app: App;
+    globalSetting?: GlobalSetting | null;
 }
 
 /**
  * AppSectionRenderer - Server Component
  * Dedicated renderer for App Detail pages to match their unique style
  */
-export function AppSectionRenderer({ sections, app }: AppSectionRendererProps) {
+export function AppSectionRenderer({ sections, app, globalSetting }: AppSectionRendererProps) {
     if (!sections || sections.length === 0) return null;
 
     return (
@@ -22,7 +23,7 @@ export function AppSectionRenderer({ sections, app }: AppSectionRendererProps) {
             {sections.map((section, index) => {
                 switch (section.__component) {
                     case 'sections.hero':
-                        return <AppHero key={index} data={section} app={app} />;
+                        return <AppHero key={index} data={section} app={app} globalSetting={globalSetting} />;
                     case 'sections.why-choose':
                         return <AppWhyChoose key={index} data={section} app={app} />;
                     case 'sections.cta':
@@ -41,7 +42,7 @@ export function AppSectionRenderer({ sections, app }: AppSectionRendererProps) {
     );
 }
 
-const AppHero: React.FC<{ data: HeroSection; app: App }> = ({ data, app }) => (
+const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSetting | null }> = ({ data, app, globalSetting }) => (
     <section className="pt-24 pb-20 bg-white">
         <div className="container-custom">
             <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
@@ -64,7 +65,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App }> = ({ data, app }) => (
                                 <Image src="/icons/downloads.svg" alt="download" width={20} height={20} className="w-5 h-5" />
                             </div>
                             <span className="text-[18px] font-black tracking-wide">
-                                {app.downloadCount || "3+ Million"}
+                                {app.downloadCount || "3+ Million"} {globalSetting?.downloadsLabel || "Downloads"}
                             </span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -72,7 +73,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App }> = ({ data, app }) => (
                                 <Image src="/icons/rate.svg" alt="rate" width={20} height={20} className="w-5 h-5" />
                             </div>
                             <span className="text-[18px] font-black tracking-wide">
-                                Decent App Store Rate: 
+                                {globalSetting?.appStoreRateLabel || "Decent App Store Rate:"} 
                                 {/* <span className="text-primary">{app.rating || "4.8"}</span> */}
                             </span>
                             <div className="flex items-center gap-1 ml-1">
