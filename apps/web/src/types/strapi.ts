@@ -91,9 +91,11 @@ export interface BlogPost {
   category: BlogCategory;
   author: Author;
   publishedAt: string;
+  updatedAt?: string;
   readTime: number;
   isFeatured: boolean;
   relatedPosts?: BlogPost[];
+  seo?: SEO;
 }
 
 export interface BlogCategory {
@@ -172,7 +174,7 @@ export interface Tutorial {
   app?: App;
   steps: TutorialStep[];
   sections?: Section[];
-  seo?: any;
+  seo?: SEO;
   order: number;
 }
 
@@ -209,7 +211,7 @@ export interface FAQ {
   app?: App;
   category: string;
   sections?: Section[];
-  seo?: any;
+  seo?: SEO;
   order: number;
 }
 
@@ -253,7 +255,7 @@ export interface Page {
   title: string;
   slug: string;
   content: BlocksContent | string;
-  seo?: any;
+  seo?: SEO;
   sections?: Section[];
   createdAt: string;
   updatedAt?: string;
