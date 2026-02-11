@@ -121,16 +121,15 @@ export default async function AppDetailPage({ params }: Props) {
                             </div>
                           );
 
-                          if (!link.isClickable) {
-                            return (
-                              <div key={link.id} className="cursor-not-allowed">
-                                {ButtonContent}
-                              </div>
-                            );
-                          }
-
                           return (
-                            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                            <a
+                              key={link.id}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                              {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                            >
                               {ButtonContent}
                             </a>
                           );

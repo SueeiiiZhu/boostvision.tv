@@ -1,17 +1,31 @@
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata } from "@/lib/seo";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const page = await getPageBySlug("contact-us");
-  return {
-    title: page?.title || "Contact Us | BoostVision",
-    description: "Get in touch with BoostVision for support, business inquiries, or feedback.",
-  };
+interface Props {
+  params: Promise<{ locale: string }>;
 }
 
-export default async function ContactUsPage() {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const [page, globalSetting] = await Promise.all([
+    getPageBySlug("contact-us").catch(() => null),
+    getGlobalSetting(locale).catch(() => null),
+  ]);
+
+  return genMetadata({
+    seo: page?.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: page?.title || "Contact Us | BoostVision",
+    defaultDescription: "Get in touch with BoostVision for support, business inquiries, or feedback.",
+    path: "/contact-us",
+  });
+}
+
+export default async function ContactUsPage({ params }: Props) {
   const page = await getPageBySlug("contact-us");
 
   return (

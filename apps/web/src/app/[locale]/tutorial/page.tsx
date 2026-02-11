@@ -2,20 +2,34 @@ import Link from "next/link";
 import Image from "next/image";
 import { getTutorials } from "@/lib/strapi/api/tutorials";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata } from "@/lib/seo";
 import { HeroSection, CTASection } from "@/types/strapi";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Screen Mirroring & TV Remote Tutorials | BoostVision",
-  description: "Learn how to use BoostVision apps with our detailed video and text tutorials for screen mirroring and smart TV control.",
-};
-
 interface Props {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ type?: string }>;
 }
 
-export default async function TutorialPage({ searchParams }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const [pageData, globalSetting] = await Promise.all([
+    getPageBySlug("tutorial").catch(() => null),
+    getGlobalSetting(locale).catch(() => null),
+  ]);
+
+  return genMetadata({
+    seo: pageData?.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: "Screen Mirroring & TV Remote Tutorials | BoostVision",
+    defaultDescription: "Learn how to use BoostVision apps with our detailed video and text tutorials for screen mirroring and smart TV control.",
+    path: "/tutorial",
+  });
+}
+
+export default async function TutorialPage({ params, searchParams }: Props) {
   const { type = "screen-mirroring" } = await searchParams;
 
   const [tutorialsResponse, pageData] = await Promise.all([

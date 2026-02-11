@@ -2,25 +2,35 @@ import Link from "next/link";
 import Image from "next/image";
 import { getApps } from "@/lib/strapi/api/apps";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata } from "@/lib/seo";
 import { App, HeroSection, CTASection, AppsFilterSection } from "@/types/strapi";
 import { QRCode } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Download Screen Mirroring & TV Remote Apps | BoostVision",
-  description: "Find and download professional screen mirroring and TV remote control apps for Roku, Fire TV, Samsung, LG, and more.",
-  openGraph: {
-    title: "Download Screen Mirroring & TV Remote Apps | BoostVision",
-    description: "Professional apps for screen mirroring and smart TV control.",
-  },
-};
-
 interface Props {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function AppsPage({ searchParams }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const [pageData, globalSetting] = await Promise.all([
+    getPageBySlug("app").catch(() => null),
+    getGlobalSetting(locale).catch(() => null),
+  ]);
+
+  return genMetadata({
+    seo: pageData?.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: "Download Screen Mirroring & TV Remote Apps | BoostVision",
+    defaultDescription: "Find and download professional screen mirroring and TV remote control apps for Roku, Fire TV, Samsung, LG, and more.",
+    path: "/app",
+  });
+}
+
+export default async function AppsPage({ params, searchParams }: Props) {
   const { tab = "screen-mirroring" } = await searchParams;
 
   // 并行获取 App 列表和页面配置数据
@@ -201,16 +211,15 @@ function AppCatalogCard({ app }: { app: App }) {
                 </div>
               );
 
-              if (!link.isClickable) {
-                return (
-                  <div key={link.id} className="opacity-50 cursor-not-allowed">
-                    {ButtonContent}
-                  </div>
-                );
-              }
-
               return (
-                <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={link.isClickable ? "hover:opacity-80 transition-opacity" : "pointer-events-none opacity-50"}
+                  {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                >
                   {ButtonContent}
                 </a>
               );

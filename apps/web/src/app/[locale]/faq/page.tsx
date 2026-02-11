@@ -2,20 +2,34 @@ import Link from "next/link";
 import Image from "next/image";
 import { getFAQs } from "@/lib/strapi/api/faqs";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata } from "@/lib/seo";
 import { HeroSection, CTASection } from "@/types/strapi";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions | BoostVision Apps",
-  description: "Find answers to common questions about screen mirroring, TV cast, and remote control apps by BoostVision.",
-};
-
 interface Props {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ type?: string }>;
 }
 
-export default async function FAQPage({ searchParams }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const [pageData, globalSetting] = await Promise.all([
+    getPageBySlug("faq").catch(() => null),
+    getGlobalSetting(locale).catch(() => null),
+  ]);
+
+  return genMetadata({
+    seo: pageData?.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: "Frequently Asked Questions | BoostVision Apps",
+    defaultDescription: "Find answers to common questions about screen mirroring, TV cast, and remote control apps by BoostVision.",
+    path: "/faq",
+  });
+}
+
+export default async function FAQPage({ params, searchParams }: Props) {
   const { type = "screen-mirroring" } = await searchParams;
 
   const [faqsResponse, pageData] = await Promise.all([

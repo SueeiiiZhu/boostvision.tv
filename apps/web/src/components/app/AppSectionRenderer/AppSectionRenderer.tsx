@@ -130,16 +130,15 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                     </div>
                                 );
 
-                                if (!link.isClickable) {
-                                    return (
-                                        <div key={link.id} className="cursor-not-allowed">
-                                            {ButtonContent}
-                                        </div>
-                                    );
-                                }
-
                                 return (
-                                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                                    <a
+                                        key={link.id}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                        {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                                    >
                                         {ButtonContent}
                                     </a>
                                 );
@@ -261,16 +260,15 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                                     </div>
                                 );
 
-                                if (!link.isClickable) {
-                                    return (
-                                        <div key={link.id} className="cursor-not-allowed">
-                                            {ButtonContent}
-                                        </div>
-                                    );
-                                }
-
                                 return (
-                                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                                    <a
+                                        key={link.id}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                        {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                                    >
                                         {ButtonContent}
                                     </a>
                                 );
@@ -331,30 +329,24 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
 
             <div className="flex flex-wrap justify-center gap-6 mb-20">
                 {app.downloadLinks && app.downloadLinks.length > 0 ? (
-                    app.downloadLinks.map((link) => {
-                        if (!link.isClickable) {
-                            return (
-                                <a key={link.id} target="_blank" rel="noopener noreferrer" className="cursor-not-allowed">
-                                    <Image
-                                        src={link.badge.url}
-                                        alt={link.platform}
-                                        width={220} height={66}
-                                        className="h-[66px] w-auto"
-                                    />
-                                </a>
-                            );
-                        }
-                        return (
-                            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
-                                <Image
-                                    src={link.badge.url}
-                                    alt={link.platform}
-                                    width={220} height={66}
-                                    className="h-[66px] w-auto"
-                                />
-                            </a>
-                        );
-                    })
+                    app.downloadLinks.map((link) => (
+                        <a
+                            key={link.id}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                            {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                        >
+                            <Image
+                                src={link.badge.url}
+                                alt={link.platform}
+                                width={220}
+                                height={66}
+                                className="h-[66px] w-auto"
+                            />
+                        </a>
+                    ))
                 ) : null}
             </div>
 
