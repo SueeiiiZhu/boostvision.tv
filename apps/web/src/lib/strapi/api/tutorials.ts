@@ -57,7 +57,9 @@ export async function getTutorialBySlug(slug: string) {
       steps: {
         populate: ['image']
       },
-      seo: true
+      seo: {
+        populate: ['metaImage']
+      }
     },
     filters: {
       slug: { $eq: slug },

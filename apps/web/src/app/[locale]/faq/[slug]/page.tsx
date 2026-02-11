@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { RichText } from "@/components/shared";
+import { RichText, JsonLd } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
 import { getFAQBySlug } from "@/lib/strapi/api/faqs";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 import { BlocksContent } from "@strapi/blocks-react-renderer";
 
@@ -24,14 +26,20 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const faq = await getFAQBySlug(slug);
+  const [faq, globalSetting] = await Promise.all([
+    getFAQBySlug(slug),
+    getGlobalSetting(),
+  ]);
 
   if (!faq) return { title: "FAQ Not Found" };
 
-  return {
-    title: faq.seo?.title || `${faq.app?.name || 'App'} F.A.Q. | BoostVision Support`,
-    description: faq.seo?.description || `Frequently asked questions and support for ${faq.app?.name || 'App'}.`,
-  };
+  return genMetadata({
+    seo: faq.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: `${faq.app?.name || 'App'} F.A.Q. | BoostVision Support`,
+    defaultDescription: `Frequently asked questions and support for ${faq.app?.name || 'App'}.`,
+    path: `/faq/${slug}`,
+  });
 }
 
 export default async function FAQDetailPage({ params }: Props) {
@@ -72,8 +80,29 @@ export default async function FAQDetailPage({ params }: Props) {
 
   const app = faq.app;
 
+  // Generate Question schema for single FAQ
+  // Extract plain text answer for schema
+  const answerText = htmlAnswer
+    ? htmlAnswer.replace(/<[^>]*>/g, '').substring(0, 500)
+    : blocksAnswer
+    ? JSON.stringify(blocksAnswer).substring(0, 500)
+    : faq.question;
+
+  const schema = {
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: answerText,
+    },
+  };
+
+  const jsonLd = wrapSchema(schema);
+
   return (
-    <main className="bg-white pb-6">
+    <>
+      <JsonLd data={jsonLd} />
+      <main className="bg-white pb-6">
       {/* 优先使用动态 sections */}
       {faq.sections && faq.sections.length > 0 ? (
         <FAQSectionRenderer sections={faq.sections} app={app!} faq={faq} />
@@ -123,24 +152,47 @@ export default async function FAQDetailPage({ params }: Props) {
             </div>
           </section>
 
-          {/* Support Link */}
-          <section className="mt-12 text-center">
-             <p className="text-muted text-[16px] mb-8">
-               Didn&apos;t find what you were looking for? 
-             </p>
-             <div className="flex justify-center gap-6">
-                <Link href="/tutorial" className="text-primary font-bold hover:underline">View Tutorials</Link>
-                <Link href="/contact-us" className="text-primary font-bold hover:underline">Contact Support</Link>
-             </div>
-             <div className="mt-16">
-                <Link href="/faq" className="text-muted font-bold hover:text-heading transition-colors">
+          {/* Related Links Section */}
+          <section className="mt-12">
+            <div className="container-custom max-w-[900px]">
+              <div className="rounded-[30px] bg-section-bg p-10 text-center">
+                <p className="text-muted text-[16px] mb-8">
+                  Didn&apos;t find what you were looking for?
+                </p>
+                <div className="flex flex-wrap justify-center gap-6 mb-8">
+                  {app && (
+                    <>
+                      <Link
+                        href={`/app/${app.slug}`}
+                        className="inline-flex items-center justify-center px-8 py-3 text-[16px] font-bold text-white bg-primary rounded-full hover:translate-y-[-2px] transition-all shadow-xl"
+                      >
+                        Download {app.name}
+                      </Link>
+                      <Link
+                        href={`/tutorial?type=${app.type}`}
+                        className="inline-flex items-center justify-center px-8 py-3 text-[16px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                      >
+                        View Tutorials
+                      </Link>
+                    </>
+                  )}
+                  <Link
+                    href="/contact-us"
+                    className="inline-flex items-center justify-center px-8 py-3 text-[16px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                  >
+                    Contact Support
+                  </Link>
+                </div>
+                <Link href="/faq" className="text-muted font-bold hover:text-heading transition-colors text-[16px]">
                   ← Back to all FAQs
                 </Link>
-             </div>
+              </div>
+            </div>
           </section>
         </>
       )}
     </main>
+    </>
   );
 }
 

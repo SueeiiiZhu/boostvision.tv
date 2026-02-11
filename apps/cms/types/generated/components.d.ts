@@ -258,15 +258,9 @@ export interface SharedSeo extends Struct.ComponentSchema {
   attributes: {
     canonicalUrl: Schema.Attribute.String;
     keywords: Schema.Attribute.String;
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160;
-      }>;
+    metaDescription: Schema.Attribute.Text;
     metaImage: Schema.Attribute.Media<'images'>;
-    metaTitle: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 60;
-      }>;
+    metaTitle: Schema.Attribute.Text;
     noIndex: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
   };
 }

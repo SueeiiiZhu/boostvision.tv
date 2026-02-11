@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { RichText } from "@/components/shared";
+import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
 import { getTutorialBySlug } from "@/lib/strapi/api/tutorials";
+import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata, generateHowToSchema, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 
 interface Props {
@@ -12,14 +14,20 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const tutorial = await getTutorialBySlug(slug);
+  const [tutorial, globalSetting] = await Promise.all([
+    getTutorialBySlug(slug),
+    getGlobalSetting(),
+  ]);
 
   if (!tutorial) return { title: "Tutorial Not Found" };
 
-  return {
-    title: tutorial.seo?.title || `How to Use ${tutorial.app?.name || 'App'} | BoostVision Tutorial`,
-    description: tutorial.seo?.description || `Step-by-step guide and video tutorial for ${tutorial.app?.name || 'App'}.`,
-  };
+  return genMetadata({
+    seo: tutorial.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: `How to Use ${tutorial.app?.name || 'App'} | BoostVision Tutorial`,
+    defaultDescription: `Step-by-step guide and video tutorial for ${tutorial.app?.name || 'App'}.`,
+    path: `/tutorial/${slug}`,
+  });
 }
 
 export default async function TutorialDetailPage({ params }: Props) {
@@ -33,8 +41,29 @@ export default async function TutorialDetailPage({ params }: Props) {
 
   const app = tutorial.app;
 
+  // Generate HowTo schema if steps exist
+  const schema = tutorial.steps && tutorial.steps.length > 0
+    ? generateHowToSchema({
+        name: tutorial.title,
+        description: `Step-by-step guide for ${app?.name || 'the app'}`,
+        steps: tutorial.steps
+          .sort((a, b) => a.stepNumber - b.stepNumber)
+          .map((step) => ({
+            name: step.title,
+            text: typeof step.description === 'string'
+              ? step.description
+              : JSON.stringify(step.description),
+            image: step.image?.url,
+          })),
+      })
+    : null;
+
+  const jsonLd = schema ? wrapSchema(schema) : null;
+
   return (
-    <main className="bg-white pb-6">
+    <>
+      {jsonLd && <JsonLd data={jsonLd} />}
+      <main className="bg-white pb-6">
       {/* 优先使用动态 sections */}
       {tutorial.sections && tutorial.sections.length > 0 ? (
         <TutorialSectionRenderer sections={tutorial.sections} app={app!} tutorial={tutorial} />
@@ -114,15 +143,41 @@ export default async function TutorialDetailPage({ params }: Props) {
             </div>
           </section>
 
-          {/* More Apps Link */}
-          <section className="mt-20 text-center">
-             <Link href="/tutorial" className="text-primary font-bold hover:underline text-[18px]">
-                ← Back to all tutorials
-             </Link>
+          {/* Related Links Section */}
+          <section className="mt-20">
+            <div className="container-custom max-w-[900px]">
+              <div className="rounded-[40px] bg-section-bg p-12 text-center">
+                <h3 className="text-[28px] font-black text-heading mb-8">
+                  Need More Help?
+                </h3>
+                <div className="flex flex-wrap justify-center gap-6 mb-8">
+                  {app && (
+                    <>
+                      <Link
+                        href={`/app/${app.slug}`}
+                        className="inline-flex items-center justify-center px-8 py-3 text-[16px] font-bold text-white bg-primary rounded-full hover:translate-y-[-2px] transition-all shadow-xl"
+                      >
+                        Download {app.name}
+                      </Link>
+                      <Link
+                        href={`/faq?type=${app.type}`}
+                        className="inline-flex items-center justify-center px-8 py-3 text-[16px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                      >
+                        View F.A.Q.
+                      </Link>
+                    </>
+                  )}
+                </div>
+                <Link href="/tutorial" className="text-primary font-bold hover:underline text-[16px]">
+                  ← Back to all tutorials
+                </Link>
+              </div>
+            </div>
           </section>
         </>
       )}
     </main>
+    </>
   );
 }
 

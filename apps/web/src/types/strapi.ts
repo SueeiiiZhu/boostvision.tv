@@ -132,6 +132,16 @@ export interface GlobalSetting {
   tocTitle?: string;
   relatedPostsTitle?: string;
   appStoreRateLabel?: string;
+  defaultSeo?: SEO;
+}
+
+export interface SEO {
+  metaTitle?: string;
+  metaDescription?: string;
+  metaImage?: StrapiImage;
+  keywords?: string;
+  canonicalUrl?: string;
+  noIndex?: boolean;
 }
 
 export interface SocialLink {

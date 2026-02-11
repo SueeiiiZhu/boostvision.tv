@@ -1,7 +1,8 @@
-import { RichText, QRCode } from "@/components/shared";
+import { RichText, QRCode, JsonLd } from "@/components/shared";
 import { AppSectionRenderer } from "@/components/app/AppSectionRenderer";
 import { getAppBySlug } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata, generateSoftwareApplicationSchema, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -13,14 +14,20 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const app = await getAppBySlug(slug);
+  const [app, globalSetting] = await Promise.all([
+    getAppBySlug(slug),
+    getGlobalSetting(),
+  ]);
 
   if (!app) return { title: "App Not Found" };
 
-  return {
-    title: `${app.name} | BoostVision`,
-    description: app.shortDescription,
-  };
+  return genMetadata({
+    seo: app.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: `${app.name} | BoostVision`,
+    defaultDescription: app.shortDescription,
+    path: `/app/${slug}`,
+  });
 }
 
 export default async function AppDetailPage({ params }: Props) {
@@ -34,31 +41,21 @@ export default async function AppDetailPage({ params }: Props) {
     notFound();
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": app.name,
-    "operatingSystem": "iOS, Android",
-    "applicationCategory": "MultimediaApplication",
-    "description": app.shortDescription,
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "15000"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    }
-  };
+  // Generate SoftwareApplication schema
+  const schema = generateSoftwareApplicationSchema({
+    name: app.name,
+    description: app.shortDescription,
+    rating: app.rating || 4.8,
+    downloadCount: app.downloadCount,
+    image: app.icon?.url,
+    url: `https://www.boostvision.tv/app/${slug}`,
+  });
+
+  const jsonLd = wrapSchema(schema);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <main className="bg-white">
         {/* 如果有动态配置的 sections，优先使用 */}
         {app.sections && app.sections.length > 0 ? (
@@ -155,7 +152,7 @@ export default async function AppDetailPage({ params }: Props) {
                       />
                     ) : (
                       <div className="aspect-[4/3] bg-section-bg rounded-[40px] flex items-center justify-center">
-                        <Image src="/logo.svg" alt="Placeholder" width={200} height={50} className="opacity-20" />
+                        <Image src="/logo.svg" alt="BoostVision logo placeholder" width={200} height={50} className="opacity-20" />
                       </div>
                     )}
                   </div>
@@ -269,8 +266,12 @@ export default async function AppDetailPage({ params }: Props) {
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-12 mb-16">
-                  <Link href="/tutorial" className="text-[20px] font-black border-b-2 border-white/20 hover:border-white transition-all pb-1 uppercase tracking-wider">Tutorial</Link>
-                  <Link href="/faq" className="text-[20px] font-black border-b-2 border-white/20 hover:border-white transition-all pb-1 uppercase tracking-wider">F.A.Q.</Link>
+                  <Link href={`/tutorial?type=${app.type}`} className="text-[20px] font-black border-b-2 border-white/20 hover:border-white transition-all pb-1 uppercase tracking-wider">
+                    How to Use {app.name}
+                  </Link>
+                  <Link href={`/faq?type=${app.type}`} className="text-[20px] font-black border-b-2 border-white/20 hover:border-white transition-all pb-1 uppercase tracking-wider">
+                    {app.name} F.A.Q.
+                  </Link>
                 </div>
 
                 <div className="max-w-[800px] mx-auto pt-10 border-t border-white/10">

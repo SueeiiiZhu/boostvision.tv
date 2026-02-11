@@ -48,9 +48,9 @@ export default async function AppsPage({ searchParams }: Props) {
         {/* Banner */}
         <section className="bg-app-hero py-24 text-center">
           <div className="container-custom">
-            <h2 className="mb-6 !text-[35px] text-white font-black text-heading leading-[1.2]">
+            <h1 className="mb-6 !text-[35px] text-white font-black leading-[1.2]">
               {heroSection?.title || "Download Screen Mirroring & TV Remote Apps ｜BoostVision"}
-            </h2>
+            </h1>
             <p className="mx-auto max-w-[800px] text-[20px] text-white/70 leading-relaxed">
               {heroSection?.subtitle || "Download screen mirroring & TV remote apps for free at App Store and Google Play Store."}
             </p>
@@ -74,7 +74,7 @@ export default async function AppsPage({ searchParams }: Props) {
               >
                 <Image
                   src={filterSection?.screenMirroringIcon?.url || "/icons/mirror-tab.svg"}
-                  alt="mirror" width={24} height={24}
+                  alt="Screen mirroring apps icon" width={24} height={24}
                   className={cn(tab === "screen-mirroring" && "brightness-0 invert")}
                 />
                 {filterSection?.screenMirroringLabel || "Screen Mirroring Apps"}
@@ -92,7 +92,7 @@ export default async function AppsPage({ searchParams }: Props) {
               >
                 <Image
                   src={filterSection?.tvRemoteIcon?.url || "/icons/remote-tab.svg"}
-                  alt="remote" width={24} height={24}
+                  alt="TV remote control apps icon" width={24} height={24}
                   className={cn(tab === "tv-remote" && "brightness-0 invert")}
                 />
                 {filterSection?.tvRemoteLabel || "TV Remote Apps"}

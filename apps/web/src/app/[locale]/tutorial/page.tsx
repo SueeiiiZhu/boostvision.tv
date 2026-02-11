@@ -37,9 +37,9 @@ export default async function TutorialPage({ searchParams }: Props) {
       {/* Banner */}
       <section className="bg-app-hero py-24 text-center">
         <div className="container-custom">
-          <h2 className="mb-6 !text-[35px] text-white font-black text-heading leading-[1.2]">
-            {heroSection?.title || "Download Screen Mirroring & TV Remote Apps ｜BoostVision"}
-          </h2>
+          <h1 className="mb-6 !text-[35px] text-white font-black leading-[1.2]">
+            {heroSection?.title || "Screen Mirroring & TV Remote Tutorials ｜BoostVision"}
+          </h1>
           <p className="mx-auto max-w-[800px] text-[20px] text-white/70 leading-relaxed">
             {heroSection?.subtitle || "Download screen mirroring & TV remote apps for free at App Store and Google Play Store."}
           </p>

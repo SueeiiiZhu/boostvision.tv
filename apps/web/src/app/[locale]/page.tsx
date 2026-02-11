@@ -1,16 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { SectionRenderer } from "@/components/shared";
+import { SectionRenderer, JsonLd } from "@/components/shared";
 import { getApps } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { generateOrganizationSchema, generateWebSiteSchema, wrapInGraph } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
   description: "BoostVision provides professional screen mirroring and TV remote control apps for iPhone, iPad, and Android. Support Roku, Fire TV, Samsung, LG, and more.",
   keywords: ["screen mirroring", "tv remote", "cast to tv", "roku remote", "fire tv remote", "samsung remote", "lg remote"],
+  alternates: {
+    canonical: 'https://www.boostvision.tv',
+  },
   openGraph: {
     title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
     description: "Mirror your phone to any TV and control your Smart TV with ease using BoostVision apps.",
@@ -18,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "BoostVision",
     images: [
       {
-        url: "/images/og-image.webp",
+        url: "https://www.boostvision.tv/images/og-image.webp",
         width: 1200,
         height: 630,
         alt: "BoostVision Apps",
@@ -31,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
     description: "Professional screen mirroring and TV remote control apps for all smart TVs.",
-    images: ["/images/og-image.webp"],
+    images: ["https://www.boostvision.tv/images/og-image.webp"],
   },
 };
 
@@ -53,30 +57,18 @@ export default async function Home() {
     supportHours: "24/7/365"
   };
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "BoostVision",
-    "url": "https://www.boostvision.tv",
-    "logo": "https://www.boostvision.tv/logo.svg",
-    "sameAs": [
-      "https://www.facebook.com/boostvision",
-      "https://twitter.com/boostvision"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "",
-      "contactType": "customer service",
-      "email": "support@boostvision.com.cn"
-    }
-  };
+  // Generate structured data schemas
+  const organizationSchema = generateOrganizationSchema({
+    socialLinks: globalSetting?.socialLinks || [],
+  });
+
+  const websiteSchema = generateWebSiteSchema();
+
+  const jsonLd = wrapInGraph([organizationSchema, websiteSchema]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <main>
         {homePage?.sections && homePage.sections.length > 0 ? (
           <SectionRenderer sections={homePage.sections} />

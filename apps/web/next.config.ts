@@ -4,8 +4,12 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  // Performance optimizations
+  compress: true, // Enable Gzip compression
+
   images: {
     unoptimized: process.env.NODE_ENV === 'development',
+    formats: ['image/avif', 'image/webp'], // Optimize image formats
     remotePatterns: [
       {
         protocol: 'http',
@@ -25,12 +29,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
   typescript: {
     ignoreBuildErrors: false,
   },
-  // eslint: {
-  //   ignoreDuringBuilds: false,
-  // },
+
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['next-qrcode'],
+  },
 };
 
 export default withNextIntl(nextConfig);

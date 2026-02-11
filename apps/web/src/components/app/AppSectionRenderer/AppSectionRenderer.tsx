@@ -161,7 +161,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                         />
                     ) : (
                         <div className="aspect-[4/3] bg-section-bg rounded-[40px] flex items-center justify-center">
-                            <Image src="/logo.svg" alt="Placeholder" width={200} height={50} className="opacity-20" />
+                            <Image src="/logo.svg" alt="BoostVision logo placeholder" width={200} height={50} className="opacity-20" />
                         </div>
                     )}
                 </div>
@@ -214,7 +214,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                 </div>
                 <div className="w-full lg:w-1/2">
                     <div className="mb-6 inline-flex h-14 w-14 items-center justify-center">
-                        <Image src={`/icons/${data.labelColor}-label.svg`} alt="icon" width={32} height={32} />
+                        <Image src={`/icons/${data.labelColor}-label.svg`} alt={`${data.labelColor} feature label`} width={32} height={32} />
                     </div>
                     <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">{data.title}</h2>
 

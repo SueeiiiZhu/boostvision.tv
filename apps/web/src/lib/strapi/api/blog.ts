@@ -45,7 +45,9 @@ export async function getBlogPostBySlug(slug: string) {
           },
         },
       },
-      seo: true,
+      seo: {
+        populate: ['metaImage']
+      },
     },
     filters: {
       slug: { $eq: slug },

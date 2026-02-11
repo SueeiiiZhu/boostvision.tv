@@ -179,7 +179,7 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
                                     />
                                 ) : processedContent.html ? (
                                     <div
-                                        className="text-[17px] text-muted font-light leading-[1.8] prose prose-lg max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline"
+                                        className="text-[17px] text-muted font-light leading-[1.8] prose prose-lg max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline [&_a]:text-primary [&_a]:font-bold [&_a:hover]:underline"
                                         dangerouslySetInnerHTML={{ __html: processedContent.html }}
                                     />
                                 ) : null

@@ -83,6 +83,62 @@ const TutorialAccordion: React.FC<{ data: TutorialAccordionSection; app: App }> 
 
 const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    // Helper function to decode HTML entities
+    const decodeHtmlEntities = (text: string): string => {
+        return text
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&apos;/g, "'")
+            .replace(/&amp;/g, '&');
+    };
+
+    // Set mounted state
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Process content only on client side
+    const getProcessedContent = () => {
+        if (!item.content || !isMounted) {
+            return { html: null, useRichText: true };
+        }
+
+        let htmlContent: string | null = null;
+        let shouldUseRichText = true;
+
+        if (typeof item.content === 'string') {
+            // Check if it contains HTML tags
+            if (/<[a-z][\s\S]*>/i.test(item.content)) {
+                htmlContent = decodeHtmlEntities(item.content);
+                shouldUseRichText = false;
+            }
+        } else if (Array.isArray(item.content)) {
+            // Extract text from BlocksContent
+            const allText = item.content
+                .filter((block: any) => block.type === 'paragraph')
+                .map((block: any) =>
+                    block.children
+                        ?.filter((child: any) => child.type === 'text')
+                        .map((child: any) => child.text)
+                        .join('')
+                )
+                .join('\n');
+
+            // Check if the text contains HTML tags
+            if (/<[a-z][\s\S]*>/i.test(allText)) {
+                htmlContent = decodeHtmlEntities(allText);
+                shouldUseRichText = false;
+            }
+        }
+
+        return { html: htmlContent, useRichText: shouldUseRichText };
+    };
+
+    const processedContent = getProcessedContent();
 
     return (
         <div className={cn(
@@ -114,12 +170,19 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
             )}>
                 <div className="overflow-hidden">
                     <div className="px-12 pb-12">
-                        <div className="pt-8 border-t border-gray-50">
+                        <div className="pt-8 border-t border-gray-50" suppressHydrationWarning>
                             {item.content && (
-                                <RichText
-                                    content={item.content}
-                                    className="text-[17px] text-muted font-light leading-[1.8]"
-                                />
+                                processedContent.useRichText ? (
+                                    <RichText
+                                        content={item.content}
+                                        className="text-[17px] text-muted font-light leading-[1.8]"
+                                    />
+                                ) : processedContent.html ? (
+                                    <div
+                                        className="text-[17px] text-muted font-light leading-[1.8] prose prose-lg max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline [&_a]:text-primary [&_a]:font-bold [&_a:hover]:underline"
+                                        dangerouslySetInnerHTML={{ __html: processedContent.html }}
+                                    />
+                                ) : null
                             )}
                         </div>
 
@@ -165,7 +228,7 @@ const TutorialCTA: React.FC<{ data: CTASection }> = ({ data }) => (
                     href={data.buttonLink ? (data.buttonLink.startsWith('mailto:') ? data.buttonLink : `mailto:${data.buttonLink}`) : "mailto:support@boostvision.com.cn"}
                     className="text-primary hover:underline font-bold"
                 >
-                    {data.buttonText || "support@boostvision.com.cn"}
+                    {data.buttonLink || "support@boostvision.com.cn"}
                 </a>
             </p>
         </div>

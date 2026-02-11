@@ -37,9 +37,9 @@ export default async function FAQPage({ searchParams }: Props) {
       {/* Banner */}
       <section className="bg-app-hero py-24 text-center">
         <div className="container-custom">
-          <h2 className="mb-6 !text-[35px] text-white font-black text-heading leading-[1.2]">
+          <h1 className="mb-6 !text-[35px] text-white font-black leading-[1.2]">
             {heroSection?.title || "F.A.Q. of Screen Mirroring and TV Remote Apps"}
-          </h2>
+          </h1>
           <p className="mx-auto max-w-[800px] text-[20px] text-white/70 leading-relaxed">
             {heroSection?.subtitle || "Find answers by selecting your app."}
           </p>

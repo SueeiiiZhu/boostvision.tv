@@ -54,7 +54,9 @@ export async function getFAQBySlug(slug: string) {
           }
         }
       },
-      seo: true
+      seo: {
+        populate: ['metaImage']
+      }
     },
     filters: {
       slug: { $eq: slug },

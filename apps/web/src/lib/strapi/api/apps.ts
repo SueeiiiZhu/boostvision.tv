@@ -77,7 +77,9 @@ export async function getAppBySlug(slug: string) {
           }
         }
       },
-      seo: true
+      seo: {
+        populate: ['metaImage']
+      }
     },
     filters: {
       slug: { $eq: slug },

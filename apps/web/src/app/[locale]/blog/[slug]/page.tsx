@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { RichText } from "@/components/shared";
+import Link from "next/link";
+import { RichText, JsonLd } from "@/components/shared";
 import { BlogCard } from "../_components/BlogCard";
 import { getBlogPostBySlug } from "@/lib/strapi/api/blog";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { generateMetadata as genMetadata, generateArticleSchema, wrapSchema } from "@/lib/seo";
 import { formatDate } from "@/lib/utils/formatDate";
 import { cn } from "@/lib/utils";
 import { Metadata } from "next";
@@ -13,15 +15,22 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const { slug, locale } = await params;
+  const [post, globalSetting] = await Promise.all([
+    getBlogPostBySlug(slug),
+    getGlobalSetting(locale),
+  ]);
 
   if (!post) return { title: "Post Not Found" };
 
-  return {
-    title: `${post.title} | BoostVision Blog`,
-    description: post.excerpt,
-  };
+  return genMetadata({
+    seo: post.seo,
+    defaultSeo: globalSetting?.defaultSeo,
+    defaultTitle: `${post.title} | BoostVision Blog`,
+    defaultDescription: post.excerpt,
+    path: `/blog/${slug}`,
+    type: "article",
+  });
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -75,30 +84,26 @@ export default async function BlogPostPage({ params }: Props) {
     }
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": post.title,
-    "image": post.coverImage?.url || "/images/blog-placeholder.webp",
-    "datePublished": post.publishedAt,
-    "author": {
-      "@type": "Person",
-      "name": post.author?.name
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "BoostVision",
-      "logo": "https://www.boostvision.tv/logo.svg"
-    },
-    "description": post.excerpt
-  };
+  // Generate Article schema
+  const schema = generateArticleSchema({
+    headline: post.title,
+    description: post.excerpt,
+    image: post.coverImage?.url
+      ? (post.coverImage.url.startsWith("http")
+          ? post.coverImage.url
+          : `https://www.boostvision.tv${post.coverImage.url}`)
+      : undefined,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    authorName: post.author?.name || "BoostVision Team",
+    url: `https://www.boostvision.tv/blog/${slug}`,
+  });
+
+  const jsonLd = wrapSchema(schema);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <main className="bg-white">
         <article className="py-20">
           <div className="container-custom max-w-[1200px]">
@@ -207,6 +212,32 @@ export default async function BlogPostPage({ params }: Props) {
                 </div>
               </div>
             )}
+
+            {/* CTA Section - Explore Apps */}
+            <div className="mt-20 pt-20 border-t border-gray-100">
+              <div className="rounded-[40px] bg-section-bg p-16 text-center">
+                <h4 className="text-[32px] font-black text-heading mb-6">
+                  Ready to Try Our Apps?
+                </h4>
+                <p className="text-[18px] text-muted mb-10 max-w-[700px] mx-auto leading-relaxed">
+                  Discover our professional screen mirroring and TV remote control apps for iPhone, iPad, and Android devices.
+                </p>
+                <div className="flex flex-wrap justify-center gap-6">
+                  <Link
+                    href="/app?tab=screen-mirroring"
+                    className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-white bg-primary rounded-full hover:translate-y-[-2px] transition-all shadow-xl"
+                  >
+                    Screen Mirroring Apps
+                  </Link>
+                  <Link
+                    href="/app?tab=tv-remote"
+                    className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                  >
+                    TV Remote Apps
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </article>
       </main>

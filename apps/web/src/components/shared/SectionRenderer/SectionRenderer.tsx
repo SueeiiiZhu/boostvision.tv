@@ -134,7 +134,7 @@ const FeatureHighlight: React.FC<{ data: FeatureHighlightSection }> = ({ data })
             "mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl",
             data.labelColor === 'green' ? "bg-[#e8f3ff]" : "bg-[#e8f3ff]"
           )}>
-            <Image src={`/icons/${data.labelColor}-label.svg`} alt="icon" width={32} height={32} />
+            <Image src={`/icons/${data.labelColor}-label.svg`} alt={`${data.labelColor} feature label`} width={32} height={32} />
           </div>
           <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">{data.title}</h2>
           <p className="text-[18px] text-muted leading-[1.8]">
