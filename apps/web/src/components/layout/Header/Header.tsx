@@ -111,7 +111,8 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
           <div className="ml-4 flex items-center gap-4">
             <SearchInput />
 
-            <div className="group relative">
+            {/* Language switcher temporarily disabled until i18n is fully configured */}
+            {/* <div className="group relative">
               <button
                 className="flex items-center gap-1 text-[16px] font-bold text-heading hover:text-primary transition-colors uppercase"
                 aria-label={`Change language, current: ${locale}`}
@@ -136,7 +137,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   </Link>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-try-free">
               {globalSetting?.tryForFreeText || t('tryForFree')}
