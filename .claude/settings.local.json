@@ -6,7 +6,9 @@
       "Bash(pnpm upgrade:*)",
       "Bash(pnpm why:*)",
       "Bash(pnpm build:*)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
     ]
   }
 }
