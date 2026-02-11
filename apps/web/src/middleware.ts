@@ -44,11 +44,21 @@ export default function middleware(request: NextRequest) {
   // Handle legacy .html blog URLs
   // Example: /go-to-settings-on-hisense-tv-without-remote.html
   // Redirect to: /blog/go-to-settings-on-hisense-tv-without-remote
+  // Example: /blog/article-name.html -> /blog/article-name
   if (pathname.endsWith('.html')) {
     const url = request.nextUrl.clone();
-    // Extract slug: article-name
-    const slug = pathname.replace(/\.html$/, '').replace(/^\//, '');
-    url.pathname = `/blog/${slug}`;
+    // Remove .html extension
+    const pathWithoutHtml = pathname.replace(/\.html$/, '');
+
+    // Check if path already starts with /blog/
+    if (pathWithoutHtml.startsWith('/blog/')) {
+      // Already has /blog/ prefix, just remove .html
+      url.pathname = pathWithoutHtml;
+    } else {
+      // Extract slug and add /blog/ prefix
+      const slug = pathWithoutHtml.replace(/^\//, '');
+      url.pathname = `/blog/${slug}`;
+    }
 
     // Use 301 permanent redirect for SEO
     return NextResponse.redirect(url, 301);
