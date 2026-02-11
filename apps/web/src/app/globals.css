@@ -228,6 +228,8 @@ body {
   color: var(--color-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* Reduce layout scope and improve rendering performance */
+  contain: layout style;
 }
 
 h1 {

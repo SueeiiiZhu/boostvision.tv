@@ -157,6 +157,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                             width={600}
                             height={450}
                             className="w-full h-auto object-contain"
+                            sizes="(max-width: 1024px) 100vw, 50vw"
                             priority
                         />
                     ) : (
@@ -210,7 +211,16 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                 data.imagePosition === 'right' && "lg:flex-row-reverse"
             )}>
                 <div className="w-full lg:w-1/2">
-                    {data.image && <Image src={data.image.url} alt={data.title} width={600} height={450} className="w-full h-auto" />}
+                    {data.image && (
+                        <Image
+                            src={data.image.url}
+                            alt={data.title}
+                            width={600}
+                            height={450}
+                            className="w-full h-auto"
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                    )}
                 </div>
                 <div className="w-full lg:w-1/2">
                     <div className="mb-6 inline-flex h-14 w-14 items-center justify-center">

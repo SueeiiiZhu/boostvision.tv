@@ -1,0 +1,16 @@
+# Browsers that we support (modern browsers only)
+# This reduces the amount of polyfills and transforms needed
+
+[production]
+>0.5%
+not dead
+not op_mini all
+chrome >= 90
+firefox >= 88
+safari >= 14
+edge >= 90
+
+[development]
+last 1 chrome version
+last 1 firefox version
+last 1 safari version

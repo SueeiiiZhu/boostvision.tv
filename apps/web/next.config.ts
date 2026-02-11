@@ -36,8 +36,35 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ['next-qrcode'],
+    optimizePackageImports: ['next-qrcode', '@vercel/analytics'],
   },
+
+  // Production optimization
+  productionBrowserSourceMaps: false, // Disable source maps in production
+
+  // Compiler options for modern browsers
+  compiler: {
+    // Remove console logs in production
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+
+  // Webpack optimization
+  webpack: (config, { isServer }) => {
+    // Enable tree shaking for production builds
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        sideEffects: false,
+      };
+    }
+    return config;
+  },
+
+  // Transpile packages for modern browsers
+  transpilePackages: [],
 };
 
 export default withNextIntl(nextConfig);

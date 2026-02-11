@@ -7,20 +7,21 @@ import { routing } from '@/i18n/routing';
 import { getNavigation } from "@/lib/strapi/api/navigation";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { Header, Footer } from "@/components/layout";
-import { GoogleAnalytics } from "@/components/analytics";
-import { Analytics } from '@vercel/analytics/react';
+import { AnalyticsWrapper } from "@/components/analytics";
 import "../globals.css";
 
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-sans",
+  display: "swap", // Prevent FOIT and reduce reflow
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["500", "600", "700", "900"],
   variable: "--font-heading",
+  display: "swap", // Prevent FOIT and reduce reflow
 });
 
 export const metadata: Metadata = {
@@ -64,8 +65,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
-        <GoogleAnalytics />
-        <Analytics />
+        <AnalyticsWrapper />
         <NextIntlClientProvider messages={messages}>
           <Header navigation={navigation as any} globalSetting={globalSetting as any} />
           {children}

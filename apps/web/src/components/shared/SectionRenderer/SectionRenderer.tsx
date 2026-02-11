@@ -111,6 +111,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
             width={1200}
             height={600}
             className="h-auto w-full max-w-[1100px]"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
             priority
           />
         </div>
@@ -127,7 +128,16 @@ const FeatureHighlight: React.FC<{ data: FeatureHighlightSection }> = ({ data })
         data.imagePosition === 'right' && "lg:flex-row-reverse"
       )}>
         <div className="w-full lg:w-1/2">
-          {data.image && <Image src={data.image.url} alt={data.title} width={600} height={450} className="w-full h-auto" />}
+          {data.image && (
+            <Image
+              src={data.image.url}
+              alt={data.title}
+              width={600}
+              height={450}
+              className="w-full h-auto"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          )}
         </div>
         <div className="w-full lg:w-1/2">
           <div className={cn(

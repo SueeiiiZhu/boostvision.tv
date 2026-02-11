@@ -148,6 +148,7 @@ export default async function AppDetailPage({ params }: Props) {
                         width={600}
                         height={450}
                         className="w-full h-auto object-contain"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                         priority
                       />
                     ) : (

@@ -123,6 +123,7 @@ export default async function Home() {
                     width={1200}
                     height={600}
                     className="h-auto w-full max-w-[1100px]"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
                     priority
                   />
                 </div>
@@ -204,7 +205,14 @@ export default async function Home() {
               <div className="container-custom">
                 <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24 mb-32">
                   <div className="w-full lg:w-1/2">
-                    <Image src="/images/highlight-mirror.webp" alt="Mirroring Highlight" width={600} height={450} className="w-full h-auto" />
+                    <Image
+                      src="/images/highlight-mirror.webp"
+                      alt="Mirroring Highlight"
+                      width={600}
+                      height={450}
+                      className="w-full h-auto"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
                   </div>
                   <div className="w-full lg:w-1/2">
                     <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
@@ -219,7 +227,14 @@ export default async function Home() {
 
                 <div className="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24">
                   <div className="w-full lg:w-1/2">
-                    <Image src="/images/highlight-remote.webp" alt="Remote Highlight" width={600} height={450} className="w-full h-auto" />
+                    <Image
+                      src="/images/highlight-remote.webp"
+                      alt="Remote Highlight"
+                      width={600}
+                      height={450}
+                      className="w-full h-auto"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
                   </div>
                   <div className="w-full lg:w-1/2">
                     <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e8f3ff]">
