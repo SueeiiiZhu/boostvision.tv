@@ -115,7 +115,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                         {app.downloadLinks && app.downloadLinks.length > 0 ? (
                             app.downloadLinks.map((link) => {
                                 const ButtonContent = (
-                                    <div className="relative group/qr hover:z-50 transition-all">
+                                    <div className="relative group/qr">
                                         <Image
                                             src={link.badge.url}
                                             alt={link.platform}
@@ -123,7 +123,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                             className="h-[54px] w-auto"
                                         />
                                         {link.generateQRCode && (
-                                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-50">
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100]">
                                                 <QRCode data={link.url} size={120} />
                                             </div>
                                         )}
@@ -245,7 +245,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                         {app.downloadLinks && app.downloadLinks.length > 0 ? (
                             app.downloadLinks.map((link) => {
                                 const ButtonContent = (
-                                    <div className="relative group/qr hover:z-50 transition-all">
+                                    <div className="relative group/qr">
                                         <Image
                                             src={link.badge.url}
                                             alt={link.platform}
@@ -253,7 +253,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                                             className="h-[54px] w-auto"
                                         />
                                         {link.generateQRCode && (
-                                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-50">
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100]">
                                                 <QRCode data={link.url} size={120} />
                                             </div>
                                         )}

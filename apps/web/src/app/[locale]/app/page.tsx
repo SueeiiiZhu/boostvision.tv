@@ -201,10 +201,10 @@ function AppCatalogCard({ app }: { app: App }) {
           {app.downloadLinks && app.downloadLinks.length > 0 ? (
             app.downloadLinks.map((link) => {
               const ButtonContent = (
-                <div className="relative group/qr hover:z-50 transition-all">
+                <div className="relative group/qr">
                   <Image src={link.badge.url} alt={link.platform} width={120} height={36} className="h-[36px] w-auto" />
                   {link.generateQRCode && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-50">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100]">
                       <QRCode data={link.url} size={80} />
                     </div>
                   )}
