@@ -188,7 +188,7 @@ const AppWhyChoose: React.FC<{ data: WhyChooseSection; app: App }> = ({ data, ap
                                 />
                             )}
                         </div>
-                        <h3 className="mb-6 text-[22px] font-bold text-heading leading-tight min-h-[60px] flex items-center justify-center">
+                        <h3 className="mb-6 text-[22px] font-bold text-heading leading-tight min-h-[60px] flex items-start justify-center">
                             {feature.title}
                         </h3>
                         <RichText
