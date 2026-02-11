@@ -55,6 +55,7 @@ export interface App {
   features: Feature[];
   isFeatured: boolean;
   order: number;
+  seo?: SEO;
   createdAt: string;
   updatedAt?: string;
   publishedAt: string;
