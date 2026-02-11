@@ -36,6 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return genMetadata({
     seo: faq.seo,
     defaultSeo: globalSetting?.defaultSeo,
+    pageTitle: faq.question,
     defaultTitle: `${faq.app?.name || 'App'} F.A.Q. | BoostVision Support`,
     defaultDescription: `Frequently asked questions and support for ${faq.app?.name || 'App'}.`,
     path: `/faq/${slug}`,

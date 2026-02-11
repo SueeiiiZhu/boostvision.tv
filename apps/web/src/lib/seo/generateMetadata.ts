@@ -4,7 +4,8 @@ import { SEO } from "@/types/strapi";
 interface GenerateMetadataOptions {
   seo?: SEO | null;
   defaultSeo?: SEO | null; // From GlobalSetting
-  defaultTitle?: string;
+  pageTitle?: string; // Page's own title (e.g., post.title, page.title)
+  defaultTitle?: string; // Fallback title if no pageTitle
   defaultDescription?: string;
   path?: string;
   type?: "website" | "article";
@@ -17,6 +18,7 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   const {
     seo,
     defaultSeo,
+    pageTitle,
     defaultTitle,
     defaultDescription,
     path = "",
@@ -26,7 +28,12 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   // Fallback chain: seo → defaultSeo → hardcoded defaults
   const effectiveSeo = seo || defaultSeo;
 
-  const title = effectiveSeo?.metaTitle || defaultTitle || SITE_NAME;
+  // Title fallback priority:
+  // 1. seo.metaTitle (SEO-optimized title from Strapi SEO component)
+  // 2. pageTitle (page's own title, e.g., post.title, app.name)
+  // 3. defaultTitle (caller-provided fallback)
+  // 4. SITE_NAME (final fallback)
+  const title = seo?.metaTitle || pageTitle || defaultTitle || SITE_NAME;
   const description =
     effectiveSeo?.metaDescription ||
     defaultDescription ||

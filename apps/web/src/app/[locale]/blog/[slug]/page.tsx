@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return genMetadata({
     seo: post.seo,
     defaultSeo: globalSetting?.defaultSeo,
+    pageTitle: post.title,
     defaultTitle: `${post.title} | BoostVision Blog`,
     defaultDescription: post.excerpt,
     path: `/blog/${slug}`,

@@ -19,7 +19,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return genMetadata({
     seo: page?.seo,
     defaultSeo: globalSetting?.defaultSeo,
-    defaultTitle: page?.title || "Contact Us | BoostVision",
+    pageTitle: page?.title,
+    defaultTitle: "Contact Us | BoostVision",
     defaultDescription: "Get in touch with BoostVision for support, business inquiries, or feedback.",
     path: "/contact-us",
   });
