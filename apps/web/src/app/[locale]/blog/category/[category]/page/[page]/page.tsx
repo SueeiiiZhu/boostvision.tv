@@ -27,9 +27,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${categoryName} - Page ${pageNumber} | BoostVision Blog`,
     description: `Browse ${categoryName} articles - Page ${pageNumber}. Stay updated with the latest news and guides.`,
+    alternates: {
+      canonical: `https://www.boostvision.tv/blog/category/${category}/page/${pageNumber}`,
+    },
     openGraph: {
       title: `${categoryName} - Page ${pageNumber} | BoostVision Blog`,
       description: `Expert insights and guides about ${categoryName}.`,
+      url: `https://www.boostvision.tv/blog/category/${category}/page/${pageNumber}`,
       images: [],
     },
   };

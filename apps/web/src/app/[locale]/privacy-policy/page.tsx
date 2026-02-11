@@ -7,6 +7,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page?.title || "Privacy Policy | BoostVision",
     description: "Read our privacy policy to understand how we handle your data.",
+    alternates: {
+      canonical: "https://www.boostvision.tv/privacy-policy",
+    },
   };
 }
 

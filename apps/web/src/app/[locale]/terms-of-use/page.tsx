@@ -7,6 +7,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page?.title || "Terms of Use | BoostVision",
     description: "Read our terms of use to understand the rules for using our services.",
+    alternates: {
+      canonical: "https://www.boostvision.tv/terms-of-use",
+    },
   };
 }
 

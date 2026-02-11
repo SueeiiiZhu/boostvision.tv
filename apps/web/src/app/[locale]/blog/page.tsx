@@ -7,9 +7,13 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Streaming & Screen Mirroring Blog | BoostVision",
   description: "Stay updated with the latest news and guides about screen mirroring, TV cast technologies, and smart home entertainment.",
+  alternates: {
+    canonical: "https://www.boostvision.tv/blog",
+  },
   openGraph: {
     title: "Streaming & Screen Mirroring Blog | BoostVision",
     description: "Expert insights and guides for better smart TV experience.",
+    url: "https://www.boostvision.tv/blog",
     images: [],
   },
 };

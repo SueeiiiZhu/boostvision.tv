@@ -31,7 +31,12 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
     effectiveSeo?.metaDescription ||
     defaultDescription ||
     "Professional screen mirroring and TV remote control apps";
-  const canonical = effectiveSeo?.canonicalUrl || `${SITE_URL}${path}`;
+
+  // Canonical URL logic:
+  // 1. Use page-specific canonicalUrl if set
+  // 2. Otherwise, use current page path
+  // Do NOT fallback to defaultSeo.canonicalUrl as it would make all pages point to the same URL
+  const canonical = seo?.canonicalUrl || `${SITE_URL}${path}`;
 
   // Image URL with fallback
   const getImageUrl = (seoData?: SEO | null): string => {

@@ -20,9 +20,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `Blog - Page ${pageNumber} | BoostVision`,
     description: `Browse our blog articles - Page ${pageNumber}. Stay updated with the latest news and guides about screen mirroring and TV cast technologies.`,
+    alternates: {
+      canonical: `https://www.boostvision.tv/blog/page/${pageNumber}`,
+    },
     openGraph: {
       title: `Blog - Page ${pageNumber} | BoostVision`,
       description: "Expert insights and guides for better smart TV experience.",
+      url: `https://www.boostvision.tv/blog/page/${pageNumber}`,
       images: [],
     },
   };

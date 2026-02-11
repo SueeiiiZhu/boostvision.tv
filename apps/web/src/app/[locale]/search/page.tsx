@@ -9,9 +9,14 @@ interface Props {
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { q = "" } = await searchParams;
+  const searchUrl = q ? `https://www.boostvision.tv/search?q=${encodeURIComponent(q)}` : "https://www.boostvision.tv/search";
+
   return {
     title: q ? `Search results for "${q}" | BoostVision` : "Search | BoostVision",
     description: `Search results for ${q} on BoostVision website.`,
+    alternates: {
+      canonical: searchUrl,
+    },
   };
 }
 

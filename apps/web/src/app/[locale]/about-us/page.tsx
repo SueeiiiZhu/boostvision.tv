@@ -9,6 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page?.title || "About us | BoostVision",
     description: "Learn more about BoostVision and our mission to improve smart home control experience.",
+    alternates: {
+      canonical: "https://www.boostvision.tv/about-us",
+    },
   };
 }
 
