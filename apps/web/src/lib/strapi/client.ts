@@ -62,7 +62,7 @@ export async function fetchStrapi<T>(
       },
     });
 
-    console.log(`[Strapi] ${endpoint} - Status: ${res.status}`);
+    // console.log(`[Strapi] ${endpoint} - Status: ${res.status}`);
 
     if (!res.ok) {
       const errorText = await res.text();

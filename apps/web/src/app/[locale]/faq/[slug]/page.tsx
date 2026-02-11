@@ -5,6 +5,18 @@ import { RichText } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
 import { getFAQBySlug } from "@/lib/strapi/api/faqs";
 import { Metadata } from "next";
+import { BlocksContent } from "@strapi/blocks-react-renderer";
+
+// Helper function to decode HTML entities
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, '&');
+}
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -24,11 +36,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function FAQDetailPage({ params }: Props) {
   const { slug } = await params;
-  
+
   const faq = await getFAQBySlug(slug);
 
   if (!faq) {
     notFound();
+  }
+
+  // Extract and decode HTML from answer
+  let htmlAnswer: string | null = null;
+  let blocksAnswer: BlocksContent | null = null;
+
+  if (typeof faq.answer === 'string') {
+    // Direct string answer
+    htmlAnswer = decodeHtmlEntities(faq.answer);
+  } else if (Array.isArray(faq.answer)) {
+    // BlocksContent format - check if it contains HTML in text nodes
+    const allText = faq.answer
+      .filter((block: any) => block.type === 'paragraph')
+      .map((block: any) =>
+        block.children
+          ?.filter((child: any) => child.type === 'text')
+          .map((child: any) => child.text)
+          .join('')
+      )
+      .join('\n');
+
+    // Check if the text contains HTML tags
+    if (/<[a-z][\s\S]*>/i.test(allText)) {
+      htmlAnswer = decodeHtmlEntities(allText);
+    } else {
+      blocksAnswer = faq.answer as BlocksContent;
+    }
   }
 
   const app = faq.app;
@@ -66,7 +105,18 @@ export default async function FAQDetailPage({ params }: Props) {
                   </h2>
                   <div className="flex items-start gap-4">
                     <span className="text-muted text-[32px] leading-none">A.</span>
-                    <RichText content={faq.answer} className="text-[17px] text-muted leading-[1.8] font-light" />
+                    {htmlAnswer ? (
+                      <div
+                        className="text-[17px] text-muted leading-[1.8] font-light prose prose-lg max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline"
+                        dangerouslySetInnerHTML={{ __html: htmlAnswer }}
+                      />
+                    ) : blocksAnswer ? (
+                      <RichText content={blocksAnswer} className="text-[17px] text-muted leading-[1.8] font-light" />
+                    ) : (
+                      <div className="text-[17px] text-muted leading-[1.8] font-light text-red-500">
+                        Error: Unable to render answer content
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

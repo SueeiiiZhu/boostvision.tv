@@ -29,6 +29,7 @@ export async function getFAQs(params: {
 
 export async function getFAQBySlug(slug: string) {
   const query = buildStrapiQuery({
+    fields: ['question', 'slug', 'answer', 'category', 'order'],
     populate: {
       app: {
         populate: {

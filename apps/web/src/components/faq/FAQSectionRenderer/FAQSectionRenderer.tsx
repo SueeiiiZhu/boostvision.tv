@@ -84,6 +84,48 @@ const FAQAccordion: React.FC<{ data: TutorialAccordionSection; app: App }> = ({ 
 const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }) => {
     const [isOpen, setIsOpen] = useState(false);
 
+    // Helper function to decode HTML entities
+    const decodeHtmlEntities = (text: string): string => {
+        return text
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&apos;/g, "'")
+            .replace(/&amp;/g, '&');
+    };
+
+    // Extract HTML content from BlocksContent if needed
+    let htmlContent: string | null = null;
+    let shouldUseRichText = true;
+
+    if (item.content) {
+        if (typeof item.content === 'string') {
+            // Check if it contains HTML tags
+            if (/<[a-z][\s\S]*>/i.test(item.content)) {
+                htmlContent = decodeHtmlEntities(item.content);
+                shouldUseRichText = false;
+            }
+        } else if (Array.isArray(item.content)) {
+            // Extract text from BlocksContent
+            const allText = item.content
+                .filter((block: any) => block.type === 'paragraph')
+                .map((block: any) =>
+                    block.children
+                        ?.filter((child: any) => child.type === 'text')
+                        .map((child: any) => child.text)
+                        .join('')
+                )
+                .join('\n');
+
+            // Check if the text contains HTML tags
+            if (/<[a-z][\s\S]*>/i.test(allText)) {
+                htmlContent = decodeHtmlEntities(allText);
+                shouldUseRichText = false;
+            }
+        }
+    }
+
     return (
         <div className={cn(
             "mb-8 rounded-[40px] border border-gray-200 bg-white transition-all duration-500 overflow-hidden",
@@ -116,10 +158,17 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
                     <div className="px-12 pb-12">
                         <div className="pt-8 border-t border-gray-50">
                             {item.content && (
-                                <RichText
-                                    content={item.content}
-                                    className="text-[17px] text-muted font-light leading-[1.8]"
-                                />
+                                shouldUseRichText ? (
+                                    <RichText
+                                        content={item.content}
+                                        className="text-[17px] text-muted font-light leading-[1.8]"
+                                    />
+                                ) : htmlContent ? (
+                                    <div
+                                        className="text-[17px] text-muted font-light leading-[1.8] prose prose-lg max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline"
+                                        dangerouslySetInnerHTML={{ __html: htmlContent }}
+                                    />
+                                ) : null
                             )}
                         </div>
 

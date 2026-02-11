@@ -101,12 +101,38 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
   if (!content) return null;
 
   if (typeof content === 'string') {
-    const isMarkdown = content.includes('#') || 
-                       content.includes('**') || 
-                       content.includes('__') || 
-                       content.includes('[') || 
-                       content.includes('<raw-html>');
-    const htmlContent = isMarkdown ? parseMarkdown(content) : content;
+    // Check if content contains HTML tags or entities
+    const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content) || // Any HTML tag
+                        content.includes('&lt;') ||          // Encoded tags
+                        content.includes('&gt;') ||          // Encoded entities
+                        content.includes('&quot;') ||
+                        content.includes('&amp;');
+
+    const isMarkdown = !hasHtmlTags && (
+                       content.includes('#') ||
+                       content.includes('**') ||
+                       content.includes('__') ||
+                       content.includes('[') ||
+                       content.includes('<raw-html>')
+                       );
+
+    let htmlContent: string;
+
+    if (hasHtmlTags) {
+      // Decode HTML entities (decode &amp; last to avoid double-decoding)
+      const decoded = content
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&amp;/g, '&');
+      htmlContent = decoded;
+    } else if (isMarkdown) {
+      htmlContent = parseMarkdown(content);
+    } else {
+      htmlContent = content;
+    }
 
     return (
       <div
