@@ -83,6 +83,7 @@ const FAQAccordion: React.FC<{ data: TutorialAccordionSection; app: App }> = ({ 
 
 const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     // Helper function to decode HTML entities
     const decodeHtmlEntities = (text: string): string => {
@@ -95,11 +96,20 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
             .replace(/&amp;/g, '&');
     };
 
-    // Extract HTML content from BlocksContent if needed
-    let htmlContent: string | null = null;
-    let shouldUseRichText = true;
+    // Set mounted state
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
-    if (item.content) {
+    // Process content only on client side
+    const getProcessedContent = () => {
+        if (!item.content || !isMounted) {
+            return { html: null, useRichText: true };
+        }
+
+        let htmlContent: string | null = null;
+        let shouldUseRichText = true;
+
         if (typeof item.content === 'string') {
             // Check if it contains HTML tags
             if (/<[a-z][\s\S]*>/i.test(item.content)) {
@@ -124,7 +134,11 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
                 shouldUseRichText = false;
             }
         }
-    }
+
+        return { html: htmlContent, useRichText: shouldUseRichText };
+    };
+
+    const processedContent = getProcessedContent();
 
     return (
         <div className={cn(
@@ -156,17 +170,17 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
             )}>
                 <div className="overflow-hidden">
                     <div className="px-12 pb-12">
-                        <div className="pt-8 border-t border-gray-50">
+                        <div className="pt-8 border-t border-gray-50" suppressHydrationWarning>
                             {item.content && (
-                                shouldUseRichText ? (
+                                processedContent.useRichText ? (
                                     <RichText
                                         content={item.content}
                                         className="text-[17px] text-muted font-light leading-[1.8]"
                                     />
-                                ) : htmlContent ? (
+                                ) : processedContent.html ? (
                                     <div
                                         className="text-[17px] text-muted font-light leading-[1.8] prose prose-lg max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline"
-                                        dangerouslySetInnerHTML={{ __html: htmlContent }}
+                                        dangerouslySetInnerHTML={{ __html: processedContent.html }}
                                     />
                                 ) : null
                             )}

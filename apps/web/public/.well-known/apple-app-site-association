@@ -1,0 +1,15 @@
+{
+  "applinks": {
+      "details": [
+           {
+             "appIDs": [ "UPKLSW627M.com.boost.universal.tv.remote"],
+             "components": [
+               {
+                  "/": "/deeplink",
+                  "comment": "Matches any URL with a path that starts with /deeplink"
+               }
+             ]
+           }
+       ]
+   }
+}

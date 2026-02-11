@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing';
 import { getNavigation } from "@/lib/strapi/api/navigation";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { Header, Footer } from "@/components/layout";
+import { GoogleAnalytics } from "@/components/analytics";
 import "../globals.css";
 
 const roboto = Roboto({
@@ -69,8 +70,9 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale} className={`${roboto.variable} ${poppins.variable}`}>
-      <body className="antialiased">
+    <html lang={locale} className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
+      <body className="antialiased" suppressHydrationWarning>
+        <GoogleAnalytics />
         <NextIntlClientProvider messages={messages}>
           <Header navigation={navigation as any} globalSetting={globalSetting as any} />
           {children}

@@ -87,7 +87,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
       {data.statistics && (
         <div className="mt-20 flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
           {[
-            { label: "Downloads", value: data.statistics.downloads, icon: "download" },
+            { label: "Downloads", value: data.statistics.downloads, icon: "downloads" },
             { label: "Countries and Regions", value: data.statistics.countries, icon: "global" },
             { label: "Satisfied Customers", value: data.statistics.customers, icon: "users" },
             { label: "Customer Service", value: data.statistics.supportHours, icon: "service" },

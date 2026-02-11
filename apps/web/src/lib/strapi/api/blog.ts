@@ -61,13 +61,29 @@ export async function getBlogCategories() {
 }
 
 export async function getBlogPostSlugs() {
-  const query = buildStrapiQuery({
-    fields: ["slug"],
-    pagination: {
-      pageSize: 1000,
-    },
-  });
+  let allSlugs: string[] = [];
+  let page = 1;
+  let hasMore = true;
+  const pageSize = 100;
 
-  const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
-  return response.data.map((post) => post.slug);
+  while (hasMore) {
+    const query = buildStrapiQuery({
+      fields: ["slug"],
+      pagination: {
+        page,
+        pageSize,
+      },
+    });
+
+    const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
+    const slugs = response.data.map((post) => post.slug);
+    allSlugs = [...allSlugs, ...slugs];
+
+    // Check if there are more pages
+    const totalPages = response.meta?.pagination?.pageCount || 1;
+    hasMore = page < totalPages;
+    page++;
+  }
+
+  return allSlugs;
 }
