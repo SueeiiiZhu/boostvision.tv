@@ -58,7 +58,7 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
           {/* Dynamic Menus from Strapi */}
           {footerColumns.map((column) => (
             <div key={column.id}>
-              <h4 className="mb-8 text-[18px] font-bold font-heading text-white">{column.title}</h4>
+              <h2 className="mb-8 text-[18px] font-bold font-heading text-white">{column.title}</h2>
               <ul className="flex flex-col gap-3">
                 {column.links?.map((link) => (
                   <li key={link.id}>

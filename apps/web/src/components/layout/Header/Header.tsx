@@ -74,7 +74,11 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   )}
                 </Link>
               ) : (
-                <button className="nav-link flex items-center gap-1">
+                <button
+                  className="nav-link flex items-center gap-1"
+                  aria-label={`${item.name} menu`}
+                  aria-expanded={activeDropdown === item.id}
+                >
                   {item.name}
                   {item.links?.length > 0 && (
                     <svg className="h-3 w-3 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,7 +112,10 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
             <SearchInput />
 
             <div className="group relative">
-              <button className="flex items-center gap-1 text-[16px] font-bold text-heading hover:text-primary transition-colors uppercase">
+              <button
+                className="flex items-center gap-1 text-[16px] font-bold text-heading hover:text-primary transition-colors uppercase"
+                aria-label={`Change language, current: ${locale}`}
+              >
                 {locale}
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -141,6 +148,8 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
         <button
           className="flex h-10 w-10 items-center justify-center rounded-lg text-heading lg:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMenuOpen}
         >
           <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             {isMenuOpen ? (

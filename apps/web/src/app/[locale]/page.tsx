@@ -297,7 +297,7 @@ export default async function Home() {
                       <p className="text-[17px] text-heading font-medium italic mb-10 leading-[1.8]">
                         &quot;{review.text}&quot;
                       </p>
-                      <h4 className="text-[19px] font-black text-heading">{review.name}</h4>
+                      <cite className="text-[19px] font-black text-heading not-italic">{review.name}</cite>
                     </div>
                   ))}
                 </div>
