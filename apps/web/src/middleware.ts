@@ -29,7 +29,7 @@ export default function middleware(request: NextRequest) {
   // Example: /pt/ -> /, /es/blog -> /blog
   const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0];
-  const nonDefaultLocales = ['pt', 'es', 'fr', 'de', 'ja']; // All locales except 'en'
+  const nonDefaultLocales = ['pt', 'es', 'fr', 'de', 'ja', 'jp']; // All locales except 'en'
 
   if (nonDefaultLocales.includes(firstSegment)) {
     const url = request.nextUrl.clone();
