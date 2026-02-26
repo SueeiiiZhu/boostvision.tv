@@ -29,33 +29,49 @@ export async function getBlogPosts(params: {
   return fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
 }
 
-export async function getBlogPostBySlug(slug: string) {
-  const query = buildStrapiQuery({
-    populate: {
-      coverImage: true,
-      category: true,
-      author: {
-        populate: ["avatar"],
-      },
-      relatedPosts: {
-        populate: {
-          coverImage: true,
-          author: {
-            populate: ["avatar"],
-          },
+export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
+  const populate = {
+    coverImage: true,
+    category: true,
+    author: {
+      populate: ["avatar"],
+    },
+    relatedPosts: {
+      populate: {
+        coverImage: true,
+        author: {
+          populate: ["avatar"],
         },
       },
-      seo: {
-        populate: ['metaImage']
-      },
     },
-    filters: {
-      slug: { $eq: slug },
+    seo: {
+      populate: ['metaImage']
     },
-  });
+  };
 
-  const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
-  return response.data?.[0] || null;
+  // Step 1: Find the document by slug (no locale filter — slug is non-localizable)
+  const slugQuery = buildStrapiQuery({
+    populate,
+    filters: { slug: { $eq: slug } },
+  });
+  const slugResponse = await fetchStrapi<BlogPost[]>(`/blog-posts${slugQuery}`);
+  const defaultPost = slugResponse.data?.[0];
+  if (!defaultPost) return null;
+
+  // Step 2: If a non-default locale is requested, fetch the localized version by documentId
+  if (locale !== 'en') {
+    const localizedQuery = buildStrapiQuery({ locale, populate });
+    try {
+      const localizedResponse = await fetchStrapi<BlogPost>(
+        `/blog-posts/${defaultPost.documentId}${localizedQuery}`
+      );
+      if (localizedResponse.data) return localizedResponse.data;
+    } catch {
+      // Localized version not available, fall back to default
+    }
+  }
+
+  return defaultPost;
 }
 
 export async function getBlogCategories() {

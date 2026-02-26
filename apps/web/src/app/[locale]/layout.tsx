@@ -64,6 +64,13 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Preconnect to Strapi CMS for faster API & media image loading */}
+        <link rel="preconnect" href="https://helpful-fun-dead826d03.strapiapp.com" />
+        {/* DNS prefetch for deferred analytics scripts */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://va.vercel-scripts.com" />
+      </head>
       <body className="antialiased" suppressHydrationWarning>
         <AnalyticsWrapper />
         <NextIntlClientProvider messages={messages}>

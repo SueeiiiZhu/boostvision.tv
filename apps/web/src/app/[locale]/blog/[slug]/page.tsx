@@ -17,7 +17,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const [post, globalSetting] = await Promise.all([
-    getBlogPostBySlug(slug),
+    getBlogPostBySlug(slug, locale),
     getGlobalSetting(locale),
   ]);
 
@@ -43,7 +43,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   try {
     const [postData, globalData] = await Promise.all([
-      getBlogPostBySlug(slug),
+      getBlogPostBySlug(slug, locale),
       getGlobalSetting(locale),
     ]);
     post = postData;

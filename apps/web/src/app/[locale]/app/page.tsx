@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     getPageBySlug("app").catch(() => null),
     getGlobalSetting(locale).catch(() => null),
   ]);
-
+  
   return genMetadata({
     seo: pageData?.seo,
     defaultSeo: globalSetting?.defaultSeo,
@@ -178,7 +178,7 @@ export default async function AppsPage({ params, searchParams }: Props) {
 
 function AppCatalogCard({ app }: { app: App }) {
   return (
-    <div className="group flex flex-col items-center rounded-[40px] bg-white p-12 text-center card-shadow transition-all duration-300 hover:translate-y-[-12px]">
+    <div className="group relative z-0 flex flex-col items-center rounded-[40px] bg-white p-12 text-center card-shadow transition-all duration-300 hover:translate-y-[-12px] hover:z-10">
       <Link href={`/app/${app.slug}`} className="mb-8 block">
         <div className="h-[120px] w-[120px] relative overflow-hidden rounded-[30px] shadow-2xl transition-transform duration-500 group-hover:scale-105">
           <Image
@@ -204,7 +204,7 @@ function AppCatalogCard({ app }: { app: App }) {
                 <div className="relative group/qr">
                   <Image src={link.badge.url} alt={link.platform} width={120} height={36} className="h-[36px] w-auto" />
                   {link.generateQRCode && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100]">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100] pointer-events-none">
                       <QRCode data={link.url} size={80} />
                     </div>
                   )}

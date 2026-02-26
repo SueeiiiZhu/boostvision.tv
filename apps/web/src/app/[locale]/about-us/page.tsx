@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getPageBySlug("about-us");
   return {
     title: page?.title || "About us | BoostVision",
-    description: "Learn more about BoostVision and our mission to improve smart home control experience.",
+    description: "Information about Chengdu BoostVision Technology Company, the software developer focuses on screen mirroring and TV remote apps.",
     alternates: {
       canonical: "https://www.boostvision.tv/about-us",
     },
