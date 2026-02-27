@@ -92,8 +92,7 @@ export interface BlogPost {
   author: Author;
   publishedAt: string;
   updatedAt?: string;
-  blogCreateTime?: string;
-  readTime: number;
+readTime: number;
   isFeatured: boolean;
   relatedPosts?: BlogPost[];
   seo?: SEO;

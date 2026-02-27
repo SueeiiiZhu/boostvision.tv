@@ -42,7 +42,7 @@ export function BlogCard({ post }: BlogCardProps) {
             </div>
             <span className="text-[14px] font-bold text-heading">{post.author?.name}</span>
           </div>
-          <span className="text-[14px] font-medium text-muted">{formatDate(post.blogCreateTime || post.publishedAt)}</span>
+          <span className="text-[14px] font-medium text-muted">{formatDate(post.publishedAt)}</span>
         </div>
       </div>
     </div>
