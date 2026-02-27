@@ -94,8 +94,8 @@ export default async function BlogPostPage({ params }: Props) {
           ? post.coverImage.url
           : `https://www.boostvision.tv${post.coverImage.url}`)
       : undefined,
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt || post.publishedAt,
+    datePublished: post.postDate,
+    dateModified: post.updatedAt || post.postDate,
     authorName: post.author?.name || "BoostVision Team",
     url: `https://www.boostvision.tv/blog/${slug}`,
   });
@@ -133,7 +133,7 @@ export default async function BlogPostPage({ params }: Props) {
                       <span className="font-bold text-heading">{post.author?.name}</span>
                     </div>
                     <span className="text-gray-300">|</span>
-                    <span className="text-muted text-[15px]">{formatDate(post.publishedAt)}</span>
+                    <span className="text-muted text-[15px]">{formatDate(post.postDate)}</span>
                   </div>
                 </header>
 

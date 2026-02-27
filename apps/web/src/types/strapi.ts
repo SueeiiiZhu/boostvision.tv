@@ -90,9 +90,11 @@ export interface BlogPost {
   coverImage: StrapiImage;
   category: BlogCategory;
   author: Author;
+  postDate: string;
+  createdAt: string;
   publishedAt: string;
   updatedAt?: string;
-readTime: number;
+  readTime: number;
   isFeatured: boolean;
   relatedPosts?: BlogPost[];
   seo?: SEO;
