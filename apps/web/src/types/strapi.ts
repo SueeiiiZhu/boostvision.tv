@@ -51,7 +51,13 @@ export interface App {
   screenshots: StrapiImage[];
   heroImage: StrapiImage;
   downloadCount: string;
-  rating: number;
+  rating?: number | string;
+  ratingCount?: number;
+  appStoreRating?: number | string;
+  appStoreRatingCount?: number;
+  googlePlayRating?: number | string;
+  googlePlayRatingCount?: number;
+  ratingSyncedAt?: string;
   features: Feature[];
   isFeatured: boolean;
   order: number;

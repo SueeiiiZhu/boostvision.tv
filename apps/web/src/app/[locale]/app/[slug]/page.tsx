@@ -12,6 +12,41 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+function parseRating(value: unknown): number | null {
+  const parsed =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : NaN;
+
+  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 5) return null;
+  return Number(parsed.toFixed(2));
+}
+
+function parseRatingCount(value: unknown): number | null {
+  const parsed =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : NaN;
+
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
+  return Math.round(parsed);
+}
+
+function formatRatingCount(value: number | null): string | null {
+  if (!value) return null;
+  return value.toLocaleString("en-US");
+}
+
+function formatDownloadCountText(value: string | null | undefined): string {
+  if (!value) return "3+ Million Downloads";
+  if (/downloads?/i.test(value)) return value;
+  return `${value} Downloads`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const [app, globalSetting] = await Promise.all([
@@ -42,11 +77,15 @@ export default async function AppDetailPage({ params }: Props) {
     notFound();
   }
 
+  const normalizedRating = parseRating(app.rating);
+  const normalizedRatingCount = parseRatingCount(app.ratingCount);
+
   // Generate SoftwareApplication schema
   const schema = generateSoftwareApplicationSchema({
     name: app.name,
     description: app.shortDescription,
-    rating: app.rating || 4.8,
+    rating: normalizedRating,
+    ratingCount: normalizedRatingCount,
     downloadCount: app.downloadCount,
     image: app.icon?.url,
     url: `https://www.boostvision.tv/app/${slug}`,
@@ -87,7 +126,7 @@ export default async function AppDetailPage({ params }: Props) {
                           </svg>
                         </div>
                         <span className="text-[18px] font-black text-heading uppercase tracking-wide">
-                          {app.downloadCount || "3+ Million"} Downloads
+                          {formatDownloadCountText(app.downloadCount)}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
@@ -97,7 +136,15 @@ export default async function AppDetailPage({ params }: Props) {
                           </svg>
                         </div>
                         <span className="text-[18px] font-black text-heading uppercase tracking-wide">
-                          {globalSetting?.appStoreRateLabel || "Decent App Store Rate:"} <span className="text-primary">{app.rating || "4.8"}★</span>
+                          {globalSetting?.appStoreRateLabel || "Decent App Store Rate:"}{" "}
+                          <span className="text-primary">
+                            {normalizedRating ? `${normalizedRating}★` : "N/A"}
+                          </span>
+                          {normalizedRatingCount ? (
+                            <span className="text-muted/80 normal-case font-semibold ml-2">
+                              ({formatRatingCount(normalizedRatingCount)} reviews)
+                            </span>
+                          ) : null}
                         </span>
                       </div>
                     </div>
