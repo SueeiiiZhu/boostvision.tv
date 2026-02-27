@@ -56,8 +56,8 @@ export function generateWebSiteSchema(): Record<string, any> {
 interface SoftwareApplicationSchemaOptions {
   name: string;
   description: string;
-  rating?: number;
-  ratingCount?: number;
+  rating?: number | null;
+  ratingCount?: number | null;
   downloadCount?: string;
   operatingSystem?: string;
   applicationCategory?: string;
@@ -74,14 +74,23 @@ export function generateSoftwareApplicationSchema(
   const {
     name,
     description,
-    rating = 4.8,
-    ratingCount = 15000,
+    rating,
+    ratingCount,
     downloadCount,
     operatingSystem = "iOS, Android",
     applicationCategory = "MultimediaApplication",
     image,
     url,
   } = options;
+
+  const hasValidAggregateRating =
+    typeof rating === "number" &&
+    Number.isFinite(rating) &&
+    rating > 0 &&
+    rating <= 5 &&
+    typeof ratingCount === "number" &&
+    Number.isFinite(ratingCount) &&
+    ratingCount > 0;
 
   return {
     "@type": "SoftwareApplication",
@@ -91,13 +100,15 @@ export function generateSoftwareApplicationSchema(
     applicationCategory,
     url,
     ...(image && { image }),
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: rating.toString(),
-      ratingCount: ratingCount.toString(),
-      bestRating: "5",
-      worstRating: "1",
-    },
+    ...(hasValidAggregateRating && {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: rating.toString(),
+        ratingCount: ratingCount.toString(),
+        bestRating: "5",
+        worstRating: "1",
+      },
+    }),
     offers: {
       "@type": "Offer",
       price: "0",
