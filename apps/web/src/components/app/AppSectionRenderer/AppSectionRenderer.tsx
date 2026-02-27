@@ -79,7 +79,16 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                             <div className="flex items-center gap-1 ml-1">
                                 {/* 渲染 5 颗星逻辑 - 放在文字后面 */}
                                 {[...Array(5)].map((_, i) => {
-                                    const rating = app.rating || 4.8;
+                                    const parsedRating =
+                                        typeof app.rating === "number"
+                                            ? app.rating
+                                            : typeof app.rating === "string"
+                                                ? Number(app.rating)
+                                                : NaN;
+                                    const rating =
+                                        Number.isFinite(parsedRating) && parsedRating > 0 && parsedRating <= 5
+                                            ? parsedRating
+                                            : 4.8;
                                     const starValue = i + 1;
 
                                     if (starValue <= Math.floor(rating)) {
