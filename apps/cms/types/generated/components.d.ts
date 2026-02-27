@@ -257,7 +257,7 @@ export interface SharedSeo extends Struct.ComponentSchema {
   };
   attributes: {
     canonicalUrl: Schema.Attribute.String;
-    keywords: Schema.Attribute.String;
+    keywords: Schema.Attribute.Text;
     metaDescription: Schema.Attribute.Text;
     metaImage: Schema.Attribute.Media<'images'>;
     metaTitle: Schema.Attribute.Text;

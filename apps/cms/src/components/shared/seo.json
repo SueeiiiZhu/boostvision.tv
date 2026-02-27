@@ -20,7 +20,7 @@
       ]
     },
     "keywords": {
-      "type": "string"
+      "type": "text"
     },
     "canonicalUrl": {
       "type": "string"

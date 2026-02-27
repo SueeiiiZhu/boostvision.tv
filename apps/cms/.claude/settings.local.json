@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(npm install:*)",
+      "Bash(npm view:*)",
+      "WebFetch(domain:docs.strapi.io)",
+      "WebSearch",
+      "WebFetch(domain:strapi.io)",
+      "WebFetch(domain:docs-v4.strapi.io)"
+    ]
+  }
+}
