@@ -1,15 +1,21 @@
 import { RichText, SectionRenderer } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 
-export async function generateMetadata(): Promise<Metadata> {
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const page = await getPageBySlug("privacy-policy");
+  const alternates = getLocaleAlternates("/privacy-policy", locale);
+
   return {
     title: page?.title || "Privacy Policy | BoostVision",
     description: "Read our privacy policy to understand how we handle your data.",
-    alternates: {
-      canonical: "https://www.boostvision.tv/privacy-policy",
-    },
+    alternates,
   };
 }
 

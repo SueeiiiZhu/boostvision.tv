@@ -26,10 +26,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return genMetadata({
     seo: post.seo,
     defaultSeo: globalSetting?.defaultSeo,
+    fallbackOgImage: post.coverImage,
     pageTitle: post.title,
     defaultTitle: `${post.title} | BoostVision Blog`,
     defaultDescription: post.excerpt,
     path: `/blog/${slug}`,
+    locale,
     type: "article",
   });
 }

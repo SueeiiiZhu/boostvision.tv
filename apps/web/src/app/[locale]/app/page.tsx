@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     defaultTitle: "Download Screen Mirroring & TV Remote Apps | BoostVision",
     defaultDescription: "Find and download professional screen mirroring and TV remote control apps for Roku, Fire TV, Samsung, LG, and more.",
     path: "/app",
+    locale,
   });
 }
 

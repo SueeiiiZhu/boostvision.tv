@@ -2,11 +2,12 @@ import { notFound } from "next/navigation";
 import { getBlogPosts, getBlogCategories } from "@/lib/strapi/api/blog";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { HeroSection, CTASection } from "@/types/strapi";
+import { getLocaleAlternates } from "@/lib/seo";
 import { BlogList } from "../../../../_components";
 import type { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ category: string; page: string }>;
+  params: Promise<{ category: string; page: string; locale: string }>;
 }
 
 // Force dynamic rendering to avoid DYNAMIC_SERVER_USAGE errors
@@ -14,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category, page } = await params;
+  const { category, page, locale } = await params;
   const pageNumber = parseInt(page, 10);
 
   // Fetch category info
@@ -23,17 +24,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const currentCategory = categories.find((cat) => cat.slug === category);
 
   const categoryName = currentCategory?.name || category;
+  const alternates = getLocaleAlternates(`/blog/category/${category}/page/${pageNumber}`, locale);
 
   return {
     title: `${categoryName} - Page ${pageNumber} | BoostVision Blog`,
     description: `Browse ${categoryName} articles - Page ${pageNumber}. Stay updated with the latest news and guides.`,
-    alternates: {
-      canonical: `https://www.boostvision.tv/blog/category/${category}/page/${pageNumber}`,
-    },
+    alternates,
     openGraph: {
       title: `${categoryName} - Page ${pageNumber} | BoostVision Blog`,
       description: `Expert insights and guides about ${categoryName}.`,
-      url: `https://www.boostvision.tv/blog/category/${category}/page/${pageNumber}`,
+      url: alternates.canonical,
       images: [],
     },
   };

@@ -1,15 +1,21 @@
 import { RichText, SectionRenderer } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 
-export async function generateMetadata(): Promise<Metadata> {
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const page = await getPageBySlug("terms-of-use");
+  const alternates = getLocaleAlternates("/terms-of-use", locale);
+
   return {
     title: page?.title || "Terms of Use | BoostVision",
     description: "Read our terms of use to understand the rules for using our services.",
-    alternates: {
-      canonical: "https://www.boostvision.tv/terms-of-use",
-    },
+    alternates,
   };
 }
 

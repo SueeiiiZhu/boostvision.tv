@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     defaultTitle: "Screen Mirroring & TV Remote Tutorials | BoostVision",
     defaultDescription: "Learn how to use BoostVision apps with our detailed video and text tutorials for screen mirroring and smart TV control.",
     path: "/tutorial",
+    locale,
   });
 }
 
