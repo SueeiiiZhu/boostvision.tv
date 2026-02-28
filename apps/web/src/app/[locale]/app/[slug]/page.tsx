@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 function parseRating(value: unknown): number | null {
@@ -48,10 +48,10 @@ function formatDownloadCountText(value: string | null | undefined): string {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const [app, globalSetting] = await Promise.all([
     getAppBySlug(slug),
-    getGlobalSetting(),
+    getGlobalSetting(locale),
   ]);
 
   if (!app) return { title: "App Not Found" };
@@ -63,6 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     defaultTitle: `${app.name} | BoostVision`,
     defaultDescription: app.shortDescription,
     path: `/app/${slug}`,
+    locale,
   });
 }
 

@@ -2,16 +2,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 
-export async function generateMetadata(): Promise<Metadata> {
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const page = await getPageBySlug("about-us");
+  const alternates = getLocaleAlternates("/about-us", locale);
+
   return {
     title: page?.title || "About us | BoostVision",
     description: "Information about Chengdu BoostVision Technology Company, the software developer focuses on screen mirroring and TV remote apps.",
-    alternates: {
-      canonical: "https://www.boostvision.tv/about-us",
-    },
+    alternates,
   };
 }
 

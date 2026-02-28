@@ -5,7 +5,7 @@ import { RichText, JsonLd } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
 import { getFAQBySlug } from "@/lib/strapi/api/faqs";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
-import { generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
+import { generateFAQPageSchema, generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 import { BlocksContent } from "@strapi/blocks-react-renderer";
 
@@ -21,14 +21,14 @@ function decodeHtmlEntities(text: string): string {
 }
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const [faq, globalSetting] = await Promise.all([
     getFAQBySlug(slug),
-    getGlobalSetting(),
+    getGlobalSetting(locale),
   ]);
 
   if (!faq) return { title: "FAQ Not Found" };
@@ -40,6 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     defaultTitle: `${faq.app?.name || 'App'} F.A.Q. | BoostVision Support`,
     defaultDescription: `Frequently asked questions and support for ${faq.app?.name || 'App'}.`,
     path: `/faq/${slug}`,
+    locale,
   });
 }
 
@@ -81,22 +82,21 @@ export default async function FAQDetailPage({ params }: Props) {
 
   const app = faq.app;
 
-  // Generate Question schema for single FAQ
-  // Extract plain text answer for schema
+  // Build FAQPage schema (single entry wrapped in mainEntity[])
   const answerText = htmlAnswer
     ? htmlAnswer.replace(/<[^>]*>/g, '').substring(0, 500)
     : blocksAnswer
     ? JSON.stringify(blocksAnswer).substring(0, 500)
     : faq.question;
 
-  const schema = {
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: answerText,
-    },
-  };
+  const schema = generateFAQPageSchema({
+    questions: [
+      {
+        question: faq.question,
+        answer: answerText,
+      },
+    ],
+  });
 
   const jsonLd = wrapSchema(schema);
 
@@ -196,4 +196,3 @@ export default async function FAQDetailPage({ params }: Props) {
     </>
   );
 }
-

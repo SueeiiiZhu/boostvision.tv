@@ -5,39 +5,46 @@ import { SectionRenderer, JsonLd } from "@/components/shared";
 import { getApps } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
-import { generateOrganizationSchema, generateWebSiteSchema, wrapInGraph } from "@/lib/seo";
+import { generateOrganizationSchema, generateWebSiteSchema, getLocaleAlternates, wrapInGraph } from "@/lib/seo";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
-  description: "BoostVision provides professional screen mirroring and TV remote control apps for iPhone, iPad, and Android. Support Roku, Fire TV, Samsung, LG, and more.",
-  keywords: ["screen mirroring", "tv remote", "cast to tv", "roku remote", "fire tv remote", "samsung remote", "lg remote"],
-  alternates: {
-    canonical: 'https://www.boostvision.tv',
-  },
-  openGraph: {
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const alternates = getLocaleAlternates("/", locale);
+
+  return {
     title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
-    description: "Mirror your phone to any TV and control your Smart TV with ease using BoostVision apps.",
-    url: "https://www.boostvision.tv",
-    siteName: "BoostVision",
-    images: [
-      {
-        url: "https://www.boostvision.tv/images/og-image.webp",
-        width: 1200,
-        height: 630,
-        alt: "BoostVision Apps",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
-    description: "Professional screen mirroring and TV remote control apps for all smart TVs.",
-    images: ["https://www.boostvision.tv/images/og-image.webp"],
-  },
-};
+    description: "BoostVision provides professional screen mirroring and TV remote control apps for iPhone, iPad, and Android. Support Roku, Fire TV, Samsung, LG, and more.",
+    keywords: ["screen mirroring", "tv remote", "cast to tv", "roku remote", "fire tv remote", "samsung remote", "lg remote"],
+    alternates,
+    openGraph: {
+      title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
+      description: "Mirror your phone to any TV and control your Smart TV with ease using BoostVision apps.",
+      url: alternates.canonical,
+      siteName: "BoostVision",
+      images: [
+        {
+          url: "https://www.boostvision.tv/images/og-image.webp",
+          width: 1200,
+          height: 630,
+          alt: "BoostVision Apps",
+        },
+      ],
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "BoostVision - Professional Screen Mirroring & TV Remote Apps",
+      description: "Professional screen mirroring and TV remote control apps for all smart TVs.",
+      images: ["https://www.boostvision.tv/images/og-image.webp"],
+    },
+  };
+}
 
 export default async function Home() {
   const [appsResponse, globalSetting, homePage] = await Promise.all([

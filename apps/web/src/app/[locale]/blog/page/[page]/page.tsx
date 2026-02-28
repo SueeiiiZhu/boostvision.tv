@@ -2,11 +2,12 @@ import { notFound } from "next/navigation";
 import { getBlogPosts, getBlogCategories } from "@/lib/strapi/api/blog";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { HeroSection, CTASection } from "@/types/strapi";
+import { getLocaleAlternates } from "@/lib/seo";
 import { BlogList } from "../../_components";
 import type { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ page: string }>;
+  params: Promise<{ page: string; locale: string }>;
 }
 
 // Force dynamic rendering to avoid DYNAMIC_SERVER_USAGE errors
@@ -14,19 +15,18 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { page } = await params;
+  const { page, locale } = await params;
   const pageNumber = parseInt(page, 10);
+  const alternates = getLocaleAlternates(`/blog/page/${pageNumber}`, locale);
 
   return {
     title: `Blog - Page ${pageNumber} | BoostVision`,
     description: `Browse our blog articles - Page ${pageNumber}. Stay updated with the latest news and guides about screen mirroring and TV cast technologies.`,
-    alternates: {
-      canonical: `https://www.boostvision.tv/blog/page/${pageNumber}`,
-    },
+    alternates,
     openGraph: {
       title: `Blog - Page ${pageNumber} | BoostVision`,
       description: "Expert insights and guides for better smart TV experience.",
-      url: `https://www.boostvision.tv/blog/page/${pageNumber}`,
+      url: alternates.canonical,
       images: [],
     },
   };

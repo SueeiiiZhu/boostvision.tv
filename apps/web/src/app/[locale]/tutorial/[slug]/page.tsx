@@ -9,14 +9,14 @@ import { generateMetadata as genMetadata, generateHowToSchema, wrapSchema } from
 import { Metadata } from "next";
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const [tutorial, globalSetting] = await Promise.all([
     getTutorialBySlug(slug),
-    getGlobalSetting(),
+    getGlobalSetting(locale),
   ]);
 
   if (!tutorial) return { title: "Tutorial Not Found" };
@@ -28,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     defaultTitle: `How to Use ${tutorial.app?.name || 'App'} | BoostVision Tutorial`,
     defaultDescription: `Step-by-step guide and video tutorial for ${tutorial.app?.name || 'App'}.`,
     path: `/tutorial/${slug}`,
+    locale,
   });
 }
 
@@ -181,4 +182,3 @@ export default async function TutorialDetailPage({ params }: Props) {
     </>
   );
 }
-

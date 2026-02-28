@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     defaultTitle: "Frequently Asked Questions | BoostVision Apps",
     defaultDescription: "Find answers to common questions about screen mirroring, TV cast, and remote control apps by BoostVision.",
     path: "/faq",
+    locale,
   });
 }
 

@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     defaultTitle: "Contact Us | BoostVision",
     defaultDescription: "Get in touch with BoostVision for support, business inquiries, or feedback.",
     path: "/contact-us",
+    locale,
   });
 }
 

@@ -1,22 +1,24 @@
 import { globalSearch } from "@/lib/strapi/api/search";
 import Link from "next/link";
 import Image from "next/image";
+import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 
 interface Props {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ q?: string }>;
 }
 
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const { q = "" } = await searchParams;
-  const searchUrl = q ? `https://www.boostvision.tv/search?q=${encodeURIComponent(q)}` : "https://www.boostvision.tv/search";
+  const path = q ? `/search?q=${encodeURIComponent(q)}` : "/search";
+  const alternates = getLocaleAlternates(path, locale);
 
   return {
     title: q ? `Search results for "${q}" | BoostVision` : "Search | BoostVision",
     description: `Search results for ${q} on BoostVision website.`,
-    alternates: {
-      canonical: searchUrl,
-    },
+    alternates,
   };
 }
 

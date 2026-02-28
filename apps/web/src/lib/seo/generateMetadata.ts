@@ -1,5 +1,12 @@
 import { Metadata } from "next";
-import { SEO } from "@/types/strapi";
+import { SEO, StrapiImage } from "@/types/strapi";
+import { routing } from "@/i18n/routing";
+import { getLocaleAlternates } from "./hreflang";
+
+type OgImageInput =
+  | Pick<StrapiImage, "url" | "width" | "height" | "alternativeText">
+  | null
+  | undefined;
 
 interface GenerateMetadataOptions {
   seo?: SEO | null;
@@ -7,7 +14,9 @@ interface GenerateMetadataOptions {
   pageTitle?: string; // Page's own title (e.g., post.title, page.title)
   defaultTitle?: string; // Fallback title if no pageTitle
   defaultDescription?: string;
+  fallbackOgImage?: OgImageInput;
   path?: string;
+  locale?: string;
   type?: "website" | "article";
 }
 
@@ -21,7 +30,9 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
     pageTitle,
     defaultTitle,
     defaultDescription,
+    fallbackOgImage,
     path = "",
+    locale = routing.defaultLocale,
     type = "website",
   } = options;
 
@@ -43,23 +54,34 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   // 1. Use page-specific canonicalUrl if set
   // 2. Otherwise, use current page path
   // Do NOT fallback to defaultSeo.canonicalUrl as it would make all pages point to the same URL
-  const canonical = seo?.canonicalUrl || `${SITE_URL}${path}`;
+  const alternates = path ? getLocaleAlternates(path, locale) : undefined;
+  const canonical = seo?.canonicalUrl || alternates?.canonical || `${SITE_URL}${path}`;
 
-  // Image URL with fallback
-  const getImageUrl = (seoData?: SEO | null): string => {
-    if (!seoData?.metaImage?.url) return `${SITE_URL}/images/og-image.webp`;
-    return seoData.metaImage.url.startsWith("http")
-      ? seoData.metaImage.url
-      : `${SITE_URL}${seoData.metaImage.url}`;
-  };
+  // OG image fallback priority:
+  // 1) Current entry SEO image
+  // 2) Caller-provided content image (e.g. blog cover / hero image)
+  // 3) Global default SEO image
+  // 4) Static fallback image
+  const toAbsoluteUrl = (url: string): string =>
+    url.startsWith("http") ? url : `${SITE_URL}${url}`;
 
-  const imageUrl = getImageUrl(seo) || getImageUrl(defaultSeo);
+  const pickImage = (...candidates: OgImageInput[]) =>
+    candidates.find((image) => Boolean(image?.url));
+
+  const selectedImage = pickImage(seo?.metaImage, fallbackOgImage, defaultSeo?.metaImage);
+  const imageUrl = selectedImage?.url
+    ? toAbsoluteUrl(selectedImage.url)
+    : `${SITE_URL}/images/og-image.webp`;
+  const imageWidth = selectedImage?.width || 1200;
+  const imageHeight = selectedImage?.height || 630;
+  const imageAlt = selectedImage?.alternativeText || title;
 
   const metadata: Metadata = {
     title,
     description,
     alternates: {
       canonical,
+      ...(alternates?.languages ? { languages: alternates.languages } : {}),
     },
   };
 
@@ -86,9 +108,9 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
     images: [
       {
         url: imageUrl,
-        width: effectiveSeo?.metaImage?.width || 1200,
-        height: effectiveSeo?.metaImage?.height || 630,
-        alt: effectiveSeo?.metaImage?.alternativeText || title,
+        width: imageWidth,
+        height: imageHeight,
+        alt: imageAlt,
       },
     ],
     locale: "en_US",
