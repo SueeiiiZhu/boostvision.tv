@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { AdScriptLoader } from './AdScriptLoader';
 
 // Dynamically import Analytics components with no SSR
 const GoogleAnalytics = dynamic(
@@ -53,14 +54,15 @@ export function AnalyticsWrapper() {
     return cleanup;
   }, []);
 
-  if (!shouldLoad) {
-    return null;
-  }
-
   return (
     <>
-      <GoogleAnalytics />
-      <VercelAnalytics />
+      <AdScriptLoader />
+      {shouldLoad ? (
+        <>
+          <GoogleAnalytics />
+          <VercelAnalytics />
+        </>
+      ) : null}
     </>
   );
 }
