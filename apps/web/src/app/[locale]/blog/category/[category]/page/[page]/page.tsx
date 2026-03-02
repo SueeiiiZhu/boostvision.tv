@@ -10,8 +10,7 @@ interface Props {
   params: Promise<{ category: string; page: string; locale: string }>;
 }
 
-// Force dynamic rendering to avoid DYNAMIC_SERVER_USAGE errors
-export const dynamic = 'force-dynamic';
+export const revalidate = 600;
 export const dynamicParams = true;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

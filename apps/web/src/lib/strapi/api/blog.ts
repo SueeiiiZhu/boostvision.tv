@@ -1,4 +1,5 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
+import { CACHE_TAGS, blogPostTag } from "../cacheTags";
 import { BlogPost, BlogCategory } from "../../../types/strapi";
 
 export async function getBlogPosts(params: {
@@ -26,7 +27,9 @@ export async function getBlogPosts(params: {
     sort: ["publishedAt:desc"],
   });
 
-  return fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
+  return fetchStrapi<BlogPost[]>(`/blog-posts${query}`, {
+    tags: [CACHE_TAGS.blogPosts],
+  });
 }
 
 export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
@@ -54,7 +57,9 @@ export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
     populate,
     filters: { slug: { $eq: slug } },
   });
-  const slugResponse = await fetchStrapi<BlogPost[]>(`/blog-posts${slugQuery}`);
+  const slugResponse = await fetchStrapi<BlogPost[]>(`/blog-posts${slugQuery}`, {
+    tags: [CACHE_TAGS.blogPosts, blogPostTag(slug)],
+  });
   const defaultPost = slugResponse.data?.[0];
   if (!defaultPost) return null;
 
@@ -63,7 +68,10 @@ export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
     const localizedQuery = buildStrapiQuery({ locale, populate });
     try {
       const localizedResponse = await fetchStrapi<BlogPost>(
-        `/blog-posts/${defaultPost.documentId}${localizedQuery}`
+        `/blog-posts/${defaultPost.documentId}${localizedQuery}`,
+        {
+          tags: [CACHE_TAGS.blogPosts, blogPostTag(slug)],
+        }
       );
       if (localizedResponse.data) return localizedResponse.data;
     } catch {
@@ -75,7 +83,9 @@ export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
 }
 
 export async function getBlogCategories() {
-  return fetchStrapi<BlogCategory[]>("/blog-categories");
+  return fetchStrapi<BlogCategory[]>("/blog-categories", {
+    tags: [CACHE_TAGS.blogCategories],
+  });
 }
 
 export async function getBlogPostSlugs() {
@@ -93,7 +103,9 @@ export async function getBlogPostSlugs() {
       },
     });
 
-    const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`);
+    const response = await fetchStrapi<BlogPost[]>(`/blog-posts${query}`, {
+      tags: [CACHE_TAGS.blogPosts],
+    });
     const slugs = response.data.map((post) => post.slug);
     allSlugs = [...allSlugs, ...slugs];
 

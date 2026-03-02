@@ -1,4 +1,5 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
+import { CACHE_TAGS, tutorialTag } from "../cacheTags";
 import { Tutorial } from "../../../types/strapi";
 
 export async function getTutorials(params: {
@@ -25,7 +26,9 @@ export async function getTutorials(params: {
     sort: ["order:asc", "createdAt:desc"],
   });
 
-  return fetchStrapi<Tutorial[]>(`/tutorials${query}`);
+  return fetchStrapi<Tutorial[]>(`/tutorials${query}`, {
+    tags: [CACHE_TAGS.tutorials],
+  });
 }
 
 export async function getTutorialBySlug(slug: string) {
@@ -66,7 +69,9 @@ export async function getTutorialBySlug(slug: string) {
     },
   });
 
-  const response = await fetchStrapi<Tutorial[]>(`/tutorials${query}`);
+  const response = await fetchStrapi<Tutorial[]>(`/tutorials${query}`, {
+    tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
+  });
   return response.data?.[0] || null;
 }
 
@@ -78,6 +83,8 @@ export async function getTutorialSlugs() {
     },
   });
 
-  const response = await fetchStrapi<Tutorial[]>(`/tutorials${query}`);
+  const response = await fetchStrapi<Tutorial[]>(`/tutorials${query}`, {
+    tags: [CACHE_TAGS.tutorials],
+  });
   return response.data.map((item) => item.slug);
 }

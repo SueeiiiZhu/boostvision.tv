@@ -1,4 +1,5 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
+import { CACHE_TAGS, faqTag } from "../cacheTags";
 import { FAQ } from "../../../types/strapi";
 
 export async function getFAQs(params: {
@@ -24,7 +25,9 @@ export async function getFAQs(params: {
     sort: ["order:asc", "createdAt:desc"],
   });
 
-  return fetchStrapi<FAQ[]>(`/faqs${query}`);
+  return fetchStrapi<FAQ[]>(`/faqs${query}`, {
+    tags: [CACHE_TAGS.faqs],
+  });
 }
 
 export async function getFAQBySlug(slug: string) {
@@ -63,7 +66,9 @@ export async function getFAQBySlug(slug: string) {
     },
   });
 
-  const response = await fetchStrapi<FAQ[]>(`/faqs${query}`);
+  const response = await fetchStrapi<FAQ[]>(`/faqs${query}`, {
+    tags: [CACHE_TAGS.faqs, faqTag(slug)],
+  });
   return response.data?.[0] || null;
 }
 
@@ -75,6 +80,8 @@ export async function getFAQSlugs() {
     },
   });
 
-  const response = await fetchStrapi<FAQ[]>(`/faqs${query}`);
+  const response = await fetchStrapi<FAQ[]>(`/faqs${query}`, {
+    tags: [CACHE_TAGS.faqs],
+  });
   return response.data.map((item) => item.slug);
 }

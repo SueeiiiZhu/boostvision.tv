@@ -1,4 +1,5 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
+import { CACHE_TAGS, appTag } from "../cacheTags";
 import { App } from "../../../types/strapi";
 
 export async function getApps(params: {
@@ -24,7 +25,9 @@ export async function getApps(params: {
     sort: ["order:asc", "createdAt:desc"],
   });
 
-  return fetchStrapi<App[]>(`/apps${query}`);
+  return fetchStrapi<App[]>(`/apps${query}`, {
+    tags: [CACHE_TAGS.apps],
+  });
 }
 
 export async function getAppBySlug(slug: string) {
@@ -86,7 +89,9 @@ export async function getAppBySlug(slug: string) {
     },
   });
 
-  const response = await fetchStrapi<App[]>(`/apps${query}`);
+  const response = await fetchStrapi<App[]>(`/apps${query}`, {
+    tags: [CACHE_TAGS.apps, appTag(slug)],
+  });
   return response.data?.[0] || null;
 }
 
@@ -98,6 +103,8 @@ export async function getAppSlugs() {
     },
   });
 
-  const response = await fetchStrapi<App[]>(`/apps${query}`);
+  const response = await fetchStrapi<App[]>(`/apps${query}`, {
+    tags: [CACHE_TAGS.apps],
+  });
   return response.data.map((app) => app.slug);
 }

@@ -82,6 +82,7 @@ pnpm dev:cms
 - [03-implementation-guide.md](./docs/03-implementation-guide.md) - 实施步骤指南
 - [04-strapi-schemas.md](./docs/04-strapi-schemas.md) - Strapi Content Types 定义
 - [05-next-steps.md](./docs/05-next-steps.md) - **后续开发流程** ⭐
+- [06-web-cache-revalidation.md](./docs/06-web-cache-revalidation.md) - Web ISR 缓存与 Strapi Webhook 失效策略
 
 ## 开发规范
 
@@ -132,4 +133,3 @@ Strapi CMS 可以部署到 Railway、Render 或其他支持 Node.js 的平台。
 ## License
 
 Private - All rights reserved.
-

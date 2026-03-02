@@ -1,5 +1,6 @@
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
+const DEFAULT_REVALIDATE_SECONDS = Number(process.env.STRAPI_REVALIDATE_SECONDS || 600);
 
 /**
  * Strapi API Response type (Strapi 6 flattened structure)
@@ -33,9 +34,14 @@ export interface StrapiError {
  */
 export async function fetchStrapi<T>(
   endpoint: string,
-  options?: RequestInit & { revalidate?: number }
+  options?: RequestInit & { revalidate?: number; tags?: string[] }
 ): Promise<StrapiResponse<T>> {
-  const { revalidate = 3600, ...fetchOptions } = options || {};
+  const {
+    revalidate = DEFAULT_REVALIDATE_SECONDS,
+    tags = [],
+    cache = "force-cache",
+    ...fetchOptions
+  } = options || {};
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -57,8 +63,10 @@ export async function fetchStrapi<T>(
     const res = await fetch(url, {
       ...fetchOptions,
       headers,
+      cache,
       next: {
         revalidate,
+        ...(tags.length ? { tags } : {}),
       },
     });
 
@@ -149,4 +157,3 @@ export function buildStrapiQuery(params: any): string {
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : "";
 }
-
