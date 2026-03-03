@@ -123,6 +123,7 @@ export interface Author {
   jobTitle?: string;
   expertise?: string;
   socialLinks?: SocialLink[];
+  blogPosts?: Array<{ id: number }>;
 }
 
 /**

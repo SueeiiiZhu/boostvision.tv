@@ -7,6 +7,49 @@ const authorPopulate = {
   socialLinks: true,
 };
 
+export async function getAuthors(locale: string = "en", limit: number = 100) {
+  const query = buildStrapiQuery({
+    locale,
+    populate: {
+      ...authorPopulate,
+      blogPosts: {
+        fields: ["id"],
+      },
+    },
+    sort: ["name:asc"],
+    pagination: {
+      page: 1,
+      pageSize: limit,
+    },
+  });
+
+  const response = await fetchStrapi<Author[]>(`/authors${query}`, {
+    tags: [CACHE_TAGS.authors],
+  });
+
+  if (locale !== "en" && response.data.length === 0) {
+    const fallbackQuery = buildStrapiQuery({
+      populate: {
+        ...authorPopulate,
+        blogPosts: {
+          fields: ["id"],
+        },
+      },
+      sort: ["name:asc"],
+      pagination: {
+        page: 1,
+        pageSize: limit,
+      },
+    });
+
+    return fetchStrapi<Author[]>(`/authors${fallbackQuery}`, {
+      tags: [CACHE_TAGS.authors],
+    });
+  }
+
+  return response;
+}
+
 export async function getAuthorBySlug(slug: string, locale: string = "en") {
   const slugQuery = buildStrapiQuery({
     populate: authorPopulate,

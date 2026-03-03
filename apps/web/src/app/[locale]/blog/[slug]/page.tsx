@@ -90,7 +90,7 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   // Generate Article schema
-  const authorProfileHref = post.author?.slug ? `/about/${post.author.slug}` : undefined;
+  const authorProfileHref = post.author?.slug ? `/authors/${post.author.slug}` : undefined;
   const schema = generateArticleSchema({
     headline: post.title,
     description: post.excerpt,
@@ -103,7 +103,7 @@ export default async function BlogPostPage({ params }: Props) {
     dateModified: post.updatedAt || post.postDate,
     authorName: post.author?.name || "BoostVision Team",
     authorUrl: post.author?.slug
-      ? `https://www.boostvision.tv/about/${post.author.slug}`
+      ? `https://www.boostvision.tv/authors/${post.author.slug}`
       : undefined,
     url: `https://www.boostvision.tv/blog/${slug}`,
   });

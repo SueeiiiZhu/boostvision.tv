@@ -41,7 +41,7 @@ export function BlogCard({ post }: BlogCardProps) {
               />
             </div>
             {post.author?.slug ? (
-              <Link href={`/about/${post.author.slug}`} className="text-[14px] font-bold text-heading hover:text-primary transition-colors">
+              <Link href={`/authors/${post.author.slug}`} className="text-[14px] font-bold text-heading hover:text-primary transition-colors">
                 {post.author?.name}
               </Link>
             ) : (

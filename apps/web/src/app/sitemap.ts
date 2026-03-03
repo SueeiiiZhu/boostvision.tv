@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     '',
     '/app',
+    '/authors',
     '/blog',
     '/tutorial',
     '/faq',
@@ -43,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const authorRoutes = authorSlugs.map((slug) => ({
-    url: `${DOMAIN}/about/${slug}`,
+    url: `${DOMAIN}/authors/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.6,

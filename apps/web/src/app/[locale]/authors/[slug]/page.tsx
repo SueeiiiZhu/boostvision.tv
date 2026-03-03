@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Author Not Found" };
   }
 
-  const alternates = getLocaleAlternates(`/about/${slug}`, locale);
+  const alternates = getLocaleAlternates(`/authors/${slug}`, locale);
   const description =
     author.expertise || author.jobTitle || author.bio || `${author.name} profile on BoostVision`;
 
@@ -55,7 +55,7 @@ export default async function AuthorProfilePage({ params }: Props) {
     jobTitle: author.jobTitle,
     description: author.expertise || author.bio,
     image: author.avatar?.url,
-    url: `https://www.boostvision.tv/about/${author.slug}`,
+    url: `https://www.boostvision.tv/authors/${author.slug}`,
     sameAs: (author.socialLinks || []).map((item) => item.url),
   });
 
