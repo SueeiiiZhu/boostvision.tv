@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { routing } from "@/i18n/routing";
 import {
   appTag,
+  authorTag,
   blogPostTag,
   CACHE_TAGS,
   faqTag,
@@ -28,6 +29,7 @@ function isEnabled(value: string | undefined, defaultValue: boolean): boolean {
 function isPreciseTag(tag: string): boolean {
   return (
     tag.startsWith("app:") ||
+    tag.startsWith("author:") ||
     tag.startsWith("blog-post:") ||
     tag.startsWith("faq:") ||
     tag.startsWith("page:") ||
@@ -37,6 +39,7 @@ function isPreciseTag(tag: string): boolean {
 
 const ALL_BASE_TAGS = [
   CACHE_TAGS.apps,
+  CACHE_TAGS.authors,
   CACHE_TAGS.blogPosts,
   CACHE_TAGS.blogCategories,
   CACHE_TAGS.faqs,
@@ -92,6 +95,13 @@ function getTagsToRevalidate(payload: WebhookPayload): string[] {
   if (uid.includes("blog-post")) {
     tags.add(CACHE_TAGS.blogPosts);
     if (slug) tags.add(blogPostTag(slug));
+    return [...tags];
+  }
+
+  if (uid.includes("author")) {
+    tags.add(CACHE_TAGS.authors);
+    tags.add(CACHE_TAGS.blogPosts);
+    if (slug) tags.add(authorTag(slug));
     return [...tags];
   }
 

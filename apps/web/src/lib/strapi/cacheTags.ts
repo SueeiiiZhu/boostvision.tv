@@ -1,5 +1,6 @@
 export const CACHE_TAGS = {
   apps: "apps",
+  authors: "authors",
   blogPosts: "blog-posts",
   blogCategories: "blog-categories",
   faqs: "faqs",
@@ -11,6 +12,10 @@ export const CACHE_TAGS = {
 
 export function appTag(slug: string) {
   return `app:${slug}`;
+}
+
+export function authorTag(slug: string) {
+  return `author:${slug}`;
 }
 
 export function blogPostTag(slug: string) {

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getAppSlugs } from '@/lib/strapi/api/apps';
+import { getAuthorSlugs } from '@/lib/strapi/api/author';
 import { getBlogPostSlugs } from '@/lib/strapi/api/blog';
 import { getTutorialSlugs } from '@/lib/strapi/api/tutorials';
 import { getFAQSlugs } from '@/lib/strapi/api/faqs';
@@ -26,8 +27,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Dynamic routes
-  const [appSlugs, blogSlugs, tutorialSlugs, faqSlugs] = await Promise.all([
+  const [appSlugs, authorSlugs, blogSlugs, tutorialSlugs, faqSlugs] = await Promise.all([
     getAppSlugs().catch(() => []),
+    getAuthorSlugs().catch(() => []),
     getBlogPostSlugs().catch(() => []),
     getTutorialSlugs().catch(() => []),
     getFAQSlugs().catch(() => []),
@@ -38,6 +40,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
+  }));
+
+  const authorRoutes = authorSlugs.map((slug) => ({
+    url: `${DOMAIN}/about/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
   }));
 
   const blogRoutes = blogSlugs.map((slug) => ({
@@ -64,6 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...appRoutes,
+    ...authorRoutes,
     ...blogRoutes,
     ...tutorialRoutes,
     ...faqRoutes,

@@ -33,14 +33,20 @@ export function BlogCard({ post }: BlogCardProps) {
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 relative overflow-hidden rounded-full border border-gray-100">
               <Image
-                src={post.author?.avatar?.url}
+                src={post.author?.avatar?.url || "/icons/author-placeholder.webp"}
                 alt={post.author?.name}
                 fill
                 sizes="32px"
                 className="object-cover"
               />
             </div>
-            <span className="text-[14px] font-bold text-heading">{post.author?.name}</span>
+            {post.author?.slug ? (
+              <Link href={`/about/${post.author.slug}`} className="text-[14px] font-bold text-heading hover:text-primary transition-colors">
+                {post.author?.name}
+              </Link>
+            ) : (
+              <span className="text-[14px] font-bold text-heading">{post.author?.name}</span>
+            )}
           </div>
           <span className="text-[14px] font-medium text-muted">{formatDate(post.postDate)}</span>
         </div>
