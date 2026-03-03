@@ -22,11 +22,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   ]);
 
   if (!post) return { title: "Post Not Found" };
+  const localizedBlogPath = locale === "en" ? `/blog/${slug}` : `/${locale}/blog/${slug}`;
 
   return genMetadata({
     seo: post.seo,
     defaultSeo: globalSetting?.defaultSeo,
     fallbackOgImage: post.coverImage,
+    fallbackOgImageUrl: `${localizedBlogPath}/opengraph-image`,
     pageTitle: post.title,
     defaultTitle: `${post.title} | BoostVision Blog`,
     defaultDescription: post.excerpt,

@@ -15,6 +15,7 @@ interface GenerateMetadataOptions {
   defaultTitle?: string; // Fallback title if no pageTitle
   defaultDescription?: string;
   fallbackOgImage?: OgImageInput;
+  fallbackOgImageUrl?: string;
   path?: string;
   locale?: string;
   type?: "website" | "article";
@@ -31,6 +32,7 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
     defaultTitle,
     defaultDescription,
     fallbackOgImage,
+    fallbackOgImageUrl,
     path = "",
     locale = routing.defaultLocale,
     type = "website",
@@ -71,6 +73,8 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   const selectedImage = pickImage(seo?.metaImage, fallbackOgImage, defaultSeo?.metaImage);
   const imageUrl = selectedImage?.url
     ? toAbsoluteUrl(selectedImage.url)
+    : fallbackOgImageUrl
+    ? toAbsoluteUrl(fallbackOgImageUrl)
     : `${SITE_URL}/images/og-image.webp`;
   const imageWidth = selectedImage?.width || 1200;
   const imageHeight = selectedImage?.height || 630;
