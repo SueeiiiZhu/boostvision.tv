@@ -38,6 +38,9 @@ importers:
       styled-components:
         specifier: ^6.0.0
         version: 6.3.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      undici:
+        specifier: ^7.22.0
+        version: 7.22.0
     devDependencies:
       '@types/node':
         specifier: ^20
@@ -7830,6 +7833,10 @@ packages:
   undici@6.23.0:
     resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
     engines: {node: '>=18.17'}
+
+  undici@7.22.0:
+    resolution: {integrity: sha512-RqslV2Us5BrllB+JeiZnK4peryVTndy9Dnqq62S3yYRRTj0tFQCwEniUy2167skdGOy3vqRzEvl1Dm4sV2ReDg==}
+    engines: {node: '>=20.18.1'}
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
@@ -17265,6 +17272,8 @@ snapshots:
   undici-types@6.21.0: {}
 
   undici@6.23.0: {}
+
+  undici@7.22.0: {}
 
   unified@11.0.5:
     dependencies:
