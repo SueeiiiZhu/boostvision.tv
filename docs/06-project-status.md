@@ -46,7 +46,7 @@
 ### 🚀 生产环境部署
 - **部署配置**: 
   - 提供了 `vercel.json` 根目录配置。
-  - 提供了 `apps/web/env.example` 环境变量模板。
+  - 提供了 `apps/web/.env.example` 环境变量模板。
   - 完善了 `docs/07-production-deployment.md` 生产部署指南。
   - 优化了 `next.config.ts` 生产环境资源加载与 i18n 支持。
 

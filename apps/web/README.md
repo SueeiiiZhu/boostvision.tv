@@ -1,4 +1,9 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is the `apps/web` Next.js application.
+
+For ISR + Strapi webhook cache invalidation setup, see:
+
+- [Web 缓存失效（ISR + Strapi Webhook）](../../docs/06-web-cache-revalidation.md)
+- [Google AdSense 接入说明（Web）](../../docs/08-adsense-integration.md)
 
 ## Getting Started
 

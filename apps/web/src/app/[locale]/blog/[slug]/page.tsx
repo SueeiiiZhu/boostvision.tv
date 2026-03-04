@@ -22,11 +22,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   ]);
 
   if (!post) return { title: "Post Not Found" };
+  const localizedBlogPath = locale === "en" ? `/blog/${slug}` : `/${locale}/blog/${slug}`;
 
   return genMetadata({
     seo: post.seo,
     defaultSeo: globalSetting?.defaultSeo,
     fallbackOgImage: post.coverImage,
+    fallbackOgImageUrl: `${localizedBlogPath}/opengraph-image`,
     pageTitle: post.title,
     defaultTitle: `${post.title} | BoostVision Blog`,
     defaultDescription: post.excerpt,
@@ -88,6 +90,7 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   // Generate Article schema
+  const authorProfileHref = post.author?.slug ? `/authors/${post.author.slug}` : undefined;
   const schema = generateArticleSchema({
     headline: post.title,
     description: post.excerpt,
@@ -99,6 +102,9 @@ export default async function BlogPostPage({ params }: Props) {
     datePublished: post.postDate,
     dateModified: post.updatedAt || post.postDate,
     authorName: post.author?.name || "BoostVision Team",
+    authorUrl: post.author?.slug
+      ? `https://www.boostvision.tv/authors/${post.author.slug}`
+      : undefined,
     url: `https://www.boostvision.tv/blog/${slug}`,
   });
 
@@ -132,7 +138,13 @@ export default async function BlogPostPage({ params }: Props) {
                       <div className="h-10 w-10 relative overflow-hidden rounded-full border border-gray-100">
                         <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
                       </div>
-                      <span className="font-bold text-heading">{post.author?.name}</span>
+                      {authorProfileHref ? (
+                        <Link href={authorProfileHref} className="font-bold text-heading hover:text-primary transition-colors">
+                          {post.author?.name}
+                        </Link>
+                      ) : (
+                        <span className="font-bold text-heading">{post.author?.name}</span>
+                      )}
                     </div>
                     <span className="text-gray-300">|</span>
                     <span className="text-muted text-[15px]">{formatDate(post.postDate)}</span>
@@ -159,6 +171,11 @@ export default async function BlogPostPage({ params }: Props) {
                     <p className="text-[18px] text-muted leading-[1.8]">
                       {post.author?.bio}
                     </p>
+                    {authorProfileHref && (
+                      <Link href={authorProfileHref} className="inline-block mt-4 text-primary font-bold hover:underline">
+                        View full author profile
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

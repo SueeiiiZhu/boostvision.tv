@@ -117,8 +117,13 @@ export interface Author {
   id: number;
   documentId: string;
   name: string;
-  avatar: StrapiImage;
-  bio: string;
+  slug: string;
+  avatar?: StrapiImage;
+  bio?: string;
+  jobTitle?: string;
+  expertise?: string;
+  socialLinks?: SocialLink[];
+  blogPosts?: Array<{ id: number }>;
 }
 
 /**

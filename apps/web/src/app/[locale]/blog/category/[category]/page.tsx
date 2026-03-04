@@ -10,6 +10,8 @@ interface Props {
   params: Promise<{ category: string; locale: string }>;
 }
 
+export const revalidate = 600;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, locale } = await params;
 

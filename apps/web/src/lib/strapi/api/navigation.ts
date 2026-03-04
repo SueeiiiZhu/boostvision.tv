@@ -1,4 +1,5 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
+import { CACHE_TAGS, navigationLocaleTag } from "../cacheTags";
 import { Navigation } from "../../../types/strapi";
 
 export async function getNavigation(locale: string = 'en') {
@@ -15,6 +16,8 @@ export async function getNavigation(locale: string = 'en') {
     }
   });
 
-  const response = await fetchStrapi<Navigation>(`/navigation${query}`);
+  const response = await fetchStrapi<Navigation>(`/navigation${query}`, {
+    tags: [CACHE_TAGS.navigation, navigationLocaleTag(locale)],
+  });
   return response.data;
 }

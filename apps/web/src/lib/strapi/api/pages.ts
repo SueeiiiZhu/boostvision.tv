@@ -1,4 +1,5 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
+import { CACHE_TAGS, pageTag } from "../cacheTags";
 import { Page } from "../../../types/strapi";
 
 export async function getPageBySlug(slug: string) {
@@ -52,7 +53,8 @@ export async function getPageBySlug(slug: string) {
     },
   });
 
-  const response = await fetchStrapi<Page[]>(`/pages${query}`);
+  const response = await fetchStrapi<Page[]>(`/pages${query}`, {
+    tags: [CACHE_TAGS.pages, pageTag(slug)],
+  });
   return response.data?.[0] || null;
 }
-

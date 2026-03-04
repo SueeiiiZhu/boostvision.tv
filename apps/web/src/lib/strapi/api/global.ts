@@ -1,4 +1,5 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
+import { CACHE_TAGS, globalSettingLocaleTag } from "../cacheTags";
 import { GlobalSetting } from "../../../types/strapi";
 
 export async function getGlobalSetting(locale: string = 'en') {
@@ -18,11 +19,12 @@ export async function getGlobalSetting(locale: string = 'en') {
       ],
     });
 
-    const response = await fetchStrapi<GlobalSetting>(`/global-setting${query}`);
+    const response = await fetchStrapi<GlobalSetting>(`/global-setting${query}`, {
+      tags: [CACHE_TAGS.globalSetting, globalSettingLocaleTag(locale)],
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to fetch global settings:", error);
     return null;
   }
 }
-

@@ -9,6 +9,8 @@ interface Props {
   params: Promise<{ locale: string }>;
 }
 
+export const revalidate = 600;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const alternates = getLocaleAlternates("/blog", locale);
