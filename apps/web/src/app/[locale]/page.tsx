@@ -6,6 +6,7 @@ import { getApps } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { generateOrganizationSchema, generateWebSiteSchema, getLocaleAlternates, wrapInGraph } from "@/lib/seo";
+import type { App } from "@/types/strapi";
 import type { Metadata } from "next";
 
 interface Props {
@@ -84,7 +85,7 @@ export default async function Home() {
             {/* Hero Section Fallback */}
             <section className="bg-white pt-24 pb-12 text-center overflow-hidden">
               <div className="container-custom">
-                <h1 className="text-[25px] md:text-[55px] mx-auto max-w-[900px] font-[family-name:var(--font-heading)] text-[36px] font-black leading-tight tracking-tight sm:text-[44px] md:text-[52px] lg:text-[58px] animate-slide-up">
+                <h1 className="mx-auto max-w-[900px] font-[family-name:var(--font-heading)] text-[36px] font-black leading-tight tracking-tight sm:text-[44px] md:text-[52px] lg:text-[58px] animate-slide-up">
                   <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                     Screen Mirroring
                   </span>{" "}
@@ -188,8 +189,8 @@ export default async function Home() {
               <div className="container-custom">
                 <h2 className="section-heading mb-16">Screen Mirroring & TV Cast Apps</h2>
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-                  {(screenMirroringApps.length > 0 ? screenMirroringApps : Array(4).fill(null)).map((app: any, i) => (
-                    <AppProductCard key={app?.slug || i} app={app} type="mirroring" />
+                  {(screenMirroringApps.length > 0 ? screenMirroringApps : Array<App | null>(4).fill(null)).map((app, i) => (
+                    <AppProductCard key={app?.slug || i} app={app} />
                   ))}
                 </div>
               </div>
@@ -200,8 +201,8 @@ export default async function Home() {
               <div className="container-custom">
                 <h2 className="section-heading mb-16">Advanced TV Remote Apps</h2>
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-                  {(tvRemoteApps.length > 0 ? tvRemoteApps : Array(4).fill(null)).map((app: any, i) => (
-                    <AppProductCard key={app?.slug || i} app={app} type="remote" />
+                  {(tvRemoteApps.length > 0 ? tvRemoteApps : Array<App | null>(4).fill(null)).map((app, i) => (
+                    <AppProductCard key={app?.slug || i} app={app} />
                   ))}
                 </div>
               </div>
@@ -339,9 +340,9 @@ export default async function Home() {
   );
 }
 
-function AppProductCard({ app, type }: { app: any, type: 'mirroring' | 'remote' }) {
+function AppProductCard({ app }: { app: App | null }) {
   // Placeholder data if app is null
-  const data = app || {
+  const data = app ?? {
     name: "Sample App Name",
     shortDescription: "Description of the app goes here. Usually two lines of text explaining core value.",
     icon: { url: "/icons/app-placeholder.webp" },

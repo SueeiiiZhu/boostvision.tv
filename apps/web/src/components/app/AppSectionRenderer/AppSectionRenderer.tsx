@@ -25,7 +25,7 @@ export function AppSectionRenderer({ sections, app, globalSetting }: AppSectionR
                     case 'sections.hero':
                         return <AppHero key={index} data={section} app={app} globalSetting={globalSetting} />;
                     case 'sections.why-choose':
-                        return <AppWhyChoose key={index} data={section} app={app} />;
+                        return <AppWhyChoose key={index} data={section} />;
                     case 'sections.cta':
                         return <AppCTA key={index} data={section} app={app} />;
                     case 'sections.brands-grid':
@@ -166,7 +166,6 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                             height={450}
                             className="w-full h-auto object-contain"
                             sizes="(max-width: 1024px) 100vw, 50vw"
-                            priority
                         />
                     ) : (
                         <div className="aspect-[4/3] bg-section-bg rounded-[40px] flex items-center justify-center">
@@ -179,7 +178,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
     </section>
 );
 
-const AppWhyChoose: React.FC<{ data: WhyChooseSection; app: App }> = ({ data, app }) => (
+const AppWhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
     <section className="py-32 bg-section-bg-2 text-center">
         <div className="container-custom">
             <h2 className="text-[40px] font-black text-heading mb-24">{data.title}</h2>

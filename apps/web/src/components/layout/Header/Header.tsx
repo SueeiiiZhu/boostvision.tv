@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { SearchInput } from "./SearchInput";
 import { Link, usePathname } from "@/i18n/routing";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Navigation, GlobalSetting } from "@/types/strapi";
 
 interface HeaderProps {
@@ -17,16 +17,32 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(98);
+  const headerRef = useRef<HTMLElement>(null);
   const t = useTranslations('Navigation');
-  const locale = useLocale();
   const pathname = usePathname();
 
   useEffect(() => {
+    const updateHeaderHeight = () => {
+      const nextHeight = headerRef.current?.offsetHeight;
+      if (nextHeight) {
+        setHeaderHeight((prev) => (prev === nextHeight ? prev : nextHeight));
+      }
+    };
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
+      updateHeaderHeight();
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    updateHeaderHeight();
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateHeaderHeight);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateHeaderHeight);
+    };
   }, []);
 
   // Close menu when route changes
@@ -34,9 +50,32 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
     setIsMenuOpen(false);
   }, [pathname]);
 
+  // Prevent background scroll while mobile menu is open
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMenuOpen]);
+
+  // Close mobile menu when switching to desktop breakpoint
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const headerMenu = navigation?.headerMenu || [];
   return (
     <header
+      ref={headerRef}
       className={cn(
         "sticky top-0 z-[100] h-[98px] w-full transition-all duration-300",
         scrolled ? "bg-white/95 backdrop-blur-sm shadow-md h-[80px]" : "bg-white"
@@ -164,7 +203,13 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-[98px] z-[99] w-full bg-white overflow-y-auto pb-10 lg:hidden animate-fade-in">
+        <div
+          className="fixed inset-x-0 z-[99] w-full overflow-y-auto bg-white pb-10 lg:hidden animate-fade-in"
+          style={{
+            top: `${headerHeight}px`,
+            height: `calc(100dvh - ${headerHeight}px)`,
+          }}
+        >
           <div className="flex flex-col p-6 gap-2">
             {/* Mobile Search */}
             <div className="mb-6">
@@ -175,7 +220,16 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               <div key={item.id} className="mb-4">
                 {item.links?.length > 0 ? (
                   <>
-                    <p className="text-[14px] font-bold uppercase tracking-wider text-muted mb-4">{item.name}</p>
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className="mb-4 block text-[14px] font-bold uppercase tracking-wider text-primary"
+                      >
+                        {item.name}
+                      </Link>
+                    ) : (
+                      <p className="mb-4 text-[14px] font-bold uppercase tracking-wider text-muted">{item.name}</p>
+                    )}
                     <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-gray-100">
                       {item.links.map(link => (
                         <Link

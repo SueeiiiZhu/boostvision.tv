@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface SearchInputProps {
@@ -16,6 +15,7 @@ export function SearchInput({ isMobile = false, onSearch }: SearchInputProps = {
   const router = useRouter();
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const q = searchParams.get("q");
@@ -26,6 +26,30 @@ export function SearchInput({ isMobile = false, onSearch }: SearchInputProps = {
     if (isOpen) {
       inputRef.current?.focus();
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,22 +87,29 @@ export function SearchInput({ isMobile = false, onSearch }: SearchInputProps = {
 
   // Desktop version: toggle button with overlay
   return (
-    <div className="relative flex items-center">
+    <div ref={containerRef} className="relative flex items-center">
       {/* Search Button / Toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-heading"
-        aria-label="Toggle search"
+        className="relative z-20 flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-heading"
+        aria-label={isOpen ? "Close search" : "Open search"}
+        aria-expanded={isOpen}
       >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        {isOpen ? (
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        )}
       </button>
 
       {/* Search Input Overlay (Desktop) */}
       <div className={cn(
-        "absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-300 origin-right",
-        isOpen ? "w-[300px] opacity-100 scale-x-100" : "w-0 opacity-0 scale-x-0 overflow-hidden"
+        "absolute right-12 top-1/2 z-10 -translate-y-1/2 transition-all duration-300 origin-right",
+        isOpen ? "w-[220px] xl:w-[300px] opacity-100 scale-x-100" : "w-0 opacity-0 scale-x-0 overflow-hidden"
       )}>
         <form onSubmit={handleSubmit} className="relative flex items-center">
           <input
