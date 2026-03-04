@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection, AppsGridSection, BrandsGridSection, App } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { getApps } from '@/lib/strapi/api/apps';
-import { RichText } from '../RichText';
 
 interface SectionRendererProps {
   sections: Section[];
@@ -112,7 +111,6 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
             height={600}
             className="h-auto w-full max-w-[1100px]"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
-            priority
           />
         </div>
       )}
