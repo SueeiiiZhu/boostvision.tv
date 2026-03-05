@@ -1,9 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { JsonLd } from "@/components/shared";
-import { getFAQs } from "@/lib/strapi/api/faqs";
+import { getFAQsForList } from "@/lib/strapi/api/faqs";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
-import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateFAQPageSchema, generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
 import { BlocksContent } from "@strapi/blocks-react-renderer";
 import { HeroSection, CTASection } from "@/types/strapi";
@@ -15,6 +14,25 @@ interface Props {
   searchParams: Promise<{ type?: string }>;
 }
 
+export const revalidate = 7200;
+
+function hasChildrenArray(block: unknown): block is { children: unknown[] } {
+  return (
+    typeof block === "object" &&
+    block !== null &&
+    Array.isArray((block as { children?: unknown }).children)
+  );
+}
+
+function isTextChild(child: unknown): child is { type: string; text: string } {
+  return (
+    typeof child === "object" &&
+    child !== null &&
+    (child as { type?: unknown }).type === "text" &&
+    typeof (child as { text?: unknown }).text === "string"
+  );
+}
+
 function normalizeFaqAnswer(answer: string | BlocksContent): string {
   if (typeof answer === "string") {
     return answer.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 500);
@@ -22,10 +40,10 @@ function normalizeFaqAnswer(answer: string | BlocksContent): string {
 
   if (Array.isArray(answer)) {
     const text = answer
-      .filter((block: any) => Array.isArray(block?.children))
-      .flatMap((block: any) => block.children)
-      .filter((child: any) => child?.type === "text" && typeof child?.text === "string")
-      .map((child: any) => child.text)
+      .filter(hasChildrenArray)
+      .flatMap((block) => block.children as unknown[])
+      .filter(isTextChild)
+      .map((child) => child.text)
       .join(" ");
 
     return text.replace(/\s+/g, " ").trim().slice(0, 500);
@@ -36,14 +54,10 @@ function normalizeFaqAnswer(answer: string | BlocksContent): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const [pageData, globalSetting] = await Promise.all([
-    getPageBySlug("faq").catch(() => null),
-    getGlobalSetting(locale).catch(() => null),
-  ]);
+  const pageData = await getPageBySlug("faq").catch(() => null);
 
   return genMetadata({
     seo: pageData?.seo,
-    defaultSeo: globalSetting?.defaultSeo,
     defaultTitle: "Frequently Asked Questions | BoostVision Apps",
     defaultDescription: "Find answers to common questions about screen mirroring, TV cast, and remote control apps by BoostVision.",
     path: "/faq",
@@ -51,11 +65,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function FAQPage({ params, searchParams }: Props) {
+export default async function FAQPage({ searchParams }: Props) {
   const { type = "screen-mirroring" } = await searchParams;
 
   const [faqsResponse, pageData] = await Promise.all([
-    getFAQs({
+    getFAQsForList({
       appType: type as 'screen-mirroring' | 'tv-remote',
       limit: 100
     }).catch(() => null),

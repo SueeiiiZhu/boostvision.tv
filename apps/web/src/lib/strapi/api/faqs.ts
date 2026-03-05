@@ -1,17 +1,22 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, faqTag } from "../cacheTags";
 import { FAQ } from "../../../types/strapi";
+import { getFaqDetailRevalidate, getFaqRevalidate } from "../revalidate";
 
-export async function getFAQs(params: {
+export async function getFAQsForList(params: {
   appSlug?: string;
   appType?: 'screen-mirroring' | 'tv-remote';
   category?: string;
   limit?: number;
 } = {}) {
   const query = buildStrapiQuery({
+    fields: ["question", "slug"],
     populate: {
       app: {
-        populate: ['icon']
+        fields: ["name", "slug", "type"],
+        populate: {
+          icon: true
+        }
       }
     },
     filters: {
@@ -27,10 +32,35 @@ export async function getFAQs(params: {
 
   return fetchStrapi<FAQ[]>(`/faqs${query}`, {
     tags: [CACHE_TAGS.faqs],
+    revalidate: getFaqRevalidate(),
   });
 }
 
-export async function getFAQBySlug(slug: string) {
+export async function getFAQSeoBySlug(slug: string) {
+  const query = buildStrapiQuery({
+    fields: ["question", "slug"],
+    populate: {
+      app: {
+        fields: ["name"]
+      },
+      seo: {
+        populate: ["metaImage"]
+      }
+    },
+    filters: {
+      slug: { $eq: slug },
+    },
+  });
+
+  const response = await fetchStrapi<FAQ[]>(`/faqs${query}`, {
+    tags: [CACHE_TAGS.faqs, faqTag(slug)],
+    revalidate: getFaqDetailRevalidate(),
+  });
+
+  return response.data?.[0] || null;
+}
+
+export async function getFAQPageBySlug(slug: string) {
   const query = buildStrapiQuery({
     fields: ['question', 'slug', 'answer', 'category', 'order'],
     populate: {
@@ -68,8 +98,13 @@ export async function getFAQBySlug(slug: string) {
 
   const response = await fetchStrapi<FAQ[]>(`/faqs${query}`, {
     tags: [CACHE_TAGS.faqs, faqTag(slug)],
+    revalidate: getFaqDetailRevalidate(),
   });
   return response.data?.[0] || null;
+}
+
+export async function getFAQBySlug(slug: string) {
+  return getFAQPageBySlug(slug);
 }
 
 export async function getFAQSlugs() {
@@ -82,6 +117,16 @@ export async function getFAQSlugs() {
 
   const response = await fetchStrapi<FAQ[]>(`/faqs${query}`, {
     tags: [CACHE_TAGS.faqs],
+    revalidate: getFaqDetailRevalidate(),
   });
   return response.data.map((item) => item.slug);
+}
+
+export async function getFAQs(params: {
+  appSlug?: string;
+  appType?: 'screen-mirroring' | 'tv-remote';
+  category?: string;
+  limit?: number;
+} = {}) {
+  return getFAQsForList(params);
 }

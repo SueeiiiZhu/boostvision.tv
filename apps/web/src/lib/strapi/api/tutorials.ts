@@ -1,19 +1,21 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, tutorialTag } from "../cacheTags";
 import { Tutorial } from "../../../types/strapi";
+import { getTutorialDetailRevalidate, getTutorialRevalidate } from "../revalidate";
 
-export async function getTutorials(params: {
+export async function getTutorialsForList(params: {
   appSlug?: string;
   appType?: 'screen-mirroring' | 'tv-remote';
   limit?: number;
 } = {}) {
   const query = buildStrapiQuery({
+    fields: ["title", "slug"],
     populate: {
       app: {
-        populate: ['icon']
-      },
-      steps: {
-        populate: ['image']
+        fields: ["name", "slug", "type"],
+        populate: {
+          icon: true
+        }
       }
     },
     filters: {
@@ -28,10 +30,35 @@ export async function getTutorials(params: {
 
   return fetchStrapi<Tutorial[]>(`/tutorials${query}`, {
     tags: [CACHE_TAGS.tutorials],
+    revalidate: getTutorialRevalidate(),
   });
 }
 
-export async function getTutorialBySlug(slug: string) {
+export async function getTutorialSeoBySlug(slug: string) {
+  const query = buildStrapiQuery({
+    fields: ["title", "slug"],
+    populate: {
+      app: {
+        fields: ["name"]
+      },
+      seo: {
+        populate: ["metaImage"]
+      }
+    },
+    filters: {
+      slug: { $eq: slug },
+    },
+  });
+
+  const response = await fetchStrapi<Tutorial[]>(`/tutorials${query}`, {
+    tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
+    revalidate: getTutorialDetailRevalidate(),
+  });
+
+  return response.data?.[0] || null;
+}
+
+export async function getTutorialPageBySlug(slug: string) {
   const query = buildStrapiQuery({
     populate: {
       app: {
@@ -71,8 +98,13 @@ export async function getTutorialBySlug(slug: string) {
 
   const response = await fetchStrapi<Tutorial[]>(`/tutorials${query}`, {
     tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
+    revalidate: getTutorialDetailRevalidate(),
   });
   return response.data?.[0] || null;
+}
+
+export async function getTutorialBySlug(slug: string) {
+  return getTutorialPageBySlug(slug);
 }
 
 export async function getTutorialSlugs() {
@@ -85,6 +117,15 @@ export async function getTutorialSlugs() {
 
   const response = await fetchStrapi<Tutorial[]>(`/tutorials${query}`, {
     tags: [CACHE_TAGS.tutorials],
+    revalidate: getTutorialDetailRevalidate(),
   });
   return response.data.map((item) => item.slug);
+}
+
+export async function getTutorials(params: {
+  appSlug?: string;
+  appType?: 'screen-mirroring' | 'tv-remote';
+  limit?: number;
+} = {}) {
+  return getTutorialsForList(params);
 }
