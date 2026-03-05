@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
-import { getFAQPageBySlug, getFAQSeoBySlug, getFAQSlugs } from "@/lib/strapi/api/faqs";
+import { getFAQPageBySlug, getFAQSeoBySlug } from "@/lib/strapi/api/faqs";
 import { generateFAQPageSchema, generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 import { BlocksContent } from "@strapi/blocks-react-renderer";
@@ -24,11 +24,6 @@ interface Props {
 }
 
 export const revalidate = 7200;
-
-export async function generateStaticParams() {
-  const slugs = await getFAQSlugs().catch(() => []);
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
