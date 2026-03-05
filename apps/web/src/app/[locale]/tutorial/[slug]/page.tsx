@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
-import { getTutorialPageBySlug, getTutorialSeoBySlug, getTutorialSlugs } from "@/lib/strapi/api/tutorials";
+import { getTutorialPageBySlug, getTutorialSeoBySlug } from "@/lib/strapi/api/tutorials";
 import { generateMetadata as genMetadata, generateHowToSchema, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 
@@ -12,11 +12,6 @@ interface Props {
 }
 
 export const revalidate = 21600;
-
-export async function generateStaticParams() {
-  const slugs = await getTutorialSlugs().catch(() => []);
-  return slugs.map((slug) => ({ slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
