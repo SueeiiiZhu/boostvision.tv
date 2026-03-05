@@ -1,5 +1,5 @@
 import { RichText, SectionRenderer } from "@/components/shared";
-import { getPageBySlug } from "@/lib/strapi/api/pages";
+import { getLegalPageBySlug } from "@/lib/strapi/api/pages";
 import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 
@@ -7,9 +7,11 @@ interface Props {
   params: Promise<{ locale: string }>;
 }
 
+export const revalidate = 86400;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const page = await getPageBySlug("privacy-policy");
+  const page = await getLegalPageBySlug("privacy-policy");
   const alternates = getLocaleAlternates("/privacy-policy", locale);
 
   return {
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PrivacyPolicyPage() {
-  const page = await getPageBySlug("privacy-policy");
+  const page = await getLegalPageBySlug("privacy-policy");
 
   return (
     <>

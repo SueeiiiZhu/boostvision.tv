@@ -1,6 +1,7 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, pageTag } from "../cacheTags";
 import { Page } from "../../../types/strapi";
+import { getLegalRevalidate } from "../revalidate";
 
 export async function getPageBySlug(slug: string) {
   const query = buildStrapiQuery({
@@ -56,5 +57,34 @@ export async function getPageBySlug(slug: string) {
   const response = await fetchStrapi<Page[]>(`/pages${query}`, {
     tags: [CACHE_TAGS.pages, pageTag(slug)],
   });
+  return response.data?.[0] || null;
+}
+
+export async function getLegalPageBySlug(slug: "terms-of-use" | "privacy-policy") {
+  const query = buildStrapiQuery({
+    fields: ["title", "slug", "content"],
+    populate: {
+      seo: true,
+      sections: {
+        on: {
+          "sections.cta": {
+            populate: ["links"]
+          },
+          "sections.hero": {
+            populate: ["backgroundImage", "image"]
+          }
+        }
+      }
+    },
+    filters: {
+      slug: { $eq: slug },
+    },
+  });
+
+  const response = await fetchStrapi<Page[]>(`/pages${query}`, {
+    tags: [CACHE_TAGS.pages, pageTag(slug)],
+    revalidate: getLegalRevalidate(),
+  });
+
   return response.data?.[0] || null;
 }

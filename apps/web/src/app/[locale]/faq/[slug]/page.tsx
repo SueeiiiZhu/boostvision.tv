@@ -3,8 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
-import { getFAQBySlug } from "@/lib/strapi/api/faqs";
-import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { getFAQPageBySlug, getFAQSeoBySlug, getFAQSlugs } from "@/lib/strapi/api/faqs";
 import { generateFAQPageSchema, generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 import { BlocksContent } from "@strapi/blocks-react-renderer";
@@ -24,18 +23,21 @@ interface Props {
   params: Promise<{ slug: string; locale: string }>;
 }
 
+export const revalidate = 7200;
+
+export async function generateStaticParams() {
+  const slugs = await getFAQSlugs().catch(() => []);
+  return slugs.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const [faq, globalSetting] = await Promise.all([
-    getFAQBySlug(slug),
-    getGlobalSetting(locale),
-  ]);
+  const faq = await getFAQSeoBySlug(slug);
 
   if (!faq) return { title: "FAQ Not Found" };
 
   return genMetadata({
     seo: faq.seo,
-    defaultSeo: globalSetting?.defaultSeo,
     pageTitle: faq.question,
     defaultTitle: `${faq.app?.name || 'App'} F.A.Q. | BoostVision Support`,
     defaultDescription: `Frequently asked questions and support for ${faq.app?.name || 'App'}.`,
@@ -44,10 +46,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
+function isParagraphBlock(block: unknown): block is { type: string; children?: unknown[] } {
+  return (
+    typeof block === "object" &&
+    block !== null &&
+    (block as { type?: unknown }).type === "paragraph"
+  );
+}
+
+function isTextChild(child: unknown): child is { type: string; text: string } {
+  return (
+    typeof child === "object" &&
+    child !== null &&
+    (child as { type?: unknown }).type === "text" &&
+    typeof (child as { text?: unknown }).text === "string"
+  );
+}
+
 export default async function FAQDetailPage({ params }: Props) {
   const { slug } = await params;
 
-  const faq = await getFAQBySlug(slug);
+  const faq = await getFAQPageBySlug(slug);
 
   if (!faq) {
     notFound();
@@ -63,12 +82,12 @@ export default async function FAQDetailPage({ params }: Props) {
   } else if (Array.isArray(faq.answer)) {
     // BlocksContent format - check if it contains HTML in text nodes
     const allText = faq.answer
-      .filter((block: any) => block.type === 'paragraph')
-      .map((block: any) =>
-        block.children
-          ?.filter((child: any) => child.type === 'text')
-          .map((child: any) => child.text)
-          .join('')
+      .filter(isParagraphBlock)
+      .map((block) =>
+        ((block.children || []) as unknown[])
+          .filter(isTextChild)
+          .map((child) => child.text)
+          .join("")
       )
       .join('\n');
 

@@ -3,8 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
-import { getTutorialBySlug } from "@/lib/strapi/api/tutorials";
-import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { getTutorialPageBySlug, getTutorialSeoBySlug, getTutorialSlugs } from "@/lib/strapi/api/tutorials";
 import { generateMetadata as genMetadata, generateHowToSchema, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 
@@ -12,18 +11,21 @@ interface Props {
   params: Promise<{ slug: string; locale: string }>;
 }
 
+export const revalidate = 21600;
+
+export async function generateStaticParams() {
+  const slugs = await getTutorialSlugs().catch(() => []);
+  return slugs.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const [tutorial, globalSetting] = await Promise.all([
-    getTutorialBySlug(slug),
-    getGlobalSetting(locale),
-  ]);
+  const tutorial = await getTutorialSeoBySlug(slug);
 
   if (!tutorial) return { title: "Tutorial Not Found" };
 
   return genMetadata({
     seo: tutorial.seo,
-    defaultSeo: globalSetting?.defaultSeo,
     pageTitle: tutorial.title,
     defaultTitle: `How to Use ${tutorial.app?.name || 'App'} | BoostVision Tutorial`,
     defaultDescription: `Step-by-step guide and video tutorial for ${tutorial.app?.name || 'App'}.`,
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function TutorialDetailPage({ params }: Props) {
   const { slug } = await params;
   
-  const tutorial = await getTutorialBySlug(slug);
+  const tutorial = await getTutorialPageBySlug(slug);
 
   if (!tutorial) {
     notFound();
@@ -121,7 +123,7 @@ export default async function TutorialDetailPage({ params }: Props) {
             <div className="container-custom max-w-[900px]">
               <h2 className="text-[32px] font-medium text-heading mb-16 text-center">Step-by-Step Guide</h2>
               <div className="space-y-20">
-                {tutorial.steps?.sort((a, b) => a.stepNumber - b.stepNumber).map((step, index) => (
+                {tutorial.steps?.sort((a, b) => a.stepNumber - b.stepNumber).map((step) => (
                   <div key={step.id} className="flex flex-col md:flex-row items-center gap-12 group">
                     <div className="w-full md:w-1/2">
                       <div className="mb-6 flex items-center gap-4">
