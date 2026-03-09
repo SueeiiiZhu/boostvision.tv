@@ -7,6 +7,14 @@ const intlMiddleware = createMiddleware(routing);
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Legacy locale mapping: jp -> ja
+  if (pathname === '/jp' || pathname.startsWith('/jp/')) {
+    const url = request.nextUrl.clone();
+    const restPath = pathname.slice('/jp'.length);
+    url.pathname = `/ja${restPath}`;
+    return NextResponse.redirect(url, 301);
+  }
+
   // Skip processing for static files (images, fonts, etc.) except .html files
   const staticFileExtensions = [
     '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.ico',
