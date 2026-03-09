@@ -26,13 +26,19 @@ export default async function middleware(request: NextRequest) {
   if (pathname.endsWith('.html')) {
     const url = request.nextUrl.clone();
     const pathWithoutHtml = pathname.replace(/\.html$/, '');
+    const segments = pathWithoutHtml.replace(/^\/+/, '').split('/');
+    const maybeLocale = segments[0];
+    const hasLocalePrefix = routing.locales.includes(maybeLocale as (typeof routing.locales)[number]);
 
-    if (pathWithoutHtml.startsWith('/blog/')) {
-      url.pathname = pathWithoutHtml;
-    } else {
-      const slug = pathWithoutHtml.replace(/^\//, '');
-      url.pathname = `/blog/${slug}`;
-    }
+    const localePrefix = hasLocalePrefix ? `/${maybeLocale}` : '';
+    const contentSegments = hasLocalePrefix ? segments.slice(1) : segments;
+    const contentPath = contentSegments.join('/');
+
+    const normalizedContentPath = contentPath.startsWith('blog/')
+      ? contentPath
+      : `blog/${contentPath}`;
+
+    url.pathname = `${localePrefix}/${normalizedContentPath}`.replace(/\/+$/, '');
 
     return NextResponse.redirect(url, 301);
   }
