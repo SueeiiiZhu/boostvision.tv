@@ -210,6 +210,7 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
   if (!content) return null;
 
   if (typeof content === 'string') {
+    const hasRawHtmlWrapper = /<raw-html>[\s\S]*?<\/raw-html>/i.test(content);
     const hasMarkdownTable = /^\s*\|.+\|\s*$/m.test(content) && /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/m.test(content);
     const hasMarkdownSyntax = hasMarkdownTable ||
       /^#{1,6}\s+/m.test(content) ||
@@ -219,16 +220,18 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
       /^\s*\d+\.\s+/m.test(content) ||
       /^>\s+/m.test(content) ||
       /```[\s\S]*```/.test(content) ||
-      content.includes("<raw-html>");
+      hasRawHtmlWrapper;
 
     // Check if content contains HTML tags or entities
     const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content);
     const hasEncodedHtml = content.includes("&lt;") && content.includes("&gt;");
-    const shouldTreatAsHtml = hasHtmlTags || (hasEncodedHtml && !hasMarkdownSyntax);
+    const shouldTreatAsHtml = !hasRawHtmlWrapper && (hasHtmlTags || (hasEncodedHtml && !hasMarkdownSyntax));
 
     let htmlContent: string;
 
-    if (shouldTreatAsHtml) {
+    if (hasMarkdownSyntax || hasRawHtmlWrapper) {
+      htmlContent = parseMarkdown(content);
+    } else if (shouldTreatAsHtml) {
       // Decode HTML entities (decode &amp; last to avoid double-decoding)
       const decoded = content
         .replace(/&lt;/g, '<')
@@ -238,8 +241,6 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
         .replace(/&apos;/g, "'")
         .replace(/&amp;/g, '&');
       htmlContent = decoded;
-    } else if (hasMarkdownSyntax) {
-      htmlContent = parseMarkdown(content);
     } else {
       htmlContent = content;
     }
