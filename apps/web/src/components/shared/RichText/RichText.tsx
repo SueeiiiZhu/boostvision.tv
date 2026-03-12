@@ -8,6 +8,106 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+function slugifyHeading(title: string) {
+  return title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+}
+
+function parseMarkdownTableRow(row: string) {
+  const normalized = row.trim().replace(/^\|/, "").replace(/\|$/, "");
+  return normalized.split("|").map((cell) => cell.trim().replace(/\\\|/g, "|"));
+}
+
+function isPipeTableDataRow(row: string) {
+  if (!row || !row.includes("|")) return false;
+  if (row.trim().startsWith("XHTMLBLOCKX")) return false;
+  return /^\s*\|?[^|\n]+?\|[^|\n]+(?:\|[^|\n]+)*\|?\s*$/.test(row);
+}
+
+function convertMarkdownTables(source: string, rawBlocks: string[]) {
+  const lines = source.split("\n");
+  const processedLines: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const current = lines[i];
+    const next = lines[i + 1];
+    const hasPipe = current.includes("|");
+    const isSeparator = !!next && /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(next);
+
+    if (!hasPipe) {
+      processedLines.push(current);
+      i += 1;
+      continue;
+    }
+
+    if (isSeparator) {
+      const tableLines = [current, next];
+      i += 2;
+      while (i < lines.length && lines[i].includes("|") && lines[i].trim() !== "") {
+        tableLines.push(lines[i]);
+        i += 1;
+      }
+
+      const headerCells = parseMarkdownTableRow(tableLines[0]);
+      const bodyRows = tableLines.slice(2).map(parseMarkdownTableRow).filter((row) => row.length > 0);
+
+      if (headerCells.length < 2) {
+        processedLines.push(...tableLines);
+        continue;
+      }
+
+      const thead = `<thead><tr>${headerCells.map((cell) => `<th>${cell}</th>`).join("")}</tr></thead>`;
+      const tbody = bodyRows.length
+        ? `<tbody>${bodyRows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody>`
+        : "";
+
+      rawBlocks.push(`<div class="rich-text-table-wrap my-8 overflow-x-auto"><table>${thead}${tbody}</table></div>`);
+      processedLines.push(`XHTMLBLOCKX${rawBlocks.length - 1}X`);
+      continue;
+    }
+
+    if (!isPipeTableDataRow(current)) {
+      processedLines.push(current);
+      i += 1;
+      continue;
+    }
+
+    const simpleRows: string[] = [];
+    while (i < lines.length && isPipeTableDataRow(lines[i])) {
+      // Skip markdown separator-like rows if present inside block
+      if (/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(lines[i])) {
+        break;
+      }
+      simpleRows.push(lines[i]);
+      i += 1;
+    }
+
+    if (simpleRows.length < 2) {
+      processedLines.push(current);
+      if (simpleRows.length === 0) {
+        i += 1;
+      }
+      continue;
+    }
+
+    const bodyRows = simpleRows
+      .map(parseMarkdownTableRow)
+      .filter((row) => row.length >= 2);
+    if (bodyRows.length < 2) {
+      processedLines.push(...simpleRows);
+      continue;
+    }
+    const tbody = `<tbody>${bodyRows
+      .map((row) => `<tr>${row.map((cell, colIndex) => (colIndex === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`)).join("")}</tr>`)
+      .join("")}</tbody>`;
+
+    rawBlocks.push(`<div class="rich-text-table-wrap my-8 overflow-x-auto"><table>${tbody}</table></div>`);
+    processedLines.push(`XHTMLBLOCKX${rawBlocks.length - 1}X`);
+  }
+
+  return processedLines.join("\n");
+}
+
 // 简单的 Markdown 转换函数，处理基本标签
 function parseMarkdown(markdown: string) {
   if (!markdown) return "";
@@ -22,26 +122,29 @@ function parseMarkdown(markdown: string) {
     return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
   });
 
-  // 2. 执行 Markdown 解析，并将生成的 HTML 标签立即存入保护区
+  // 2. 优先处理 GFM 表格，转换为受保护 HTML 块
+  html = convertMarkdownTables(html, rawBlocks);
+
+  // 3. 执行 Markdown 解析，并将生成的 HTML 标签立即存入保护区
   html = html
     // 处理标题，并存入保护区
     .replace(/^### (.*$)/gim, (match, title) => {
       const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
-      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      const id = slugifyHeading(displayTitle);
       const tag = `<h3 id="${id}" class="text-[24px] font-bold text-heading mt-10 mb-4">${displayTitle}</h3>`;
       rawBlocks.push(tag);
       return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
     })
     .replace(/^## (.*$)/gim, (match, title) => {
       const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
-      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      const id = slugifyHeading(displayTitle);
       const tag = `<h2 id="${id}" class="text-[32px] font-bold text-heading mt-12 mb-6">${displayTitle}</h2>`;
       rawBlocks.push(tag);
       return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
     })
     .replace(/^# (.*$)/gim, (match, title) => {
       const displayTitle = title.replace(/\\/g, '').replace(/\*\*|\__/g, '');
-      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      const id = slugifyHeading(displayTitle);
       const tag = `<h1 id="${id}" class="text-[40px] font-black text-heading mb-8">${displayTitle}</h1>`;
       rawBlocks.push(tag);
       return `XHTMLBLOCKX${rawBlocks.length - 1}X`;
@@ -63,12 +166,12 @@ function parseMarkdown(markdown: string) {
     // 剩下的普通文本处理 加粗/斜体/列表
     .replace(/\*\*(.*?)\*\*/gim, (match, content) => `<strong class="font-black text-heading">${content.replace(/\\/g, '')}</strong>`)
     .replace(/__(.*?)__/gim, (match, content) => `<strong class="font-black text-heading">${content.replace(/\\/g, '')}</strong>`)
-    .replace(/\*(.*?)\*/gim, (match, content) => `<em class="italic">${content.replace(/\\/g, '')}</em>`)
-    .replace(/_(.*?)_/gim, (match, content) => `<em class="italic">${content.replace(/\\/g, '')}</em>`)
+    .replace(/(^|[\s(])\*(\S(?:.*?\S)?)\*(?=$|[\s).,!?:;])/gim, '$1<em class="italic">$2</em>')
+    .replace(/(^|[\s(])_(\S(?:.*?\S)?)_(?=$|[\s).,!?:;])/gim, '$1<em class="italic">$2</em>')
     .replace(/^\* (.*$)/gim, '<li class="ml-6 list-disc">$1</li>')
     .replace(/^\- (.*$)/gim, '<li class="ml-6 list-disc">$1</li>');
 
-  // 3. 处理段落包裹
+  // 4. 处理段落包裹
   const lines = html.split('\n');
   const wrappedLines = lines.map(line => {
     const trimmed = line.trim();
@@ -82,7 +185,7 @@ function parseMarkdown(markdown: string) {
 
   html = wrappedLines.join('\n');
 
-  // 4. 最后精准还原所有受保护的内容
+  // 5. 最后精准还原所有受保护的内容
   rawBlocks.forEach((content, index) => {
     const placeholder = `XHTMLBLOCKX${index}X`;
     html = html.split(placeholder).join(content);
@@ -97,28 +200,38 @@ interface RichTextProps {
   variant?: 'default' | 'blue-circle' | 'gray-square';
 }
 
+interface LinkBlockProps {
+  children?: React.ReactNode;
+  url?: string;
+  href?: string;
+}
+
 export function RichText({ content, className, variant = 'default' }: RichTextProps) {
   if (!content) return null;
 
   if (typeof content === 'string') {
-    // Check if content contains HTML tags or entities
-    const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content) || // Any HTML tag
-                        content.includes('&lt;') ||          // Encoded tags
-                        content.includes('&gt;') ||          // Encoded entities
-                        content.includes('&quot;') ||
-                        content.includes('&amp;');
+    const hasRawHtmlWrapper = /<raw-html>[\s\S]*?<\/raw-html>/i.test(content);
+    const hasMarkdownTable = /^\s*\|.+\|\s*$/m.test(content) && /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/m.test(content);
+    const hasMarkdownSyntax = hasMarkdownTable ||
+      /^#{1,6}\s+/m.test(content) ||
+      /(\*\*|__)[^*\n_]+(\*\*|__)/.test(content) ||
+      /\[[^\]]+\]\([^)]+\)/.test(content) ||
+      /^\s*[-*]\s+/m.test(content) ||
+      /^\s*\d+\.\s+/m.test(content) ||
+      /^>\s+/m.test(content) ||
+      /```[\s\S]*```/.test(content) ||
+      hasRawHtmlWrapper;
 
-    const isMarkdown = !hasHtmlTags && (
-                       content.includes('#') ||
-                       content.includes('**') ||
-                       content.includes('__') ||
-                       content.includes('[') ||
-                       content.includes('<raw-html>')
-                       );
+    // Check if content contains HTML tags or entities
+    const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content);
+    const hasEncodedHtml = content.includes("&lt;") && content.includes("&gt;");
+    const shouldTreatAsHtml = !hasRawHtmlWrapper && (hasHtmlTags || (hasEncodedHtml && !hasMarkdownSyntax));
 
     let htmlContent: string;
 
-    if (hasHtmlTags) {
+    if (hasMarkdownSyntax || hasRawHtmlWrapper) {
+      htmlContent = parseMarkdown(content);
+    } else if (shouldTreatAsHtml) {
       // Decode HTML entities (decode &amp; last to avoid double-decoding)
       const decoded = content
         .replace(/&lt;/g, '<')
@@ -128,8 +241,6 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
         .replace(/&apos;/g, "'")
         .replace(/&amp;/g, '&');
       htmlContent = decoded;
-    } else if (isMarkdown) {
-      htmlContent = parseMarkdown(content);
     } else {
       htmlContent = content;
     }
@@ -162,7 +273,7 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
               <Image src={image.url} alt={image.alternativeText || ""} width={image.width} height={image.height} className="rounded-2xl shadow-lg" />
             </div>
           ),
-          link: (props: any) => {
+          link: (props: LinkBlockProps) => {
             const { children, url, href } = props;
             const targetUrl = url || href || "";
             const isInternal = targetUrl.startsWith("/") || targetUrl.startsWith("https://www.boostvision.tv");

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
@@ -12,6 +12,10 @@ import { Metadata } from "next";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
+}
+
+function slugifyHeading(title: string) {
+  return title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -41,6 +45,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPostPage({ params }: Props) {
   const { slug, locale } = await params;
 
+  // Backward-compatible pagination URL: /blog/2 -> /blog/page/2
+  if (/^\d+$/.test(slug)) {
+    const pagePath = locale === "en" ? `/blog/page/${slug}` : `/${locale}/blog/page/${slug}`;
+    redirect(pagePath);
+  }
+
   // 增加错误捕获，防止 API 失败导致整页崩溃
   let post = null;
   let globalSetting = null;
@@ -65,6 +75,16 @@ export default async function BlogPostPage({ params }: Props) {
 
   // 提取目录 (Table of Contents)
   const toc: { id: string; title: string; level: number }[] = [];
+  const tocIds = new Set<string>();
+  const pushTocItem = (title: string, level: number) => {
+    const displayTitle = title.trim();
+    if (!displayTitle) return;
+    const id = slugifyHeading(displayTitle);
+    if (!id || tocIds.has(id)) return;
+    toc.push({ id, title: displayTitle, level });
+    tocIds.add(id);
+  };
+
   if (typeof post.content === 'string') {
     // 1. 首先尝试匹配标准的 ## 和 ### 标题
     const headerMatches = Array.from(post.content.matchAll(/^(##|###) (.*$)/gim));
@@ -74,17 +94,31 @@ export default async function BlogPostPage({ params }: Props) {
       const rawTitle = match[2].trim();
       // 清理标题中的 ** 和 __ 标记，使目录显示纯文本
       const displayTitle = rawTitle.replace(/\*\*|\__/g, '');
-      const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-      toc.push({ id, title: displayTitle, level });
+      pushTocItem(displayTitle, level);
     }
 
-    // 2. 如果没有找到标准的 # 标题，尝试捕获单独一行的加粗文本作为标题（兼容不规范写法）
+    // 2. 若正文是 HTML，兜底提取 h2/h3
+    if (toc.length === 0) {
+      const decodedHtml = post.content
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&amp;/g, "&");
+      const htmlHeaderMatches = Array.from(decodedHtml.matchAll(/<h([23])[^>]*>([\s\S]*?)<\/h\1>/gim));
+      for (const match of htmlHeaderMatches) {
+        const level = Number(match[1]);
+        const plainTitle = match[2].replace(/<[^>]+>/g, "").trim();
+        pushTocItem(plainTitle, level);
+      }
+    }
+
+    // 3. 如果没有找到标准标题，尝试捕获单独一行的加粗文本作为标题（兼容不规范写法）
     if (toc.length === 0) {
       const boldHeaderMatches = Array.from(post.content.matchAll(/^\*\*(.*?)\*\*\s*$/gim));
       for (const match of boldHeaderMatches) {
-        const displayTitle = match[1].trim();
-        const id = displayTitle.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-        toc.push({ id, title: displayTitle, level: 2 });
+        pushTocItem(match[1], 2);
       }
     }
   }
