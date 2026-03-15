@@ -1,4 +1,6 @@
 import { RichText, SectionRenderer } from "@/components/shared";
+import { PageAdSlot } from "@/components/ads";
+import { hasAdSenseSlot } from "@/config/adsense";
 import { getLegalPageBySlug } from "@/lib/strapi/api/pages";
 import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";
@@ -23,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PrivacyPolicyPage() {
   const page = await getLegalPageBySlug("privacy-policy");
+  const showInlineAd = hasAdSenseSlot("privacyInline");
 
   return (
     <>
@@ -50,6 +53,14 @@ export default async function PrivacyPolicyPage() {
             </div>
           </div>
         </section>
+
+        {showInlineAd ? (
+          <section className="py-12">
+            <div className="container-custom max-w-[900px]">
+              <PageAdSlot placement="privacyInline" minHeight={280} />
+            </div>
+          </section>
+        ) : null}
 
         {page?.sections && <SectionRenderer sections={page.sections} />}
       </main>

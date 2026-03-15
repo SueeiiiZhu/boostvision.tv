@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { Section, HeroSection, CTASection, TutorialAccordionSection, App, Tutorial, TutorialItem } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText } from '@/components/shared';
+import { PageAdSlot } from '@/components/ads';
+import { hasAdSenseSlot } from '@/config/adsense';
 
 interface TutorialSectionRendererProps {
     sections: Section[];
@@ -185,6 +187,15 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
                                 ) : null
                             )}
                         </div>
+
+                        {isOpen && hasAdSenseSlot('tutorialAccordion') ? (
+                            <div className="mt-10 border-t border-gray-50 pt-10">
+                                <PageAdSlot
+                                    placement="tutorialAccordion"
+                                    minHeight={250}
+                                />
+                            </div>
+                        ) : null}
 
                         {item.showDownloadButtons && (
                             <div className="mt-16 flex flex-wrap justify-center gap-8 pt-12 border-t border-gray-50">
