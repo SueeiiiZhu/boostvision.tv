@@ -3,9 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
+import { PageAdSlot } from "@/components/ads";
 import { getTutorialPageBySlug, getTutorialSeoBySlug } from "@/lib/strapi/api/tutorials";
 import { generateMetadata as genMetadata, generateHowToSchema, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
+import { hasAdSenseSlot } from "@/config/adsense";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -58,6 +60,7 @@ export default async function TutorialDetailPage({ params }: Props) {
     : null;
 
   const jsonLd = schema ? wrapSchema(schema) : null;
+  const showBottomAd = hasAdSenseSlot("tutorialBottom");
 
   return (
     <>
@@ -175,6 +178,14 @@ export default async function TutorialDetailPage({ params }: Props) {
           </section>
         </>
       )}
+
+      {showBottomAd ? (
+        <section className="mt-12">
+          <div className="container-custom max-w-[1000px]">
+            <PageAdSlot placement="tutorialBottom" minHeight={280} />
+          </div>
+        </section>
+      ) : null}
     </main>
     </>
   );

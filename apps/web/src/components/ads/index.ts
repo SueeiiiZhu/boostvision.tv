@@ -1,0 +1,1 @@
+export { PageAdSlot } from "./PageAdSlot";
