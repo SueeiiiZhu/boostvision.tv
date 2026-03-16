@@ -16,14 +16,11 @@ interface FAQSectionRendererProps {
 }
 
 type TextNode = {
-    type: string;
-    text?: string;
+    type: 'text';
+    text: string;
 };
 
-type ParagraphBlock = {
-    type: string;
-    children?: TextNode[];
-};
+type ParagraphBlock = Extract<TutorialItem["content"][number], { type: 'paragraph' }>;
 
 /**
  * FAQSectionRenderer - Client Component (for accordion/tab logic)
@@ -129,8 +126,8 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App; isOpen: boolean; o
             .filter((block): block is ParagraphBlock => block.type === 'paragraph')
             .map((block) =>
                 block.children
-                    ?.filter((child): child is TextNode => child.type === 'text')
-                    .map((child) => child.text ?? '')
+                    .filter((child): child is TextNode => child.type === 'text')
+                    .map((child) => child.text)
                     .join('')
             )
             .join('\n');

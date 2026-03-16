@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { getAdSenseSlot, normalizeAdSenseSlot } from "./adsense.ts";
+import { getAdSenseSlot, normalizeAdSenseSlot } from "./adsense";
 
 test("normalizeAdSenseSlot trims configured slot ids", () => {
   assert.equal(normalizeAdSenseSlot(" 1234567890 "), "1234567890");
@@ -13,7 +13,7 @@ test("normalizeAdSenseSlot returns null for blank values", () => {
   assert.equal(normalizeAdSenseSlot(undefined), null);
 });
 
-test("getAdSenseSlot returns null for unconfigured placeholder placements", () => {
-  assert.equal(getAdSenseSlot("faqAccordion"), null);
-  assert.equal(getAdSenseSlot("privacyInline"), null);
+test("getAdSenseSlot returns configured slot ids", () => {
+  assert.equal(getAdSenseSlot("faqAccordion"), "1648701811");
+  assert.equal(getAdSenseSlot("privacyInline"), "5204803446");
 });
