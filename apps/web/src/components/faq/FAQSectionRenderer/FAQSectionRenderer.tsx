@@ -15,11 +15,18 @@ interface FAQSectionRendererProps {
     faq: FAQ;
 }
 
+type TextNode = {
+    type: 'text';
+    text: string;
+};
+
+type ParagraphBlock = Extract<TutorialItem["content"][number], { type: 'paragraph' }>;
+
 /**
  * FAQSectionRenderer - Client Component (for accordion/tab logic)
  * Dedicated renderer for FAQ pages to match their unique style
  */
-export function FAQSectionRenderer({ sections, app, faq }: FAQSectionRendererProps) {
+export function FAQSectionRenderer({ sections, app }: FAQSectionRendererProps) {
     if (!sections || sections.length === 0) return null;
 
     return (
@@ -70,12 +77,20 @@ const FAQHero: React.FC<{ data: HeroSection; app: App }> = ({ data, app }) => (
 );
 
 const FAQAccordion: React.FC<{ data: TutorialAccordionSection; app: App }> = ({ data, app }) => {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
     return (
         <section className="py-12 bg-white">
             <div className="container-custom max-w-[1000px]">
                 <div className="space-y-6">
                     {data.items.map((item, index) => (
-                        <AccordionItem key={index} item={item} app={app} />
+                        <AccordionItem
+                            key={index}
+                            item={item}
+                            app={app}
+                            isOpen={openIndex === index}
+                            onToggle={() => setOpenIndex((prev) => (prev === index ? null : index))}
+                        />
                     ))}
                 </div>
             </div>
@@ -83,8 +98,7 @@ const FAQAccordion: React.FC<{ data: TutorialAccordionSection; app: App }> = ({ 
     );
 };
 
-const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }) => {
-    const [isOpen, setIsOpen] = useState(false);
+const AccordionItem: React.FC<{ item: TutorialItem; app: App; isOpen: boolean; onToggle: () => void }> = ({ item, app, isOpen, onToggle }) => {
     const [isMounted, setIsMounted] = useState(false);
 
     // Helper function to decode HTML entities
@@ -103,6 +117,22 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
         setIsMounted(true);
     }, []);
 
+    const extractTextFromBlocks = (content: TutorialItem["content"]) => {
+        if (!Array.isArray(content)) {
+            return "";
+        }
+
+        return content
+            .filter((block): block is ParagraphBlock => block.type === 'paragraph')
+            .map((block) =>
+                block.children
+                    .filter((child): child is TextNode => child.type === 'text')
+                    .map((child) => child.text)
+                    .join('')
+            )
+            .join('\n');
+    };
+
     // Process content only on client side
     const getProcessedContent = () => {
         if (!item.content || !isMounted) {
@@ -120,15 +150,7 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
             }
         } else if (Array.isArray(item.content)) {
             // Extract text from BlocksContent
-            const allText = item.content
-                .filter((block: any) => block.type === 'paragraph')
-                .map((block: any) =>
-                    block.children
-                        ?.filter((child: any) => child.type === 'text')
-                        .map((child: any) => child.text)
-                        .join('')
-                )
-                .join('\n');
+            const allText = extractTextFromBlocks(item.content);
 
             // Check if the text contains HTML tags
             if (/<[a-z][\s\S]*>/i.test(allText)) {
@@ -149,7 +171,7 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App }> = ({ item, app }
         )}>
             {/* Header */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={onToggle}
                 className="w-full flex items-center justify-between px-12 py-4 text-left transition-colors"
             >
                 <h3 className="text-[12px] md:text-[16px] font-black text-heading">
