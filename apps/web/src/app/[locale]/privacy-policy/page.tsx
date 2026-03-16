@@ -3,6 +3,7 @@ import { PageAdSlot } from "@/components/ads";
 import { hasAdSenseSlot } from "@/config/adsense";
 import { getLegalPageBySlug } from "@/lib/strapi/api/pages";
 import { getLocaleAlternates } from "@/lib/seo";
+import { type BlocksContent } from "@strapi/blocks-react-renderer";
 import { Metadata } from "next";
 
 interface Props {
@@ -10,6 +11,37 @@ interface Props {
 }
 
 export const revalidate = 86400;
+
+type LegalContent = BlocksContent | string;
+
+function splitContentForInlineAd(content?: LegalContent | null): { before: LegalContent; after: LegalContent } | null {
+  if (!content) return null;
+
+  if (typeof content === "string") {
+    const lines = content.split("\n");
+    if (lines.length < 8) return null;
+
+    let splitIndex = Math.floor(lines.length / 2);
+    const headingIndex = lines.findIndex((line, index) => index > splitIndex && /^#{1,3}\s+/.test(line.trim()));
+    if (headingIndex > 0) {
+      splitIndex = headingIndex;
+    }
+
+    const before = lines.slice(0, splitIndex).join("\n").trim();
+    const after = lines.slice(splitIndex).join("\n").trim();
+    if (!before || !after) return null;
+
+    return { before, after };
+  }
+
+  if (!Array.isArray(content) || content.length < 4) return null;
+  const splitIndex = Math.ceil(content.length / 2);
+  const before = content.slice(0, splitIndex);
+  const after = content.slice(splitIndex);
+  if (before.length === 0 || after.length === 0) return null;
+
+  return { before, after };
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -26,6 +58,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PrivacyPolicyPage() {
   const page = await getLegalPageBySlug("privacy-policy");
   const showInlineAd = hasAdSenseSlot("privacyInline");
+  const content = page?.content as LegalContent | undefined;
+  const splitContent = splitContentForInlineAd(content);
 
   return (
     <>
@@ -43,8 +77,37 @@ export default async function PrivacyPolicyPage() {
         <section className="py-0 mt-0">
           <div className="container-custom max-w-[900px]">
             <div className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
-              {page?.content ? (
-                <RichText content={page.content} />
+              {content ? (
+                splitContent ? (
+                  <>
+                    <RichText content={splitContent.before} />
+                    {showInlineAd ? (
+                      <PageAdSlot
+                        placement="privacyInline"
+                        minHeight={280}
+                        label=""
+                        unstyled
+                        constrainWidth={false}
+                        className="my-10"
+                      />
+                    ) : null}
+                    <RichText content={splitContent.after} />
+                  </>
+                ) : (
+                  <>
+                    <RichText content={content} />
+                    {showInlineAd ? (
+                      <PageAdSlot
+                        placement="privacyInline"
+                        minHeight={280}
+                        label=""
+                        unstyled
+                        constrainWidth={false}
+                        className="mt-10"
+                      />
+                    ) : null}
+                  </>
+                )
               ) : (
                 <div className="py-20 text-center text-muted italic">
                   Content is being updated in Strapi CMS. Please check back later.
