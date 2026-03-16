@@ -51,7 +51,7 @@ export function GoogleAdSenseSlot({
     <ins
       ref={adRef}
       className={`adsbygoogle ${className || ''}`.trim()}
-      style={{ display: 'block', minHeight }}
+      style={{ display: 'block', minHeight, width: '100%', maxWidth: '100%' }}
       data-ad-client={adClient}
       data-ad-slot={adSlot}
       data-ad-format={format}

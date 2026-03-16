@@ -85,7 +85,6 @@ export default async function PrivacyPolicyPage() {
                       <PageAdSlot
                         placement="privacyInline"
                         minHeight={280}
-                        label=""
                         unstyled
                         constrainWidth={false}
                         className="my-10"
@@ -100,7 +99,6 @@ export default async function PrivacyPolicyPage() {
                       <PageAdSlot
                         placement="privacyInline"
                         minHeight={280}
-                        label=""
                         unstyled
                         constrainWidth={false}
                         className="mt-10"

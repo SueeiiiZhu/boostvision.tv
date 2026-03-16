@@ -24,7 +24,7 @@ export function PageAdSlot({
   placement,
   className,
   containerClassName,
-  label = "Sponsored",
+  label = "Ad",
   minHeight = 280,
   format = "auto",
   responsive = true,
@@ -77,24 +77,29 @@ export function PageAdSlot({
       ref={containerRef}
       aria-label="Advertisement"
       className={cn(
-        !unstyled && "rounded-[28px] border border-gray-100 bg-section-bg px-6 py-5 sm:px-8",
+        "max-w-full overflow-hidden",
+        !unstyled && "rounded-[24px] border border-gray-100/60 bg-white/70 px-5 py-4 sm:px-6",
         className
       )}
     >
       {label ? (
-        <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-[0.24em] text-muted/70">
+        <p className="mb-3 text-center text-[10px] font-medium uppercase tracking-[0.18em] text-muted/45">
           {label}
         </p>
       ) : null}
 
       <div
-        className={cn(constrainWidth ? "mx-auto w-full max-w-[728px]" : "w-full", containerClassName)}
+        className={cn(
+          "max-w-full overflow-hidden",
+          constrainWidth ? "mx-auto w-full max-w-[728px]" : "w-full",
+          containerClassName
+        )}
         style={{ minHeight }}
       >
         {shouldLoad ? (
           <GoogleAdSenseSlot
             adSlot={slot}
-            className="mx-auto w-full"
+            className="mx-auto block w-full max-w-full overflow-hidden"
             format={format}
             responsive={responsive}
             minHeight={minHeight}
