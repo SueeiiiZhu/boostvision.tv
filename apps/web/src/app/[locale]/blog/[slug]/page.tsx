@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { BlogCard } from "../_components/BlogCard";
+import { BlogToc } from "../_components/BlogToc";
 import { getBlogPostBySlug } from "@/lib/strapi/api/blog";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata, generateArticleSchema, wrapSchema } from "@/lib/seo";
 import { formatDate } from "@/lib/utils/formatDate";
-import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 
 interface Props {
@@ -223,30 +223,7 @@ export default async function BlogPostPage({ params }: Props) {
                       <h4 className="text-[20px] font-black text-heading mb-6">
                         {globalSetting?.tocTitle || "Contents"}
                       </h4>
-                      <nav>
-                        <ul className="space-y-4">
-                          {toc.map((item) => (
-                            <li
-                              key={item.id}
-                              className={cn(
-                                item.level === 3 && "ml-4"
-                              )}
-                            >
-                              <a
-                                href={`#${item.id}`}
-                                className={cn(
-                                  "block transition-colors leading-snug",
-                                  item.level === 2
-                                    ? "text-[16px] font-bold text-muted hover:text-primary"
-                                    : "text-[14px] font-medium text-muted/80 hover:text-primary"
-                                )}
-                              >
-                                {item.title}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </nav>
+                      <BlogToc toc={toc} />
                     </div>
                   )}
                 </div>

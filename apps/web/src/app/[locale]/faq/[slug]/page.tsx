@@ -3,10 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
+import { PageAdSlot } from "@/components/ads";
 import { getFAQPageBySlug, getFAQSeoBySlug } from "@/lib/strapi/api/faqs";
 import { generateFAQPageSchema, generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
 import { Metadata } from "next";
 import { BlocksContent } from "@strapi/blocks-react-renderer";
+import { hasAdSenseSlot } from "@/config/adsense";
 
 // Helper function to decode HTML entities
 function decodeHtmlEntities(text: string): string {
@@ -113,6 +115,7 @@ export default async function FAQDetailPage({ params }: Props) {
   });
 
   const jsonLd = wrapSchema(schema);
+  const showBottomAd = hasAdSenseSlot("faqBottom");
 
   return (
     <>
@@ -206,6 +209,14 @@ export default async function FAQDetailPage({ params }: Props) {
           </section>
         </>
       )}
+
+      {showBottomAd ? (
+        <section className="mt-12">
+          <div className="container-custom max-w-[1000px]">
+            <PageAdSlot placement="faqBottom" minHeight={280} />
+          </div>
+        </section>
+      ) : null}
     </main>
     </>
   );
