@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Roboto, Poppins } from "next/font/google";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { getNavigation } from "@/lib/strapi/api/navigation";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
+import { IntlProvider } from "@/components/providers/IntlProvider";
 import { Header, Footer } from "@/components/layout";
 import { AnalyticsWrapper } from "@/components/analytics";
 import "../globals.css";
@@ -29,6 +29,10 @@ export const metadata: Metadata = {
   description: "Mirror the screen of your iPhone, iPad, Android phone & tablet directly to your Smart TV. Try our professional remote control apps.",
 };
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function RootLayout({
   children,
   params
@@ -42,6 +46,8 @@ export default async function RootLayout({
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
+
+  setRequestLocale(locale);
 
   // Providing all messages to the client side
   const messages = await getMessages();
@@ -73,11 +79,11 @@ export default async function RootLayout({
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <AnalyticsWrapper />
-        <NextIntlClientProvider messages={messages}>
+        <IntlProvider locale={locale} messages={messages}>
           <Header navigation={navigation as any} globalSetting={globalSetting as any} />
           {children}
           <Footer navigation={navigation as any} globalSetting={globalSetting as any} />
-        </NextIntlClientProvider>
+        </IntlProvider>
       </body>
     </html>
   );
