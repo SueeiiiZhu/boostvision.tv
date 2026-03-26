@@ -2,6 +2,7 @@ import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, tutorialTag } from "../cacheTags";
 import { Tutorial } from "../../../types/strapi";
 import { getTutorialDetailRevalidate, getTutorialRevalidate } from "../revalidate";
+import { normalizeTutorial } from "../normalize";
 
 export async function getTutorialsForList(params: {
   appSlug?: string;
@@ -55,7 +56,7 @@ export async function getTutorialSeoBySlug(slug: string) {
     revalidate: getTutorialDetailRevalidate(),
   });
 
-  return response.data?.[0] || null;
+  return normalizeTutorial(response.data?.[0] || null);
 }
 
 export async function getTutorialPageBySlug(slug: string) {
@@ -100,7 +101,7 @@ export async function getTutorialPageBySlug(slug: string) {
     tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
     revalidate: getTutorialDetailRevalidate(),
   });
-  return response.data?.[0] || null;
+  return normalizeTutorial(response.data?.[0] || null);
 }
 
 export async function getTutorialBySlug(slug: string) {

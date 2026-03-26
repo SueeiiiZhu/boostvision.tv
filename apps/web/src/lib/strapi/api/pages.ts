@@ -2,6 +2,7 @@ import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, pageTag } from "../cacheTags";
 import { Page } from "../../../types/strapi";
 import { getLegalRevalidate } from "../revalidate";
+import { normalizePage } from "../normalize";
 
 export async function getPageBySlug(slug: string) {
   const query = buildStrapiQuery({
@@ -57,7 +58,7 @@ export async function getPageBySlug(slug: string) {
   const response = await fetchStrapi<Page[]>(`/pages${query}`, {
     tags: [CACHE_TAGS.pages, pageTag(slug)],
   });
-  return response.data?.[0] || null;
+  return normalizePage(response.data?.[0] || null);
 }
 
 export async function getLegalPageBySlug(slug: "terms-of-use" | "privacy-policy") {
@@ -86,5 +87,5 @@ export async function getLegalPageBySlug(slug: "terms-of-use" | "privacy-policy"
     revalidate: getLegalRevalidate(),
   });
 
-  return response.data?.[0] || null;
+  return normalizePage(response.data?.[0] || null);
 }
