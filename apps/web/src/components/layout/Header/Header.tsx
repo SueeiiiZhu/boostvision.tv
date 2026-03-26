@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { SearchInput } from "./SearchInput";
@@ -148,7 +148,9 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
 
           {/* Language & CTA */}
           <div className="ml-4 flex items-center gap-4">
-            <SearchInput />
+            <Suspense fallback={null}>
+              <SearchInput />
+            </Suspense>
 
             {/* Language switcher temporarily disabled until i18n is fully configured */}
             {/* <div className="group relative">
@@ -213,7 +215,9 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
           <div className="flex flex-col p-6 gap-2">
             {/* Mobile Search */}
             <div className="mb-6">
-              <SearchInput isMobile onSearch={() => setIsMenuOpen(false)} />
+              <Suspense fallback={null}>
+                <SearchInput isMobile onSearch={() => setIsMenuOpen(false)} />
+              </Suspense>
             </div>
 
             {headerMenu.map((item) => (

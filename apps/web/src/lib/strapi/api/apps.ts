@@ -1,6 +1,7 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, appTag } from "../cacheTags";
 import { App } from "../../../types/strapi";
+import { normalizeApp, normalizeApps } from "../normalize";
 
 export async function getApps(params: {
   type?: 'screen-mirroring' | 'tv-remote';
@@ -25,9 +26,14 @@ export async function getApps(params: {
     sort: ["order:asc", "createdAt:desc"],
   });
 
-  return fetchStrapi<App[]>(`/apps${query}`, {
+  const response = await fetchStrapi<App[]>(`/apps${query}`, {
     tags: [CACHE_TAGS.apps],
   });
+
+  return {
+    ...response,
+    data: normalizeApps(response.data),
+  };
 }
 
 export async function getAppBySlug(slug: string) {
@@ -92,7 +98,7 @@ export async function getAppBySlug(slug: string) {
   const response = await fetchStrapi<App[]>(`/apps${query}`, {
     tags: [CACHE_TAGS.apps, appTag(slug)],
   });
-  return response.data?.[0] || null;
+  return normalizeApp(response.data?.[0] || null);
 }
 
 export async function getAppSlugs() {

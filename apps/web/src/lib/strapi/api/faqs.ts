@@ -2,6 +2,7 @@ import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, faqTag } from "../cacheTags";
 import { FAQ } from "../../../types/strapi";
 import { getFaqDetailRevalidate, getFaqRevalidate } from "../revalidate";
+import { normalizeFaq } from "../normalize";
 
 export async function getFAQsForList(params: {
   appSlug?: string;
@@ -57,7 +58,7 @@ export async function getFAQSeoBySlug(slug: string) {
     revalidate: getFaqDetailRevalidate(),
   });
 
-  return response.data?.[0] || null;
+  return normalizeFaq(response.data?.[0] || null);
 }
 
 export async function getFAQPageBySlug(slug: string) {
@@ -100,7 +101,7 @@ export async function getFAQPageBySlug(slug: string) {
     tags: [CACHE_TAGS.faqs, faqTag(slug)],
     revalidate: getFaqDetailRevalidate(),
   });
-  return response.data?.[0] || null;
+  return normalizeFaq(response.data?.[0] || null);
 }
 
 export async function getFAQBySlug(slug: string) {

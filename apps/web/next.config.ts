@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
 
   images: {
     unoptimized: process.env.NODE_ENV === 'development',
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === 'development',
     formats: ['image/avif', 'image/webp'], // Optimize image formats
     qualities: [75, 80],
     remotePatterns: [
