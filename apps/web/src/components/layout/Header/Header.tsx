@@ -9,8 +9,8 @@ import { useTranslations } from "next-intl";
 import { Navigation, GlobalSetting } from "@/types/strapi";
 
 interface HeaderProps {
-  navigation: Navigation;
-  globalSetting: GlobalSetting;
+  navigation: Navigation | null;
+  globalSetting: GlobalSetting | null;
 }
 
 export function Header({ navigation, globalSetting }: HeaderProps) {
@@ -218,6 +218,26 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               <Suspense fallback={null}>
                 <SearchInput isMobile onSearch={() => setIsMenuOpen(false)} />
               </Suspense>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mb-6 grid grid-cols-2 gap-3">
+              <Link
+                href="/app?tab=screen-mirroring"
+                className="flex flex-col items-center gap-2 rounded-2xl bg-section-bg p-4 text-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Image src="/icons/mirror-tab.svg" alt="" width={24} height={24} />
+                <span className="text-[13px] font-bold text-heading">Screen Mirroring</span>
+              </Link>
+              <Link
+                href="/app?tab=tv-remote"
+                className="flex flex-col items-center gap-2 rounded-2xl bg-section-bg p-4 text-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Image src="/icons/remote-tab.svg" alt="" width={24} height={24} />
+                <span className="text-[13px] font-bold text-heading">TV Remote</span>
+              </Link>
             </div>
 
             {headerMenu.map((item) => (

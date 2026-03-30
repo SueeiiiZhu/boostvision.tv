@@ -1,6 +1,20 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+type RuntimeProcess = {
+  env?: Record<string, string | undefined>;
+};
+
+function getRuntimeProcess(): RuntimeProcess | undefined {
+  if (typeof globalThis !== "object" || globalThis === null) {
+    return undefined;
+  }
+
+  return "process" in globalThis
+    ? (globalThis as typeof globalThis & { process?: RuntimeProcess }).process
+    : undefined;
+}
+
 /**
  * Utility function to merge Tailwind CSS classes
  */
@@ -60,7 +74,8 @@ export function slugify(text: string): string {
 export function getStrapiMediaUrl(url: string | undefined): string {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+  const strapiUrl =
+    getRuntimeProcess()?.env?.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
   return `${strapiUrl}${url}`;
 }
 
@@ -80,4 +95,3 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     timeoutId = setTimeout(() => func(...args), wait);
   };
 }
-

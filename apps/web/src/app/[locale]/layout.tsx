@@ -8,6 +8,7 @@ import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { IntlProvider } from "@/components/providers/IntlProvider";
 import { Header, Footer } from "@/components/layout";
 import { AnalyticsWrapper } from "@/components/analytics";
+import type { GlobalSetting, Navigation } from "@/types/strapi";
 import "../globals.css";
 
 const roboto = Roboto({
@@ -33,6 +34,12 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+type Locale = (typeof routing.locales)[number];
+
+function isLocale(locale: string): locale is Locale {
+  return routing.locales.includes(locale as Locale);
+}
+
 export default async function RootLayout({
   children,
   params
@@ -43,7 +50,7 @@ export default async function RootLayout({
   const { locale } = await params;
 
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     notFound();
   }
 
@@ -53,8 +60,8 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   // Fetch navigation and global settings for the layout
-  let navigation = null;
-  let globalSetting = null;
+  let navigation: Navigation | null = null;
+  let globalSetting: GlobalSetting | null = null;
 
   try {
     navigation = await getNavigation(locale);
@@ -80,9 +87,9 @@ export default async function RootLayout({
       <body className="antialiased" suppressHydrationWarning>
         <AnalyticsWrapper />
         <IntlProvider locale={locale} messages={messages}>
-          <Header navigation={navigation as any} globalSetting={globalSetting as any} />
+          <Header navigation={navigation} globalSetting={globalSetting} />
           {children}
-          <Footer navigation={navigation as any} globalSetting={globalSetting as any} />
+          <Footer navigation={navigation} globalSetting={globalSetting} />
         </IntlProvider>
       </body>
     </html>

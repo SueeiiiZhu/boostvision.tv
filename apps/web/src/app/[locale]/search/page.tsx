@@ -110,7 +110,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   <div className="text-[60px] mb-6">🔍</div>
                   <h3 className="text-[24px] font-bold text-heading mb-4">No results found</h3>
                   <p className="text-muted text-[18px] max-w-[500px] mx-auto">
-                    We couldn't find anything matching "{query}". <br />
+                    We couldn&apos;t find anything matching &quot;{query}&quot;. <br />
                     Try checking your spelling or using different keywords.
                   </p>
                   <Link href="/" className="mt-10 inline-block btn-gradient px-10">Back to Home</Link>

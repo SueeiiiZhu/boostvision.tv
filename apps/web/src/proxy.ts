@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const intlMiddleware = createMiddleware(routing);
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Legacy locale mapping: jp -> ja
@@ -55,9 +55,7 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Match internationalized pathnames and .html files
-  // Note: We include paths without dots AND .html files specifically
   matcher: [
-    '/((?!api|_next|_vercel).*)',  // Match all except api, _next, _vercel
+    '/((?!api|_next|_vercel).*)',
   ]
 };
