@@ -57,7 +57,8 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   // 2. Otherwise, use current page path
   // Do NOT fallback to defaultSeo.canonicalUrl as it would make all pages point to the same URL
   const alternates = path ? getLocaleAlternates(path, locale) : undefined;
-  const canonical = seo?.canonicalUrl || alternates?.canonical || `${SITE_URL}${path}`;
+  const fallbackCanonical = path === "/" ? SITE_URL : `${SITE_URL}${path}`;
+  const canonical = seo?.canonicalUrl || alternates?.canonical || fallbackCanonical;
 
   // OG image fallback priority:
   // 1) Current entry SEO image
