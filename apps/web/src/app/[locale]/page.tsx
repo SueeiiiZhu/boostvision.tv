@@ -83,7 +83,7 @@ export default async function Home() {
         ) : (
           <>
             {/* Hero Section Fallback */}
-            <section className="bg-white pt-24 pb-12 text-center overflow-hidden">
+            <section className="bg-white pt-20 pb-8 text-center overflow-hidden">
               <div className="container-custom">
                 <h1 className="mx-auto max-w-[900px] font-[family-name:var(--font-heading)] text-[36px] font-black leading-tight tracking-tight sm:text-[44px] md:text-[52px] lg:text-[58px] animate-slide-up">
                   <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -109,22 +109,32 @@ export default async function Home() {
                 {/* Stats Row */}
                 <div className="mt-20 flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
                   {[
-                    { label: "Downloads", value: stats.downloads, icon: "download" },
-                    { label: "Countries and Regions", value: stats.countries, icon: "global" },
-                    { label: "Satisfied Customers", value: stats.customers, icon: "users" },
-                    { label: "Customer Service", value: stats.supportHours, icon: "service" },
-                  ].map((stat) => (
-                    <div key={stat.label} className="flex flex-col items-center gap-3">
-                      <div className="flex items-center gap-3">
-                        <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={32} height={32} />
-                        <span className="text-[24px] font-black text-heading leading-none">{stat.value}</span>
+                    { label: "Downloads", value: stats.downloads, icon: "download", href: "/app" },
+                    { label: "Countries and Regions", value: stats.countries, icon: "global", href: undefined },
+                    { label: "Satisfied Customers", value: stats.customers, icon: "users", href: "/app" },
+                    { label: "Customer Service", value: stats.supportHours, icon: "service", href: "/contact-us" },
+                  ].map((stat) => {
+                    const content = (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="flex items-center gap-3">
+                          <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={32} height={32} />
+                          <span className="text-[24px] font-black text-heading leading-none">{stat.value}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+
+                    return stat.href ? (
+                      <Link key={stat.label} href={stat.href} className="transition-opacity hover:opacity-80">
+                        {content}
+                      </Link>
+                    ) : (
+                      <div key={stat.label}>{content}</div>
+                    );
+                  })}
                 </div>
 
                 {/* Main Product Image */}
-                <div className="mt-24 flex justify-center scale-105 transform">
+                <div className="mt-16 flex justify-center scale-105 transform">
                   <Image
                     src="/images/hero-devices.webp"
                     alt="BoostVision Apps"
@@ -139,7 +149,7 @@ export default async function Home() {
             </section>
 
             {/* Why Choose Section Fallback */}
-            <section className="py-32 bg-section-bg text-center">
+            <section className="bg-section-bg pt-20 pb-32 text-center">
               <div className="container-custom">
                 <h2 className="section-heading mb-20">
                   Why Choose BoostVision Apps?

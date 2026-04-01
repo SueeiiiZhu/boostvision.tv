@@ -26,7 +26,10 @@ export function AnalyticsWrapper() {
 
   useEffect(() => {
     // Load analytics after user interaction or after 3 seconds
-    let timeout: NodeJS.Timeout;
+    const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
+      setShouldLoad(true);
+      cleanup();
+    }, 3000);
 
     const handleInteraction = () => {
       setShouldLoad(true);
@@ -39,16 +42,11 @@ export function AnalyticsWrapper() {
     });
 
     // Fallback: load after 3 seconds if no interaction
-    timeout = setTimeout(() => {
-      setShouldLoad(true);
-      cleanup();
-    }, 3000);
-
     function cleanup() {
       events.forEach((event) => {
         window.removeEventListener(event, handleInteraction);
       });
-      if (timeout) clearTimeout(timeout);
+      clearTimeout(timeout);
     }
 
     return cleanup;

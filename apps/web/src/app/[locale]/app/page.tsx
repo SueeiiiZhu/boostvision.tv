@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function AppsPage({ params, searchParams }: Props) {
+export default async function AppsPage({ searchParams }: Props) {
   const { tab = "screen-mirroring" } = await searchParams;
 
   // 并行获取 App 列表和页面配置数据

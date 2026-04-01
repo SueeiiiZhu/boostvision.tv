@@ -10,6 +10,12 @@ import { getFAQSlugs } from '@/lib/strapi/api/faqs';
 const DOMAIN = 'https://www.boostvision.tv';
 const TRANSLATION_CSV_PATH = path.join(process.cwd(), 'public', 'translation_refine_success_table.csv');
 
+function normalizeLegacyLocalePathname(pathname: string) {
+  if (pathname === '/jp') return '/ja';
+  if (pathname.startsWith('/jp/')) return `/ja${pathname.slice('/jp'.length)}`;
+  return pathname;
+}
+
 async function getTranslationRefinedUrls() {
   try {
     const csv = await readFile(TRANSLATION_CSV_PATH, 'utf8');
@@ -29,6 +35,7 @@ async function getTranslationRefinedUrls() {
 
       try {
         const url = new URL(rawUrl);
+        url.pathname = normalizeLegacyLocalePathname(url.pathname);
         urls.add(url.toString());
       } catch {
         // Ignore malformed URLs so sitemap generation remains stable.

@@ -150,9 +150,20 @@ export default async function BlogPostPage({ params }: Props) {
       <main className="bg-white">
         <article className="py-20">
           <div className="container-custom max-w-[1200px]">
-            <div className="flex flex-col lg:flex-row gap-12">
+            {toc.length > 0 && (
+              <details className="mb-8 rounded-[20px] border border-gray-100 bg-section-bg p-6 lg:hidden">
+                <summary className="cursor-pointer select-none text-[18px] font-black text-heading">
+                  {globalSetting?.tocTitle || "Contents"}
+                </summary>
+                <div className="mt-4">
+                  <BlogToc toc={toc} />
+                </div>
+              </details>
+            )}
+
+            <div className="flex flex-col gap-12 lg:flex-row">
               {/* Main Content Area */}
-              <div className="flex-1 max-w-[850px]">
+              <div className="flex-1 max-w-[880px]">
                 {/* Header */}
                 <header className="mb-12">
                   {/* <div className="mb-6 flex items-center gap-4 text-[15px] font-medium">
@@ -185,8 +196,24 @@ export default async function BlogPostPage({ params }: Props) {
                   </div>
                 </header>
 
+                {/* Quick Answer */}
+                {post.excerpt && (
+                  <div className="mb-12 rounded-[20px] border border-primary/20 bg-section-bg-2 p-8">
+                    <h2 className="mb-3 flex items-center gap-2 text-[18px] font-black text-heading">
+                      <svg className="h-5 w-5 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Quick Answer
+                    </h2>
+                    <p className="text-[16px] leading-[1.7] text-muted">{post.excerpt}</p>
+                    <a href="#article-content" className="mt-4 inline-block text-[14px] font-bold text-primary hover:underline">
+                      Read full article below ↓
+                    </a>
+                  </div>
+                )}
+
                 {/* Content */}
-                <div className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
+                <div id="article-content" className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
                   <RichText content={post.content} />
                 </div>
 
@@ -215,7 +242,7 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
 
               {/* Sidebar - Table of Contents */}
-              <aside className="hidden lg:block w-[300px] shrink-0">
+              <aside className="hidden w-[260px] shrink-0 lg:block">
                 <div className="sticky top-[120px]">
                   {/* Table of Contents */}
                   {toc.length > 0 && (
