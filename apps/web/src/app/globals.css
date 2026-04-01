@@ -18,6 +18,8 @@
   --color-section-bg: #f5f7ff;
   --color-section-bg-2: #f3f9ff;
   /* rgb(243, 249, 255) */
+  --color-blog-bg: #faf8ff;
+  --color-support-bg: #f5fff7;
   --background-image-section-bg-3: linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)), linear-gradient(180deg, #072a58 0%, #000911 100%);
   --background-image-section-bg-cta: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)),
     linear-gradient(90deg, #1e6cf4 0%, #b8f732 100%);

@@ -3,8 +3,8 @@ import { Link } from "@/i18n/routing";
 import { Navigation, GlobalSetting } from "@/types/strapi";
 
 interface FooterProps {
-  navigation: Navigation;
-  globalSetting: GlobalSetting;
+  navigation: Navigation | null;
+  globalSetting: GlobalSetting | null;
 }
 
 export function Footer({ navigation, globalSetting }: FooterProps) {

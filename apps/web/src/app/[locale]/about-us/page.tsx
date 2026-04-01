@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { RichText } from "@/components/shared";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";

@@ -5,6 +5,19 @@
 const SITE_URL = "https://www.boostvision.tv";
 const SITE_NAME = "BoostVision";
 
+type JsonLdValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | JsonLdObject
+  | JsonLdValue[];
+
+type JsonLdObject = {
+  [key: string]: JsonLdValue;
+};
+
 interface OrganizationSchemaOptions {
   socialLinks?: Array<{ platform: string; url: string }>;
 }
@@ -14,7 +27,7 @@ interface OrganizationSchemaOptions {
  */
 export function generateOrganizationSchema(
   options: OrganizationSchemaOptions = {}
-): Record<string, any> {
+): JsonLdObject {
   const { socialLinks = [] } = options;
 
   return {
@@ -33,7 +46,7 @@ export function generateOrganizationSchema(
 /**
  * Generate WebSite schema for homepage
  */
-export function generateWebSiteSchema(): Record<string, any> {
+export function generateWebSiteSchema(): JsonLdObject {
   return {
     "@type": "WebSite",
     "@id": `${SITE_URL}#website`,
@@ -70,7 +83,7 @@ interface SoftwareApplicationSchemaOptions {
  */
 export function generateSoftwareApplicationSchema(
   options: SoftwareApplicationSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const {
     name,
     description,
@@ -140,7 +153,7 @@ interface ArticleSchemaOptions {
  */
 export function generateArticleSchema(
   options: ArticleSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const {
     headline,
     description,
@@ -191,7 +204,7 @@ interface FAQPageSchemaOptions {
  */
 export function generateFAQPageSchema(
   options: FAQPageSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const { questions } = options;
 
   return {
@@ -224,7 +237,7 @@ interface HowToSchemaOptions {
  */
 export function generateHowToSchema(
   options: HowToSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const { name, description, image, totalTime, steps } = options;
 
   return {
@@ -246,7 +259,7 @@ export function generateHowToSchema(
 /**
  * Wrap multiple schemas in @graph for homepage
  */
-export function wrapInGraph(schemas: Record<string, any>[]): Record<string, any> {
+export function wrapInGraph(schemas: JsonLdObject[]): JsonLdObject {
   return {
     "@context": "https://schema.org",
     "@graph": schemas,
@@ -256,7 +269,7 @@ export function wrapInGraph(schemas: Record<string, any>[]): Record<string, any>
 /**
  * Wrap single schema with @context
  */
-export function wrapSchema(schema: Record<string, any>): Record<string, any> {
+export function wrapSchema(schema: JsonLdObject): JsonLdObject {
   return {
     "@context": "https://schema.org",
     ...schema,

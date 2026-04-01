@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { BlogPost, BlogCategory, HeroSection, CTASection } from "@/types/strapi";
-import { cn } from "@/lib/utils";
 import { BlogCard } from "./BlogCard";
 import { Pagination } from "./Pagination";
 
@@ -16,7 +15,6 @@ interface BlogListProps {
 
 export function BlogList({
   posts,
-  categories,
   currentCategory = "all",
   currentPage,
   totalPages,
@@ -76,7 +74,7 @@ export function BlogList({
           </div> */}
 
           {/* Posts Grid */}
-          <div className="min-h-[600px]">
+          <div className="min-h-[600px] px-4 py-4 -mx-4 -my-4">
             <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
               {posts.length > 0 ? (
                 posts.map((post) => <BlogCard key={post.id} post={post} />)
