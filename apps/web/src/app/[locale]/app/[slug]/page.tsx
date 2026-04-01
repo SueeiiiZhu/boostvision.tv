@@ -1,12 +1,18 @@
-import { RichText, QRCode, JsonLd } from "@/components/shared";
+import dynamic from "next/dynamic";
+import { RichText, JsonLd } from "@/components/shared";
 import { AppSectionRenderer } from "@/components/app/AppSectionRenderer";
 import { getAppBySlug } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
-import { generateMetadata as genMetadata, generateSoftwareApplicationSchema, wrapSchema } from "@/lib/seo";
+import { generateMetadata as genMetadata, generateSoftwareApplicationSchema, generateBreadcrumbSchema, wrapInGraph } from "@/lib/seo";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+
+const QRCode = dynamic(
+  () => import("@/components/shared/QRCode/QRCode").then((mod) => mod.QRCode),
+  { ssr: false },
+);
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -92,7 +98,13 @@ export default async function AppDetailPage({ params }: Props) {
     url: `https://www.boostvision.tv/app/${slug}`,
   });
 
-  const jsonLd = wrapSchema(schema);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "https://www.boostvision.tv" },
+    { name: "Apps", url: "https://www.boostvision.tv/app" },
+    { name: app.name, url: `https://www.boostvision.tv/app/${slug}` },
+  ]);
+
+  const jsonLd = wrapInGraph([schema, breadcrumbSchema]);
 
   return (
     <>

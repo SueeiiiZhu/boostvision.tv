@@ -5,7 +5,7 @@ import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
 import { PageAdSlot } from "@/components/ads";
 import { getTutorialPageBySlug, getTutorialSeoBySlug } from "@/lib/strapi/api/tutorials";
-import { generateMetadata as genMetadata, generateHowToSchema, wrapSchema } from "@/lib/seo";
+import { generateMetadata as genMetadata, generateHowToSchema, generateBreadcrumbSchema, wrapInGraph } from "@/lib/seo";
 import { Metadata } from "next";
 import { hasAdSenseSlot } from "@/config/adsense";
 
@@ -59,12 +59,19 @@ export default async function TutorialDetailPage({ params }: Props) {
       })
     : null;
 
-  const jsonLd = schema ? wrapSchema(schema) : null;
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "https://www.boostvision.tv" },
+    { name: "Tutorials", url: "https://www.boostvision.tv/tutorial" },
+    { name: tutorial.title, url: `https://www.boostvision.tv/tutorial/${slug}` },
+  ]);
+
+  const schemas = [breadcrumbSchema, ...(schema ? [schema] : [])];
+  const jsonLd = wrapInGraph(schemas);
   const showBottomAd = hasAdSenseSlot("tutorialBottom");
 
   return (
     <>
-      {jsonLd && <JsonLd data={jsonLd} />}
+      <JsonLd data={jsonLd} />
       <main className="bg-white pb-6">
       {/* 优先使用动态 sections */}
       {tutorial.sections && tutorial.sections.length > 0 ? (

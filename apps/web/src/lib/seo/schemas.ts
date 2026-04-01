@@ -79,6 +79,46 @@ interface SoftwareApplicationSchemaOptions {
 }
 
 /**
+ * Parse a download count string (e.g. "1+ Million Downloads", "3M+", "500K")
+ * into an integer for schema.org userInteractionCount.
+ * Returns undefined if the string cannot be parsed.
+ */
+function parseDownloadCount(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+
+  const cleaned = value.replace(/[,\s]/g, "").toLowerCase();
+
+  // Direct integer (e.g. "1000000" or "28000000+")
+  const directMatch = cleaned.match(/^(\d+)\+?$/);
+  if (directMatch) {
+    const num = parseInt(directMatch[1], 10);
+    return Number.isFinite(num) && num > 0 ? num : undefined;
+  }
+
+  // Patterns like "1+ million", "3m+", "500k", "1.5 million downloads"
+  const match = cleaned.match(
+    /(\d+(?:\.\d+)?)\+?\s*(million|billion|m|b|k)?/,
+  );
+  if (!match) return undefined;
+
+  const num = parseFloat(match[1]);
+  if (!Number.isFinite(num) || num <= 0) return undefined;
+
+  const multipliers: Record<string, number> = {
+    k: 1_000,
+    m: 1_000_000,
+    million: 1_000_000,
+    b: 1_000_000_000,
+    billion: 1_000_000_000,
+  };
+
+  const unit = match[2];
+  const multiplier = unit ? multipliers[unit] ?? 1 : 1;
+
+  return Math.round(num * multiplier);
+}
+
+/**
  * Generate SoftwareApplication schema for app pages
  */
 export function generateSoftwareApplicationSchema(
@@ -105,6 +145,8 @@ export function generateSoftwareApplicationSchema(
     Number.isFinite(ratingCount) &&
     ratingCount > 0;
 
+  const parsedDownloadCount = parseDownloadCount(downloadCount);
+
   return {
     "@type": "SoftwareApplication",
     name,
@@ -127,11 +169,11 @@ export function generateSoftwareApplicationSchema(
       price: "0",
       priceCurrency: "USD",
     },
-    ...(downloadCount && {
+    ...(parsedDownloadCount && {
       interactionStatistic: {
         "@type": "InteractionCounter",
         interactionType: "https://schema.org/DownloadAction",
-        userInteractionCount: downloadCount,
+        userInteractionCount: parsedDownloadCount,
       },
     }),
   };
@@ -252,6 +294,29 @@ export function generateHowToSchema(
       name: step.name,
       text: step.text,
       ...(step.image && { image: step.image }),
+    })),
+  };
+}
+
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+/**
+ * Generate BreadcrumbList schema from path segments.
+ * Items should be ordered from root to current page.
+ */
+export function generateBreadcrumbSchema(
+  items: BreadcrumbItem[],
+): JsonLdObject {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url,
     })),
   };
 }

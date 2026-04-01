@@ -6,7 +6,7 @@ import { BlogCard } from "../_components/BlogCard";
 import { BlogToc } from "../_components/BlogToc";
 import { getBlogPostBySlug } from "@/lib/strapi/api/blog";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
-import { generateMetadata as genMetadata, generateArticleSchema, wrapSchema } from "@/lib/seo";
+import { generateMetadata as genMetadata, generateArticleSchema, generateBreadcrumbSchema, wrapInGraph } from "@/lib/seo";
 import { formatDate } from "@/lib/utils/formatDate";
 import { Metadata } from "next";
 
@@ -142,7 +142,13 @@ export default async function BlogPostPage({ params }: Props) {
     url: `https://www.boostvision.tv/blog/${slug}`,
   });
 
-  const jsonLd = wrapSchema(schema);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "https://www.boostvision.tv" },
+    { name: "Blog", url: "https://www.boostvision.tv/blog" },
+    { name: post.title, url: `https://www.boostvision.tv/blog/${slug}` },
+  ]);
+
+  const jsonLd = wrapInGraph([schema, breadcrumbSchema]);
 
   return (
     <>

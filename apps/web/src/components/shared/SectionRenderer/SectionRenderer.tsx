@@ -111,6 +111,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
             height={600}
             className="h-auto w-full max-w-[1100px]"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
+            priority
           />
         </div>
       )}
