@@ -1,5 +1,3 @@
-import { StickyMobileAdBanner } from "@/components/ads";
-import { hasAdSenseSlot } from "@/config/adsense";
 import Link from "next/link";
 import Image from "next/image";
 import { getTutorialsForList } from "@/lib/strapi/api/tutorials";
@@ -47,7 +45,6 @@ export default async function TutorialPage({ searchParams }: Props) {
   const ctaSection = sections.find(s => s.__component === 'sections.cta') as CTASection | undefined;
 
   return (
-    <>
     <main className="bg-white">
       {/* Banner */}
       <section className="bg-app-hero py-24 text-center">
@@ -175,13 +172,6 @@ export default async function TutorialPage({ searchParams }: Props) {
           </a>
         </p>
       </div>
-      {/* Spacer for sticky mobile ad */}
-      <div className="h-20 md:hidden" />
     </main>
-
-    {hasAdSenseSlot("tutorialStickyMobile") && (
-      <StickyMobileAdBanner placement="tutorialStickyMobile" />
-    )}
-  </>
   );
 }
