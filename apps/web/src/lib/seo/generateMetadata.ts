@@ -24,6 +24,15 @@ interface GenerateMetadataOptions {
 const SITE_URL = "https://www.boostvision.tv";
 const SITE_NAME = "BoostVision";
 
+const OG_LOCALE_MAP: Record<string, string> = {
+  en: "en_US",
+  pt: "pt_BR",
+  es: "es_ES",
+  fr: "fr_FR",
+  de: "de_DE",
+  ja: "ja_JP",
+};
+
 export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   const {
     seo,
@@ -118,7 +127,7 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
         alt: imageAlt,
       },
     ],
-    locale: "en_US",
+    locale: OG_LOCALE_MAP[locale] || "en_US",
     type,
   };
 
