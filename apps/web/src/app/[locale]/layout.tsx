@@ -56,11 +56,9 @@ export default async function RootLayout({
 
   setRequestLocale(locale);
 
-  // Providing all messages to the client side
-  const messages = await getMessages();
-
-  // Fetch navigation and global settings in parallel to reduce LCP render delay
-  const [navigation, globalSetting] = await Promise.all([
+  // Fetch messages, navigation, and global settings all in parallel
+  const [messages, navigation, globalSetting] = await Promise.all([
+    getMessages(),
     getNavigation(locale).catch((err) => {
       console.error('Navigation fetch error:', err);
       return null;
