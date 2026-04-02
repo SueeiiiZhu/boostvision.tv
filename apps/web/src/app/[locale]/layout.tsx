@@ -72,9 +72,6 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
       <head>
-        {/* Preconnect to Google Fonts for faster font loading (critical for LCP) */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Preconnect to Strapi CMS for faster API & media image loading */}
         <link rel="preconnect" href="https://helpful-fun-dead826d03.strapiapp.com" />
         {/* DNS prefetch for deferred analytics scripts */}
