@@ -14,33 +14,58 @@ export const revalidate = 86400;
 
 type LegalContent = BlocksContent | string;
 
-function splitContentForInlineAd(content?: LegalContent | null): { before: LegalContent; after: LegalContent } | null {
+/** Find the nearest heading boundary at or after `target` line index */
+function findHeadingBoundary(lines: string[], target: number): number {
+  const headingIndex = lines.findIndex((line, i) => i >= target && /^#{1,3}\s+/.test(line.trim()));
+  return headingIndex > 0 ? headingIndex : target;
+}
+
+function splitContentForInlineAds(content?: LegalContent | null): LegalContent[] | null {
   if (!content) return null;
 
   if (typeof content === "string") {
     const lines = content.split("\n");
     if (lines.length < 8) return null;
 
-    let splitIndex = Math.floor(lines.length / 2);
-    const headingIndex = lines.findIndex((line, index) => index > splitIndex && /^#{1,3}\s+/.test(line.trim()));
-    if (headingIndex > 0) {
-      splitIndex = headingIndex;
+    // Try triple-split for long content
+    if (lines.length >= 20) {
+      const oneThird = findHeadingBoundary(lines, Math.floor(lines.length / 3));
+      const twoThirds = findHeadingBoundary(lines, Math.floor((lines.length * 2) / 3));
+
+      if (oneThird < twoThirds) {
+        const part1 = lines.slice(0, oneThird).join("\n").trim();
+        const part2 = lines.slice(oneThird, twoThirds).join("\n").trim();
+        const part3 = lines.slice(twoThirds).join("\n").trim();
+        if (part1 && part2 && part3) return [part1, part2, part3];
+      }
     }
 
+    // Fallback: two-split
+    const splitIndex = findHeadingBoundary(lines, Math.floor(lines.length / 2));
     const before = lines.slice(0, splitIndex).join("\n").trim();
     const after = lines.slice(splitIndex).join("\n").trim();
     if (!before || !after) return null;
-
-    return { before, after };
+    return [before, after];
   }
 
   if (!Array.isArray(content) || content.length < 4) return null;
+
+  // Triple-split for BlocksContent with enough blocks
+  if (content.length >= 10) {
+    const oneThird = Math.ceil(content.length / 3);
+    const twoThirds = Math.ceil((content.length * 2) / 3);
+    const part1 = content.slice(0, oneThird);
+    const part2 = content.slice(oneThird, twoThirds);
+    const part3 = content.slice(twoThirds);
+    if (part1.length && part2.length && part3.length) return [part1, part2, part3];
+  }
+
+  // Fallback: two-split
   const splitIndex = Math.ceil(content.length / 2);
   const before = content.slice(0, splitIndex);
   const after = content.slice(splitIndex);
   if (before.length === 0 || after.length === 0) return null;
-
-  return { before, after };
+  return [before, after];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -58,8 +83,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PrivacyPolicyPage() {
   const page = await getLegalPageBySlug("privacy-policy");
   const showInlineAd = hasAdSenseSlot("privacyInline");
+  const showAfterTitleAd = hasAdSenseSlot("privacyAfterTitle");
   const content = page?.content as LegalContent | undefined;
-  const splitContent = splitContentForInlineAd(content);
+  const contentParts = splitContentForInlineAds(content);
 
   return (
     <>
@@ -73,24 +99,36 @@ export default async function PrivacyPolicyPage() {
           </div>
         </section>
 
+        {/* After-title ad */}
+        {showAfterTitleAd && (
+          <section className="py-6">
+            <div className="container-custom max-w-[900px]">
+              <PageAdSlot placement="privacyAfterTitle" minHeight={100} />
+            </div>
+          </section>
+        )}
+
         {/* Content */}
         <section className="py-0 mt-0">
           <div className="container-custom max-w-[900px]">
             <div className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
               {content ? (
-                splitContent ? (
+                contentParts ? (
                   <>
-                    <RichText content={splitContent.before} />
-                    {showInlineAd ? (
-                      <PageAdSlot
-                        placement="privacyInline"
-                        minHeight={280}
-                        unstyled
-                        constrainWidth={false}
-                        className="my-10"
-                      />
-                    ) : null}
-                    <RichText content={splitContent.after} />
+                    {contentParts.map((part, index) => (
+                      <div key={index}>
+                        <RichText content={part} />
+                        {showInlineAd && index < contentParts.length - 1 ? (
+                          <PageAdSlot
+                            placement="privacyInline"
+                            minHeight={280}
+                            unstyled
+                            constrainWidth={false}
+                            className="my-10"
+                          />
+                        ) : null}
+                      </div>
+                    ))}
                   </>
                 ) : (
                   <>
