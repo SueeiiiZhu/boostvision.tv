@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { SearchInput } from "./SearchInput";
@@ -17,31 +17,28 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(98);
-  const headerRef = useRef<HTMLElement>(null);
+  const headerHeight = 80;
   const t = useTranslations('Navigation');
   const pathname = usePathname();
 
   useEffect(() => {
-    const updateHeaderHeight = () => {
-      const nextHeight = headerRef.current?.offsetHeight;
-      if (nextHeight) {
-        setHeaderHeight((prev) => (prev === nextHeight ? prev : nextHeight));
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMenuOpen(false);
       }
     };
 
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-      updateHeaderHeight();
-    };
-    updateHeaderHeight();
-    handleScroll();
+    handleScroll(); // initial check
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", updateHeaderHeight);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", updateHeaderHeight);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -61,24 +58,12 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
     };
   }, [isMenuOpen]);
 
-  // Close mobile menu when switching to desktop breakpoint
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setIsMenuOpen(false);
-      }
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const headerMenu = navigation?.headerMenu || [];
   return (
     <header
-      ref={headerRef}
       className={cn(
-        "sticky top-0 z-[100] h-[98px] w-full transition-all duration-300",
-        scrolled ? "bg-white/95 backdrop-blur-sm shadow-md h-[80px]" : "bg-white"
+        "sticky top-0 z-[100] h-[80px] w-full transition-all duration-300",
+        scrolled ? "bg-white/95 backdrop-blur-sm shadow-md" : "bg-white"
       )}
     >
       <nav className="container-custom flex h-full items-center justify-between">

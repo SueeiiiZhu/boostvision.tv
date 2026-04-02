@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
-import { PageAdSlot } from "@/components/ads";
+import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
 import { getFAQPageBySlug, getFAQSeoBySlug } from "@/lib/strapi/api/faqs";
 import { generateFAQPageSchema, generateMetadata as genMetadata, generateBreadcrumbSchema, wrapInGraph } from "@/lib/seo";
 import { Metadata } from "next";
@@ -223,7 +223,14 @@ export default async function FAQDetailPage({ params }: Props) {
           </div>
         </section>
       ) : null}
+
+      {/* Spacer for sticky mobile ad */}
+      <div className="h-20 md:hidden" />
     </main>
+
+    {hasAdSenseSlot("faqStickyMobile") && (
+      <StickyMobileAdBanner placement="faqStickyMobile" />
+    )}
     </>
   );
 }

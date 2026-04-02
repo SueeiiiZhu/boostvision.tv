@@ -110,7 +110,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
             width={1200}
             height={600}
             className="h-auto w-full max-w-[1100px]"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
+            sizes="(max-width: 768px) calc(100vw - 30px), (max-width: 1200px) calc(90vw - 30px), 1100px"
             priority
           />
         </div>
@@ -246,7 +246,7 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
             <p className="text-[17px] text-heading font-medium italic mb-10 leading-[1.8]">
               &quot;{review.text}&quot;
             </p>
-            <h4 className="text-[19px] font-black text-heading">{review.name}</h4>
+            <p className="text-[19px] font-black text-heading">{review.name}</p>
           </div>
         ))}
       </div>

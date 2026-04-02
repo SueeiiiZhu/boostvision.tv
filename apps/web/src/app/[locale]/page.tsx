@@ -124,7 +124,7 @@ export default async function Home() {
                     width={1200}
                     height={600}
                     className="h-auto w-full max-w-[1100px]"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
+                    sizes="(max-width: 768px) calc(100vw - 30px), (max-width: 1200px) calc(90vw - 30px), 1100px"
                     priority
                   />
                 </div>

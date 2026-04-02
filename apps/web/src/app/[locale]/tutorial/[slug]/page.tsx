@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
-import { PageAdSlot } from "@/components/ads";
+import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
 import { getTutorialPageBySlug, getTutorialSeoBySlug } from "@/lib/strapi/api/tutorials";
 import { generateMetadata as genMetadata, generateHowToSchema, generateBreadcrumbSchema, wrapInGraph } from "@/lib/seo";
 import { Metadata } from "next";
@@ -193,7 +193,14 @@ export default async function TutorialDetailPage({ params }: Props) {
           </div>
         </section>
       ) : null}
+
+      {/* Spacer for sticky mobile ad */}
+      <div className="h-20 md:hidden" />
     </main>
+
+    {hasAdSenseSlot("tutorialStickyMobile") && (
+      <StickyMobileAdBanner placement="tutorialStickyMobile" />
+    )}
     </>
   );
 }
