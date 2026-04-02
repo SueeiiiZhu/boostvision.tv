@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection, AppsGridSection, BrandsGridSection, App } from '@/types/strapi';
@@ -9,9 +9,37 @@ interface SectionRendererProps {
   sections: Section[];
 }
 
+function renderSection(section: Section, index: number) {
+  switch (section.__component) {
+    case 'sections.hero':
+      return <Hero key={index} data={section} />;
+    case 'sections.feature-highlight':
+      return <FeatureHighlight key={index} data={section} />;
+    case 'sections.cta':
+      return <CTA key={index} data={section} />;
+    case 'sections.why-choose':
+      return <WhyChoose key={index} data={section} />;
+    case 'sections.statistics':
+      return <Statistics key={index} data={section} />;
+    case 'sections.reviews':
+      return <Reviews key={index} data={section} />;
+    case 'sections.apps-grid':
+      return <AppsGrid key={index} data={section} />;
+    case 'sections.brands-grid':
+      return <BrandsGrid key={index} data={section} />;
+    default:
+      return null;
+  }
+}
+
 /**
  * SectionRenderer - Server Component
- * Handles dynamic page building from Strapi sections
+ * Handles dynamic page building from Strapi sections.
+ *
+ * The first section (Hero) renders immediately to optimize LCP.
+ * Subsequent sections are wrapped in individual Suspense boundaries so they
+ * can stream progressively, reducing the initial HTML/RSC payload and allowing
+ * the browser to paint the hero before async sections (e.g. AppsGrid) resolve.
  */
 export async function SectionRenderer({ sections }: SectionRendererProps) {
   if (!sections || sections.length === 0) return null;
@@ -19,26 +47,18 @@ export async function SectionRenderer({ sections }: SectionRendererProps) {
   return (
     <>
       {sections.map((section, index) => {
-        switch (section.__component) {
-          case 'sections.hero':
-            return <Hero key={index} data={section} />;
-          case 'sections.feature-highlight':
-            return <FeatureHighlight key={index} data={section} />;
-          case 'sections.cta':
-            return <CTA key={index} data={section} />;
-          case 'sections.why-choose':
-            return <WhyChoose key={index} data={section} />;
-          case 'sections.statistics':
-            return <Statistics key={index} data={section} />;
-          case 'sections.reviews':
-            return <Reviews key={index} data={section} />;
-          case 'sections.apps-grid':
-            return <AppsGrid key={index} data={section} />;
-          case 'sections.brands-grid':
-            return <BrandsGrid key={index} data={section} />;
-          default:
-            return null;
-        }
+        const element = renderSection(section, index);
+        if (!element) return null;
+
+        // First section (hero) renders immediately — critical for LCP
+        if (index === 0) return element;
+
+        // Below-fold sections stream progressively to reduce initial payload
+        return (
+          <Suspense key={index} fallback={<div style={{ minHeight: '200px' }} />}>
+            {element}
+          </Suspense>
+        );
       })}
     </>
   );
