@@ -1,5 +1,5 @@
 import { RichText, SectionRenderer } from "@/components/shared";
-import { PageAdSlot } from "@/components/ads";
+import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
 import { hasAdSenseSlot } from "@/config/adsense";
 import { getLegalPageBySlug } from "@/lib/strapi/api/pages";
 import { getLocaleAlternates } from "@/lib/seo";
@@ -124,7 +124,14 @@ export default async function TermsOfUsePage() {
         ) : null}
 
         {page?.sections && <SectionRenderer sections={page.sections} />}
+
+        {/* Spacer for sticky mobile ad */}
+        <div className="h-20 md:hidden" />
       </main>
+
+      {hasAdSenseSlot("termsStickyMobile") && (
+        <StickyMobileAdBanner placement="termsStickyMobile" />
+      )}
     </>
   );
 }

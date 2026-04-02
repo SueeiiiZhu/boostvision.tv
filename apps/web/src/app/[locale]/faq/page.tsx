@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import { StickyMobileAdBanner } from "@/components/ads";
+import { hasAdSenseSlot } from "@/config/adsense";
 import { JsonLd } from "@/components/shared";
 import { getFAQsForList } from "@/lib/strapi/api/faqs";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
@@ -222,7 +224,13 @@ export default async function FAQPage({ searchParams }: Props) {
             </a>
           </p>
         </div>
+        {/* Spacer for sticky mobile ad */}
+        <div className="h-20 md:hidden" />
       </main>
+
+      {hasAdSenseSlot("faqStickyMobile") && (
+        <StickyMobileAdBanner placement="faqStickyMobile" />
+      )}
     </>
   );
 }
