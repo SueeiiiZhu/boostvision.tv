@@ -11,7 +11,11 @@ export async function getPageBySlug(slug: string) {
       sections: {
         on: {
           'sections.hero': {
-            populate: '*'
+            populate: {
+              image: true,
+              backgroundImage: true,
+              statistics: true
+            }
           },
           'sections.why-choose': {
             populate: {
@@ -33,9 +37,7 @@ export async function getPageBySlug(slug: string) {
               reviews: true
             }
           },
-          'sections.cta': {
-            populate: ['links']
-          },
+          'sections.cta': true,
           'sections.apps-grid': true,
           'sections.brands-grid': {
             populate: {
@@ -68,9 +70,7 @@ export async function getLegalPageBySlug(slug: "terms-of-use" | "privacy-policy"
       seo: true,
       sections: {
         on: {
-          "sections.cta": {
-            populate: ["links"]
-          },
+          "sections.cta": true,
           "sections.hero": {
             populate: ["backgroundImage", "image"]
           }
