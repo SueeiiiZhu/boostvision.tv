@@ -1,7 +1,7 @@
 import { getBlogPosts, getBlogCategories } from "@/lib/strapi/api/blog";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { HeroSection, CTASection } from "@/types/strapi";
-import { getLocaleAlternates } from "@/lib/seo";
+import { generateMetadata as genMetadata } from "@/lib/seo";
 import { BlogList } from "./_components";
 import type { Metadata } from "next";
 
@@ -13,19 +13,15 @@ export const revalidate = 600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const alternates = getLocaleAlternates("/blog", locale);
+  const pageData = await getPageBySlug("blog").catch(() => null);
 
-  return {
-    title: "Streaming & Screen Mirroring Blog | BoostVision",
-    description: "Stay updated with the latest news and guides about screen mirroring, TV cast technologies, and smart home entertainment.",
-    alternates,
-    openGraph: {
-      title: "Streaming & Screen Mirroring Blog | BoostVision",
-      description: "Expert insights and guides for better smart TV experience.",
-      url: alternates.canonical,
-      images: [],
-    },
-  };
+  return genMetadata({
+    seo: pageData?.seo,
+    defaultTitle: "Streaming & Screen Mirroring Blog | BoostVision",
+    defaultDescription: "Stay updated with the latest news and guides about screen mirroring, TV cast technologies, and smart home entertainment.",
+    path: "/blog",
+    locale,
+  });
 }
 
 export default async function BlogPage() {
