@@ -56,11 +56,9 @@ export default async function RootLayout({
 
   setRequestLocale(locale);
 
-  // Providing all messages to the client side
-  const messages = await getMessages();
-
-  // Fetch navigation and global settings in parallel to reduce LCP render delay
-  const [navigation, globalSetting] = await Promise.all([
+  // Fetch messages, navigation, and global settings all in parallel
+  const [messages, navigation, globalSetting] = await Promise.all([
+    getMessages(),
     getNavigation(locale).catch((err) => {
       console.error('Navigation fetch error:', err);
       return null;
@@ -74,9 +72,6 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
       <head>
-        {/* Preconnect to Google Fonts for faster font loading (critical for LCP) */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Preconnect to Strapi CMS for faster API & media image loading */}
         <link rel="preconnect" href="https://helpful-fun-dead826d03.strapiapp.com" />
         {/* DNS prefetch for deferred analytics scripts */}

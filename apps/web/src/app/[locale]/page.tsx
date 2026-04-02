@@ -9,6 +9,10 @@ import { generateMetadata as genMetadata, generateOrganizationSchema, generateWe
 import type { App } from "@/types/strapi";
 import type { Metadata } from "next";
 
+// ISR: serve stale page instantly while revalidating in background (1 hour)
+// Reduces cold-start LCP hits by keeping cached pages fresh longer
+export const revalidate = 3600;
+
 interface Props {
   params: Promise<{ locale: string }>;
 }
