@@ -94,7 +94,7 @@ export function PageAdSlot({
           constrainWidth ? "mx-auto w-full max-w-[728px]" : "w-full",
           containerClassName
         )}
-        style={{ minHeight }}
+        style={{ minHeight, maxHeight: minHeight * 1.5 }}
       >
         {shouldLoad ? (
           <GoogleAdSenseSlot

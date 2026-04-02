@@ -15,38 +15,58 @@ const VercelAnalytics = dynamic(
   { ssr: false }
 );
 
+const FALLBACK_DELAY_MS = 3000;
+const INTERACTION_EVENTS: Array<keyof WindowEventMap> = ['mousedown', 'touchstart', 'keydown', 'scroll'];
+
 /**
  * Analytics Wrapper
- * - Defers loading of analytics scripts until after initial page load
- * - Only loads after user interaction or timeout
- * - Reduces initial bundle size and improves Core Web Vitals
+ * - Primary: loads during browser idle time (requestIdleCallback)
+ * - Secondary: interaction events schedule an idle load (not synchronous, so INP-safe)
+ * - Fallback: timeout guarantees scripts load within FALLBACK_DELAY_MS
  */
 export function AnalyticsWrapper() {
   const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
-    // Load analytics after user interaction or after 3 seconds
-    const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
-      setShouldLoad(true);
-      cleanup();
-    }, 3000);
+    let done = false;
 
-    const handleInteraction = () => {
+    const load = () => {
+      if (done) return;
+      done = true;
       setShouldLoad(true);
       cleanup();
     };
 
-    const events = ['mousedown', 'touchstart', 'keydown', 'scroll'];
-    events.forEach((event) => {
-      window.addEventListener(event, handleInteraction, { once: true, passive: true });
+    // Schedule load via requestIdleCallback (non-blocking)
+    const scheduleLoad = () => {
+      if (done) return;
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(load, { timeout: 500 });
+      } else {
+        load();
+      }
+    };
+
+    // 1. Primary: idle callback fires when browser is free
+    let idleId: number | undefined;
+    if ('requestIdleCallback' in window) {
+      idleId = requestIdleCallback(load, { timeout: FALLBACK_DELAY_MS });
+    }
+
+    // 2. Secondary: interaction events schedule an idle load (not sync, INP-safe)
+    INTERACTION_EVENTS.forEach((event) => {
+      window.addEventListener(event, scheduleLoad, { once: true, passive: true });
     });
 
-    // Fallback: load after 3 seconds if no interaction
+    // 3. Fallback: guarantee load within timeout
+    const timeout = setTimeout(load, FALLBACK_DELAY_MS);
+
     function cleanup() {
-      events.forEach((event) => {
-        window.removeEventListener(event, handleInteraction);
+      INTERACTION_EVENTS.forEach((event) => {
+        window.removeEventListener(event, scheduleLoad);
       });
       clearTimeout(timeout);
+      if (idleId !== undefined) cancelIdleCallback(idleId);
     }
 
     return cleanup;

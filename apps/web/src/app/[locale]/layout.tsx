@@ -59,30 +59,31 @@ export default async function RootLayout({
   // Providing all messages to the client side
   const messages = await getMessages();
 
-  // Fetch navigation and global settings for the layout
-  let navigation: Navigation | null = null;
-  let globalSetting: GlobalSetting | null = null;
-
-  try {
-    navigation = await getNavigation(locale);
-  } catch (err) {
-    console.error('Navigation fetch error:', err);
-  }
-
-  try {
-    globalSetting = await getGlobalSetting(locale);
-  } catch (err) {
-    console.error('Global settings fetch error:', err);
-  }
+  // Fetch navigation and global settings in parallel to reduce LCP render delay
+  const [navigation, globalSetting] = await Promise.all([
+    getNavigation(locale).catch((err) => {
+      console.error('Navigation fetch error:', err);
+      return null;
+    }),
+    getGlobalSetting(locale).catch((err) => {
+      console.error('Global settings fetch error:', err);
+      return null;
+    }),
+  ]);
 
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
       <head>
+        {/* Preconnect to Google Fonts for faster font loading (critical for LCP) */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Preconnect to Strapi CMS for faster API & media image loading */}
         <link rel="preconnect" href="https://helpful-fun-dead826d03.strapiapp.com" />
         {/* DNS prefetch for deferred analytics scripts */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://va.vercel-scripts.com" />
+        {/* DNS prefetch for Google AdSense */}
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <AnalyticsWrapper />
