@@ -1,11 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="22px" height="29px" viewBox="0 0 22 29" version="1.1">
-  <title>chromecast_icon_2</title>
-  <g id="1.1.0" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-    <g id="产品详情页_TV-Cast-for-Chromecast" transform="translate(-300.000000, -4705.000000)" fill="#1E6CF4">
-      <g id="chromecast_icon_2" transform="translate(300.000000, 4705.000000)">
-        <polygon id="路径-2备份-3" points="0.33203125 0.828125 0.33203125 28.828125 10.8320312 19.8441317 21.3320312 28.828125 21.3320312 0.828125"></polygon>
-      </g>
-    </g>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="29" viewBox="0 0 22 29"><title>chromecast_icon_2</title><path fill="#1e6cf4" fill-rule="evenodd" d="M.332.828v28l10.5-8.984 10.5 8.984v-28z"/></svg>

@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import Image from 'next/image';
+import OptimizedImage from '../OptimizedImage';
 import Link from 'next/link';
 import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection, AppsGridSection, BrandsGridSection, App } from '@/types/strapi';
 import { cn } from '@/lib/utils';
@@ -124,7 +125,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
 
       {(data.image || data.backgroundImage) && (
         <div className="mt-24 flex justify-center scale-105 transform">
-          <Image
+          <OptimizedImage
             src={(data.image || data.backgroundImage)!.url}
             alt={data.title}
             width={1200}
@@ -132,6 +133,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
             className="h-auto w-full max-w-[1100px]"
             sizes="(max-width: 768px) calc(100vw - 30px), (max-width: 1200px) calc(90vw - 30px), 1100px"
             priority
+            fetchPriority="high"
           />
         </div>
       )}
@@ -148,13 +150,14 @@ const FeatureHighlight: React.FC<{ data: FeatureHighlightSection }> = ({ data })
       )}>
         <div className="w-full lg:w-1/2">
           {data.image && (
-            <Image
+            <OptimizedImage
               src={data.image.url}
               alt={data.title}
               width={600}
               height={450}
               className="w-full h-auto"
               sizes="(max-width: 1024px) 100vw, 50vw"
+              fetchPriority="low"
             />
           )}
         </div>
@@ -208,12 +211,13 @@ const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
           <div key={i} className="group flex flex-col items-center">
             <div className="mb-12 h-[120px] flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
               {feature.icon && (
-                <Image
+                <OptimizedImage
                   src={feature.icon.url}
                   alt={feature.title}
                   width={160}
                   height={120}
                   className="h-auto w-auto max-h-full max-w-full object-contain"
+                  fetchPriority="low"
                 />
               )}
             </div>
@@ -312,7 +316,7 @@ const BrandsGrid: React.FC<{ data: BrandsGridSection }> = ({ data }) => (
         {data.brands.map((brand, i) => (
           <div key={i} className="brand-pill h-16 px-4">
             {brand.icon ? (
-              <Image src={brand.icon.url} alt={brand.title} width={120} height={40} className="h-full w-auto object-contain" />
+              <OptimizedImage src={brand.icon.url} alt={brand.title} width={120} height={40} className="h-full w-auto object-contain" fetchPriority="low" />
             ) : (
               <span className="text-[17px] font-black text-heading">{brand.title}</span>
             )}
@@ -327,7 +331,7 @@ function AppListCard({ app }: { app: App }) {
   return (
     <Link href={`/app/${app.slug}`} className="group flex items-start gap-6 transition-transform hover:translate-y-[-4px]">
       <div className="h-20 w-20 shrink-0 relative overflow-hidden rounded-[20px] shadow-lg border border-gray-100">
-        <Image src={app.icon?.url || "/icons/app-placeholder.webp"} alt={app.name} fill className="object-cover" />
+        <OptimizedImage src={app.icon?.url || "/icons/app-placeholder.webp"} alt={app.name} fill className="object-cover" fetchPriority="low" />
       </div>
       <div className="flex flex-col pt-1">
         <h3 className="mb-3 text-[20px] font-bold text-heading leading-tight group-hover:text-primary transition-colors">
