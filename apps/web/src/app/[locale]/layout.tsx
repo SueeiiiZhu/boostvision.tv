@@ -42,14 +42,23 @@ function isLocale(locale: string): locale is Locale {
 }
 
 // In-process cache for layout data — avoids full fetch call chain on cache hit (0ms)
+// Throw on null so unstable_cache does NOT cache failed results; outer .catch() handles fallback
 const getCachedNavigation = unstable_cache(
-  (locale: string) => getNavigation(locale),
+  async (locale: string) => {
+    const result = await getNavigation(locale);
+    if (!result) throw new Error('Navigation fetch returned null');
+    return result;
+  },
   ['navigation'],
   { revalidate: 3600, tags: ['navigation'] }
 );
 
 const getCachedGlobalSetting = unstable_cache(
-  (locale: string) => getGlobalSetting(locale),
+  async (locale: string) => {
+    const result = await getGlobalSetting(locale);
+    if (!result) throw new Error('GlobalSetting fetch returned null');
+    return result;
+  },
   ['global-setting'],
   { revalidate: 3600, tags: ['global-setting'] }
 );
