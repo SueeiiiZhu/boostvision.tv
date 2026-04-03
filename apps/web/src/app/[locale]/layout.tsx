@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto, Poppins } from "next/font/google";
+import { unstable_cache } from 'next/cache';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
@@ -20,7 +21,7 @@ const roboto = Roboto({
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "900"],
+  weight: ["500", "700", "900"],
   variable: "--font-heading",
   display: "swap", // Prevent FOIT and reduce reflow
 });
@@ -40,6 +41,19 @@ function isLocale(locale: string): locale is Locale {
   return routing.locales.includes(locale as Locale);
 }
 
+// In-process cache for layout data — avoids full fetch call chain on cache hit (0ms)
+const getCachedNavigation = unstable_cache(
+  (locale: string) => getNavigation(locale),
+  ['navigation'],
+  { revalidate: 3600, tags: ['navigation'] }
+);
+
+const getCachedGlobalSetting = unstable_cache(
+  (locale: string) => getGlobalSetting(locale),
+  ['global-setting'],
+  { revalidate: 3600, tags: ['global-setting'] }
+);
+
 export default async function RootLayout({
   children,
   params
@@ -57,13 +71,14 @@ export default async function RootLayout({
   setRequestLocale(locale);
 
   // Fetch messages, navigation, and global settings all in parallel
+  // Navigation and globalSetting use unstable_cache for in-process caching (0ms on hit)
   const [messages, navigation, globalSetting] = await Promise.all([
     getMessages(),
-    getNavigation(locale).catch((err) => {
+    getCachedNavigation(locale).catch((err) => {
       console.error('Navigation fetch error:', err);
       return null;
     }),
-    getGlobalSetting(locale).catch((err) => {
+    getCachedGlobalSetting(locale).catch((err) => {
       console.error('Global settings fetch error:', err);
       return null;
     }),
