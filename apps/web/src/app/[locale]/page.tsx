@@ -123,6 +123,7 @@ export default async function Home() {
                     className="h-auto w-full max-w-[1100px]"
                     sizes="(max-width: 768px) calc(100vw - 30px), (max-width: 1200px) calc(90vw - 30px), 1100px"
                     priority
+                    fetchPriority="high"
                   />
                 </div>
               </div>

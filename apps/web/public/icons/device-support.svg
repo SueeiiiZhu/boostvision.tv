@@ -1,12 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="36px" height="32px" viewBox="0 0 36 32" version="1.1">
-  <title>home_devices_icon</title>
-  <g id="2.0-" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-    <g id="主页" transform="translate(-942.000000, -2828.000000)" stroke="#AFF122">
-      <g id="home_devices_icon" transform="translate(942.000000, 2828.000000)">
-        <path d="M4.44235061,2 L32.297354,2 C33.4019235,2 34.297354,2.8954305 34.297354,4 L34.297354,21.0183576 C34.297354,22.1229271 33.4019235,23.0183576 32.297354,23.0183576 L4.44235061,23.0183576 C3.33778112,23.0183576 2.44235061,22.1229271 2.44235061,21.0183576 L2.44235061,4 C2.44235061,2.8954305 3.33778112,2 4.44235061,2 Z" id="路径-4备份" stroke-width="3"></path>
-        <line x1="2.82806082" y1="30.0119755" x2="33.93523" y2="30.0119755" id="直线-8备份" stroke-width="2" stroke-linecap="round"></line>
-      </g>
-    </g>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="32" viewBox="0 0 36 32"><title>home_devices_icon</title><g fill="none" fill-rule="evenodd" stroke="#aff122"><path stroke-width="3" d="M4.442 2h27.855a2 2 0 0 1 2 2v17.018a2 2 0 0 1-2 2H4.442a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path stroke-linecap="round" stroke-width="2" d="M2.828 30.012h31.107"/></g></svg>
