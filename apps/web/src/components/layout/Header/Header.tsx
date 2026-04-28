@@ -1,9 +1,8 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { SearchInput } from "./SearchInput";
 import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Navigation, GlobalSetting } from "@/types/strapi";
@@ -18,6 +17,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const headerHeight = 80;
+  const mobileHeaderTopOffset = `calc(${headerHeight}px + env(safe-area-inset-top))`;
   const t = useTranslations('Navigation');
   const pathname = usePathname();
 
@@ -65,6 +65,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
         "sticky top-0 z-[100] h-[80px] w-full transition-all duration-300",
         scrolled ? "bg-white/95 backdrop-blur-sm shadow-md" : "bg-white"
       )}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <nav className="container-custom flex h-full items-center justify-between">
         {/* Logo */}
@@ -80,7 +81,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden items-center gap-2 lg:flex h-full">
+        <div className="hidden items-center gap-4 lg:flex h-full">
           {headerMenu.map((item) => (
             <div
               key={item.id}
@@ -133,10 +134,6 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
 
           {/* Language & CTA */}
           <div className="ml-4 flex items-center gap-4">
-            <Suspense fallback={null}>
-              <SearchInput />
-            </Suspense>
-
             {/* Language switcher temporarily disabled until i18n is fully configured */}
             {/* <div className="group relative">
               <button
@@ -165,7 +162,10 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               </div>
             </div> */}
 
-            <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-try-free">
+            <Link
+              href={globalSetting?.tryForFreeLink || "/app"}
+              className="btn-try-free"
+            >
               {globalSetting?.tryForFreeText || t('tryForFree')}
             </Link>
           </div>
@@ -193,38 +193,11 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
         <div
           className="fixed inset-x-0 z-[99] w-full overflow-y-auto bg-white pb-10 lg:hidden animate-fade-in"
           style={{
-            top: `${headerHeight}px`,
-            height: `calc(100dvh - ${headerHeight}px)`,
+            top: mobileHeaderTopOffset,
+            height: `calc(100dvh - ${mobileHeaderTopOffset})`,
           }}
         >
           <div className="flex flex-col p-6 gap-2">
-            {/* Mobile Search */}
-            <div className="mb-6">
-              <Suspense fallback={null}>
-                <SearchInput isMobile onSearch={() => setIsMenuOpen(false)} />
-              </Suspense>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="mb-6 grid grid-cols-2 gap-3">
-              <Link
-                href="/app?tab=screen-mirroring"
-                className="flex flex-col items-center gap-2 rounded-2xl bg-section-bg p-4 text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Image src="/icons/mirror-tab.svg" alt="" width={24} height={24} />
-                <span className="text-[13px] font-bold text-heading">Screen Mirroring</span>
-              </Link>
-              <Link
-                href="/app?tab=tv-remote"
-                className="flex flex-col items-center gap-2 rounded-2xl bg-section-bg p-4 text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Image src="/icons/remote-tab.svg" alt="" width={24} height={24} />
-                <span className="text-[13px] font-bold text-heading">TV Remote</span>
-              </Link>
-            </div>
-
             {headerMenu.map((item) => (
               <div key={item.id} className="mb-4">
                 {item.links?.length > 0 ? (
