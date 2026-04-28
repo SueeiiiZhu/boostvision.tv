@@ -67,7 +67,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
       )}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <nav className="container-custom flex h-full items-center justify-between">
+      <nav className="container-custom max-w-[1320px] px-3 md:px-4 flex h-full items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
