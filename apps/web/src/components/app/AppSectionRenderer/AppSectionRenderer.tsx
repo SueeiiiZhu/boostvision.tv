@@ -43,12 +43,12 @@ export function AppSectionRenderer({ sections, app, globalSetting }: AppSectionR
 }
 
 const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSetting | null }> = ({ data, app, globalSetting }) => (
-    <section className="pt-24 pb-20 bg-white">
+    <section className="pt-0 md:pt-24 pb-20 bg-white">
         <div className="container-custom">
-            <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+            <div className="flex flex-col lg:flex-row items-center gap-0 md:gap-16 lg:gap-24">
                 {/* Left Column: Text Content */}
-                <div className="flex-1 text-left">
-                    <h1 className="text-[25px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
+                <div className="order-2 lg:order-1 flex-1 text-left">
+                    <h1 className="text-[30px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
                         {data.title || app.displayTitle || app.name}
                     </h1>
 
@@ -64,7 +64,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                             <div className="flex items-center justify-center w-6 h-6">
                                 <Image src="/icons/downloads.svg" alt="download" width={20} height={20} className="w-5 h-5" />
                             </div>
-                            <span className="text-[18px] font-black tracking-wide">
+                            <span className="text-[15px] md:text-[18px] font-semibold text-muted/90 tracking-normal md:tracking-wide">
                                 {app.downloadCount || "3+ Million"}
                             </span>
                         </div>
@@ -72,7 +72,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                             <div className="flex items-center justify-center w-6 h-6">
                                 <Image src="/icons/rate.svg" alt="rate" width={20} height={20} className="w-5 h-5" />
                             </div>
-                            <span className="text-[18px] font-black tracking-wide">
+                            <span className="text-[15px] md:text-[18px] font-semibold text-muted/90 tracking-normal md:tracking-wide">
                                 {globalSetting?.appStoreRateLabel || "Decent App Store Rate:"} 
                                 {/* <span className="text-primary">{app.rating || "4.8"}</span> */}
                             </span>
@@ -120,7 +120,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                     </div>
 
                     {/* Download Buttons */}
-                    <div className="flex flex-wrap gap-6">
+                    <div className="flex flex-wrap justify-center md:justify-start gap-6">
                         {app.downloadLinks && app.downloadLinks.length > 0 ? (
                             app.downloadLinks.map((link) => {
                                 const ButtonContent = (
@@ -157,16 +157,17 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                 </div>
 
                 {/* Right Column: Hero Image */}
-                <div className="flex-1 relative animate-fade-in">
+                <div className="order-1 lg:order-2 flex-1 relative animate-fade-in">
                     {(data.image || app.heroImage) ? (
-                        <Image
-                            src={(data.image || app.heroImage)!.url}
-                            alt={app.name}
-                            width={600}
-                            height={450}
-                            className="w-full h-auto object-contain"
-                            sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
+                        <div className="relative w-full min-h-[240px] md:min-h-0" style={{ aspectRatio: '4 / 3' }}>
+                            <Image
+                                src={(data.image || app.heroImage)!.url}
+                                alt={app.name}
+                                fill
+                                className="object-contain"
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                            />
+                        </div>
                     ) : (
                         <div className="aspect-[4/3] bg-section-bg rounded-[40px] flex items-center justify-center">
                             <Image src="/logo.svg" alt="BoostVision logo placeholder" width={200} height={50} className="opacity-20" />
@@ -179,13 +180,13 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
 );
 
 const AppWhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
-    <section className="py-32 bg-section-bg-2 text-center">
-        <div className="container-custom">
-            <h2 className="text-[40px] font-black text-heading mb-24">{data.title}</h2>
-            <div className="grid grid-cols-1 gap-x-12 gap-y-20 md:grid-cols-2 lg:grid-cols-4">
+    <section className="pt-6 md:pt-8 pb-14 md:pb-16 bg-section-bg-2 text-center">
+        <div className="container-custom md:max-w-[1320px]">
+            <h2 className="text-[28px] md:text-[40px] font-black text-heading mt-[1em] mb-[1em]">{data.title}</h2>
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
                 {data.features.map((feature, i) => (
-                    <div key={i} className="group flex flex-col items-center">
-                        <div className="mb-12 h-[120px] flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
+                    <div key={i} className="group grid grid-cols-[96px_1fr] items-center gap-x-5 gap-y-4 rounded-[40px] bg-white p-6 card-shadow transition-all duration-500 hover:-translate-y-3 md:flex md:flex-col md:gap-0 md:p-8">
+                        <div className="h-24 w-24 shrink-0 flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110 md:mb-10 md:h-[120px] md:w-auto">
                             {feature.icon && (
                                 <Image
                                     src={feature.icon.url}
@@ -196,12 +197,12 @@ const AppWhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
                                 />
                             )}
                         </div>
-                        <h3 className="mb-6 text-[22px] font-bold text-heading leading-tight min-h-[60px] flex items-start justify-center">
+                        <h3 className="text-[22px] font-black text-heading leading-tight min-h-0 flex items-center justify-start text-left md:mb-6 md:min-h-[60px] md:justify-center md:text-center">
                             {feature.title}
                         </h3>
                         <RichText
                             content={feature.description}
-                            className="text-[16px] text-muted leading-[1.6] max-w-[280px]"
+                            className="col-span-2 text-[16px] text-muted leading-[1.6] max-w-none text-left md:col-auto md:max-w-[280px] md:text-center"
                         />
                     </div>
                 ))}
@@ -229,11 +230,21 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                         />
                     )}
                 </div>
-                <div className="w-full lg:w-1/2">
-                    <div className="mb-6 inline-flex h-14 w-14 items-center justify-center">
-                        <Image src={`/icons/${data.labelColor}-label.svg`} alt={`${data.labelColor} feature label`} width={32} height={32} />
+                <div
+                    className="w-full lg:w-1/2"
+                    style={{ paddingInline: 'clamp(12px, 3.5vw, 24px)' }}
+                >
+                    <div className="mb-6 flex items-center gap-6 md:mb-0 md:flex-col md:items-start md:gap-[0.5em] md:text-left">
+                        <div className="flex h-14 w-auto items-center justify-start">
+                            <Image
+                                src={`/icons/${data.labelColor}-label.svg`}
+                                alt={`${data.labelColor} feature label`}
+                                width={32}
+                                height={32}
+                            />
+                        </div>
+                        <h2 className="text-[28px] md:text-[40px] font-black leading-[1.1] text-heading text-left md:mb-8">{data.title}</h2>
                     </div>
-                    <h2 className="text-[40px] font-black leading-[1.1] text-heading mb-8">{data.title}</h2>
 
                     {/* description 和 richText 现在可以共存，且都使用 RichText 渲染 */}
                     {data.description && (
@@ -243,13 +254,13 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                     {data.richText && (
                         <RichText
                             content={data.richText}
-                            className="mb-10"
+                            className="mb-10 app-zigzag-list-tight"
                             variant={data.labelColor === 'blue' ? 'blue-circle' : 'gray-square'}
                         />
                     )}
 
                     {/* Download Buttons inside column */}
-                    <div className="flex flex-wrap gap-6">
+                    <div className="flex flex-wrap justify-center md:justify-start gap-6">
                         {app.downloadLinks && app.downloadLinks.length > 0 ? (
                             app.downloadLinks.map((link) => {
                                 const ButtonContent = (
@@ -292,7 +303,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
 const AppBrandsGrid: React.FC<{ data: BrandsGridSection; app: App }> = ({ data, app }) => (
     <section className="py-32 bg-white text-center">
         <div className="container-custom">
-            <h2 className="text-[40px] font-black text-heading mb-6 tracking-tight">
+            <h2 className="text-[28px] md:text-[40px] font-black text-heading mb-6 tracking-tight">
                 {data.title || `${app.name} Support all Smart TVs & Sticks`}
             </h2>
             <RichText
@@ -325,14 +336,14 @@ const AppBrandsGrid: React.FC<{ data: BrandsGridSection; app: App }> = ({ data, 
 );
 
 const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
-    <section className="py-32 text-center bg-section-bg-cta text-white">
+    <section className="py-16 md:py-32 text-center bg-section-bg-cta text-white">
         <div className="container-custom">
-            <h2 className="mb-8 max-w-[1000px] mx-auto text-[45px] leading-[1.2] font-black text-heading">
+            <h2 className="mb-8 max-w-[1000px] mx-auto text-[30px] md:text-[45px] leading-[1.2] font-black text-heading">
                 {data.title || `Free Download ${app.name} on Android or iPhone, iPad Today!`}
             </h2>
             <RichText
                 content={data.description || `Get and install the ${app.name} and start screencasting from iPhone, iPad or Android phone to TV now`}
-                className="text-muted/70 mb-16 text-[20px] max-w-[850px] mx-auto leading-relaxed"
+                className="text-muted/70 mb-10 md:mb-16 text-[16px] md:text-[20px] max-w-[850px] mx-auto leading-relaxed"
             />
 
             <div className="flex flex-wrap justify-center gap-6 mb-20">

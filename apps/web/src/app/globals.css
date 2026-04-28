@@ -121,10 +121,10 @@
 
 @utility nav-link {
   font-family: var(--font-heading);
-  font-weight: 500;
+  font-weight: 400;
   font-size: 16px;
   color: var(--color-heading);
-  padding: 10px 15px;
+  padding: 10px 18px;
   transition: color 0.2s ease;
 
   &:hover {
@@ -336,6 +336,23 @@ p {
 
 .rich-text-gray-square ul li::marker {
   color: rgba(108, 117, 125, 0.6);
+}
+
+.app-zigzag-list-tight ul,
+.app-zigzag-list-tight ol {
+  margin-block: 0.75rem !important;
+}
+
+.app-zigzag-list-tight li + li {
+  margin-top: 0.5rem !important;
+}
+
+.app-zigzag-list-tight ul {
+  list-style-type: square !important;
+}
+
+.app-zigzag-list-tight ul li::marker {
+  color: rgba(108, 117, 125, 0.6) !important;
 }
 
 .footer-gradient {
