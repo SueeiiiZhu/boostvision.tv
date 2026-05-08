@@ -55,7 +55,7 @@ export default async function AppsPage({ searchParams }: Props) {
 
   return (
     <>
-      <main className="bg-white">
+      <main className="bg-white poppins-headings">
         {/* Banner */}
         <section className="bg-app-hero py-10 text-center md:py-24">
           <div className="container-custom">
@@ -125,7 +125,7 @@ export default async function AppsPage({ searchParams }: Props) {
 
             {/* Bottom Support CTA */}
             <div className="mt-32 rounded-[40px] bg-section-bg-cta p-8 text-center md:p-16">
-              <h3 className="mb-8 text-[24px] font-black text-heading md:mb-12 md:text-[32px]">
+              <h3 className="mb-8 text-[24px] font-heading font-semibold text-heading md:mb-12 md:text-[32px]">
                 {ctaSection?.title || "Still have questions?"}
               </h3>
 
@@ -136,7 +136,7 @@ export default async function AppsPage({ searchParams }: Props) {
                     <Link
                       key={link.id}
                       href={link.href}
-                      className="inline-flex w-[calc(50%-0.375rem)] items-center justify-center px-4 py-3 text-[15px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all md:w-auto md:px-10 md:py-4 md:text-[18px]"
+                      className="inline-flex w-[calc(50%-0.375rem)] md:w-[240px] items-center justify-center px-4 py-3 text-[15px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all md:px-10 md:py-4 md:text-[18px]"
                     >
                       {link.name}
                     </Link>
@@ -145,13 +145,13 @@ export default async function AppsPage({ searchParams }: Props) {
                   <>
                     <Link
                       href="/tutorial"
-                      className="inline-flex w-[calc(50%-0.375rem)] items-center justify-center px-4 py-3 text-[15px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all md:w-auto md:px-10 md:py-4 md:text-[18px]"
+                      className="inline-flex w-[calc(50%-0.375rem)] md:w-[240px] items-center justify-center px-4 py-3 text-[15px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all md:px-10 md:py-4 md:text-[18px]"
                     >
                       How-to Guides
                     </Link>
                     <Link
                       href="/faq"
-                      className="inline-flex w-[calc(50%-0.375rem)] items-center justify-center px-4 py-3 text-[15px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all md:w-auto md:px-10 md:py-4 md:text-[18px]"
+                      className="inline-flex w-[calc(50%-0.375rem)] md:w-[240px] items-center justify-center px-4 py-3 text-[15px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all md:px-10 md:py-4 md:text-[18px]"
                     >
                       F.A.Q
                     </Link>
@@ -204,7 +204,7 @@ function AppCatalogCard({ app }: { app: App }) {
       </div>
 
       <div className="mt-auto flex w-full flex-col items-center gap-4 md:mt-0 md:w-auto md:items-end">
-        <div className="flex w-full flex-row flex-wrap items-center justify-center gap-3 md:w-auto md:flex-col md:items-end md:justify-start md:gap-3 md:isolate">
+        <div className="flex w-full flex-col items-center justify-center gap-3 md:w-auto md:flex-col md:items-end md:justify-start md:gap-3 md:isolate">
           {app.downloadLinks && app.downloadLinks.length > 0 ? (
             app.downloadLinks.map((link) => {
               const ButtonContent = (
@@ -214,7 +214,7 @@ function AppCatalogCard({ app }: { app: App }) {
                     alt={link.platform}
                     width={120}
                     height={36}
-                    className="h-auto w-[140px] md:w-[170px]"
+                    className="h-12 sm:h-14 w-auto"
                   />
                   {link.generateQRCode && (
                     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[260] pointer-events-none">
@@ -231,7 +231,7 @@ function AppCatalogCard({ app }: { app: App }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
-                    "relative z-0 mx-auto flex w-[calc(50%-0.375rem)] max-w-[170px] justify-center md:mx-0 md:w-auto md:max-w-none md:hover:z-[250] md:focus-within:z-[250]",
+                    "relative z-0 mx-auto flex w-auto max-w-[170px] justify-center md:mx-0 md:w-auto md:max-w-none md:hover:z-[250] md:focus-within:z-[250]",
                     link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
                   )}
                   {...(!link.isClickable && { 'aria-disabled': 'true' })}
@@ -241,9 +241,12 @@ function AppCatalogCard({ app }: { app: App }) {
               );
             })
           ) : (
-            <>
-              {/* Fallback or empty */}
-            </>
+            <div
+              className="mx-auto flex h-12 w-[160px] items-center justify-center rounded-[10px] bg-gray-100 text-[14px] font-medium font-heading lowercase tracking-wide text-gray-600 sm:h-14 sm:w-[186px] md:mx-0"
+              aria-label="coming soon"
+            >
+              coming soon
+            </div>
           )}
         </div>
       </div>

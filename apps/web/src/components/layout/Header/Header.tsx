@@ -15,6 +15,7 @@ interface HeaderProps {
 export function Header({ navigation, globalSetting }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const [mobileExpandedMenu, setMobileExpandedMenu] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const headerHeight = 80;
   const mobileHeaderTopOffset = `calc(${headerHeight}px + env(safe-area-inset-top))`;
@@ -45,6 +46,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
   // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
+    setMobileExpandedMenu(null);
   }, [pathname]);
 
   // Prevent background scroll while mobile menu is open
@@ -69,9 +71,9 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
     >
       <nav className="container-custom max-w-[1320px] px-3 md:px-4 flex h-full items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center">
+        <Link href="/" target="_self" className="flex items-center">
           <Image
-            src={globalSetting?.logo?.url || "/logo.svg"}
+            src="/logo.svg"
             alt={globalSetting?.siteName || "BoostVision Logo"}
             width={180}
             height={45}
@@ -202,32 +204,49 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               <div key={item.id} className="mb-4">
                 {item.links?.length > 0 ? (
                   <>
-                    {item.href ? (
-                      <Link
-                        href={item.href}
-                        className="mb-4 block text-[14px] font-bold uppercase tracking-wider text-primary"
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMobileExpandedMenu((prev) => (prev === item.id ? null : item.id))
+                      }
+                      className="mb-2 flex w-full items-center justify-between border-b border-gray-100 pb-3 text-left text-[16px] font-medium tracking-wide text-muted font-heading"
+                      aria-expanded={mobileExpandedMenu === item.id}
+                      aria-controls={`mobile-submenu-${item.id}`}
+                    >
+                      <span>{item.name}</span>
+                      <svg
+                        className={cn(
+                          "h-4 w-4 transition-transform",
+                          mobileExpandedMenu === item.id ? "rotate-180" : ""
+                        )}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
-                        {item.name}
-                      </Link>
-                    ) : (
-                      <p className="mb-4 text-[14px] font-bold uppercase tracking-wider text-muted">{item.name}</p>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {mobileExpandedMenu === item.id && (
+                      <div
+                        id={`mobile-submenu-${item.id}`}
+                        className="mt-1 grid grid-cols-1 gap-1 pl-3"
+                      >
+                        {item.links.map(link => (
+                          <Link
+                            key={link.id}
+                            href={link.href}
+                            className="py-2 text-[15px] font-medium text-muted font-sans"
+                          >
+                            {link.name}
+                          </Link>
+                        ))}
+                      </div>
                     )}
-                    <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-gray-100">
-                      {item.links.map(link => (
-                        <Link
-                          key={link.id}
-                          href={link.href}
-                          className="py-2 text-[16px] font-medium text-heading"
-                        >
-                          {link.name}
-                        </Link>
-                      ))}
-                    </div>
                   </>
                 ) : (
                   <Link
                     href={item.href || "#"}
-                    className="py-4 text-[18px] font-bold text-heading border-b border-gray-50 block"
+                    className="block border-b border-gray-100 pb-3 pt-1 text-[16px] font-medium tracking-wide text-muted font-heading"
                   >
                     {item.name}
                   </Link>
