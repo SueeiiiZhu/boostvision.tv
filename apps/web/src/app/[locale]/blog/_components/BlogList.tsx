@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BlogPost, BlogCategory, HeroSection, CTASection } from "@/types/strapi";
 import { BlogCard } from "./BlogCard";
 import { Pagination } from "./Pagination";
@@ -23,16 +24,20 @@ export function BlogList({
 }: BlogListProps) {
   // Generate base URL for pagination
   const baseUrl = currentCategory === "all" ? "/blog" : `/blog/category/${currentCategory}`;
+  const descriptionList = (ctaSection?.description || "")
+    .split("\n")
+    .map((line) => line.trim().replace(/^[-*•]\s*/, ""))
+    .filter(Boolean);
 
   return (
-    <main className="bg-white">
+    <main className="bg-white poppins-headings">
       {/* Banner */}
-      <section className="bg-app-hero py-24 text-center">
+      <section className="bg-app-hero py-12 text-center">
         <div className="container-custom">
-          <h1 className="mb-4 text-[40px] font-black text-white uppercase tracking-tight">
-            {heroSection?.title || "BLOG"}
+          <h1 className="mb-4 text-[40px] font-black text-white tracking-tight">
+            {heroSection?.title || "Blogs"}
           </h1>
-          <p className="mx-auto max-w-[700px] text-[20px] text-white/70 leading-relaxed">
+          <p className="mx-auto max-w-[700px] text-[16px] md:text-[20px] text-white/70 leading-relaxed">
             {heroSection?.subtitle || "Acquire informations about streaming application, level up your entertainment experience."}
           </p>
         </div>
@@ -73,76 +78,76 @@ export function BlogList({
             ))}
           </div> */}
 
-          {/* Posts Grid */}
-          <div className="min-h-[600px] px-4 py-4 -mx-4 -my-4">
-            <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
-              {posts.length > 0 ? (
-                posts.map((post) => <BlogCard key={post.id} post={post} />)
-              ) : (
-                <div className="col-span-full py-20 text-center">
-                  <p className="text-[18px] text-muted">No blog posts found in this category.</p>
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="min-h-[600px] px-4 py-4 -mx-4 -my-4">
+              <div className="grid grid-cols-1 gap-8 animate-fade-in">
+                {posts.length > 0 ? (
+                  posts.map((post) => <BlogCard key={post.id} post={post} />)
+                ) : (
+                  <div className="col-span-full py-20 text-center">
+                    <p className="text-[18px] text-muted">No blog posts found in this category.</p>
+                  </div>
+                )}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="mt-16 flex justify-center">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    baseUrl={baseUrl}
+                  />
                 </div>
               )}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-16 flex justify-center">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  baseUrl={baseUrl}
+            <aside className="lg:sticky lg:top-28 lg:h-fit">
+              <div className="rounded-[28px] border-2 border-primary/40 bg-section-bg-cta p-6">
+                <Image
+                  src="/logo.svg"
+                  alt="BoostVision Logo"
+                  width={220}
+                  height={56}
+                  className="h-auto w-[180px]"
+                  priority={false}
                 />
+                <p className="mt-5 text-[22px] font-bold leading-[1.3] text-heading/90">
+                  {ctaSection?.title || "Best TV app suite"}
+                </p>
+                <ul className="mt-6 list-outside list-[square] space-y-2.5 pl-6 text-[18px] leading-[1.4] text-muted marker:text-heading/70">
+                  {descriptionList.length > 0 ? (
+                    descriptionList.map((line, index) => (
+                      <li key={`${line}-${index}`}>{line}</li>
+                    ))
+                  ) : (
+                    <>
+                      <li>Fast, stable casting</li>
+                      <li>Low-latency screen mirror</li>
+                      <li>Easy setup on TV and desktop</li>
+                    </>
+                  )}
+                </ul>
+                <Link
+                  href={ctaSection?.buttonLink || "/download"}
+                  className="btn-gradient mt-8 inline-flex w-full px-7 py-2.5 text-[22px] font-medium leading-[1.2]"
+                >
+                  {ctaSection?.buttonText || "Download Now"}
+                </Link>
+                {ctaSection?.links && ctaSection.links.length > 0 && (
+                  <div className="mt-5 flex flex-col gap-2">
+                    {ctaSection.links.map((link) => (
+                      <Link
+                        key={link.id}
+                        href={link.href || "#"}
+                        className="text-[15px] leading-[1.4] text-primary underline underline-offset-2 hover:text-primary/80"
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-
-          {/* Support CTA Section */}
-          <div className="mt-32 p-16 text-center">
-            <h3 className="text-[32px] font-black text-heading mb-12">
-              {ctaSection?.title}
-            </h3>
-
-            {/* Links as Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
-              {ctaSection?.links && ctaSection.links.length > 0 ? (
-                ctaSection.links.map((link) => (
-                  <Link
-                    key={link.id}
-                    href={link.href}
-                    className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
-                  >
-                    {link.name}
-                  </Link>
-                ))
-              ) : (
-                <>
-                  <Link
-                    href="/tutorial"
-                    className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
-                  >
-                    Tutorial
-                  </Link>
-                  <Link
-                    href="/faq"
-                    className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
-                  >
-                    FAQ
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Description with Email */}
-            <p className="text-[18px] text-muted leading-relaxed">
-              {ctaSection?.description || "If you have any thoughts and questions, you can contact us at:"}{" "}
-              <a
-                href={ctaSection?.buttonLink ? (ctaSection.buttonLink.startsWith('mailto:') ? ctaSection.buttonLink : `mailto:${ctaSection.buttonLink}`) : "mailto:support@boostvision.com.cn"}
-                className="text-primary hover:underline font-bold"
-              >
-                {ctaSection?.buttonText || "support@boostvision.com.cn"}
-              </a>
-            </p>
+            </aside>
           </div>
         </div>
       </section>
