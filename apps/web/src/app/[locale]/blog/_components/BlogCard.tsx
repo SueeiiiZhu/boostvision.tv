@@ -1,34 +1,38 @@
 import Link from "next/link";
 import Image from "next/image";
 import { BlogPost } from "@/types/strapi";
-import { formatDate } from "@/lib/utils/formatDate";
 
 interface BlogCardProps {
   post: BlogPost;
 }
 
+function formatUsShortDate(dateString: string): string {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+}
+
 export function BlogCard({ post }: BlogCardProps) {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-[30px] bg-white card-shadow transition-all duration-300 hover:translate-y-[-10px]">
-      <Link href={`/blog/${post.slug}`} className="relative h-[240px] w-full overflow-hidden" target="_blank" rel="noopener noreferrer">
-        <Image
-          src={post.coverImage?.url}
-          alt={post.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          quality={80}
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
-        />
-        {/* Category Badge - Temporarily Hidden */}
-        {/* TODO: Re-enable when category feature is ready */}
-        {/* <div className="absolute left-6 top-6 rounded-full bg-primary/90 px-4 py-1.5 text-[12px] font-bold text-white backdrop-blur-sm">
-          {post.category?.name}
-        </div> */}
-      </Link>
-      <div className="flex flex-col p-10">
-        <h3 className="mb-6 text-[22px] font-bold text-heading leading-[1.4] line-clamp-2 min-h-[62px] group-hover:text-primary transition-colors">
-          <Link href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">{post.title}</Link>
+    <Link
+      href={`/blog/${post.slug}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex flex-col rounded-[30px] border border-gray-100 bg-white p-6 card-shadow transition-all duration-300 hover:translate-y-[-6px] md:min-h-[240px] md:p-10"
+    >
+      <div className="flex h-full flex-col">
+        <h3 className="mb-4 text-[20px] font-medium font-heading text-gray-800 leading-[1.4] line-clamp-2 transition-colors group-hover:text-primary md:text-[20px] md:leading-[1.25]">
+          {post.title}
         </h3>
+        <p className="mb-6 text-[15px] leading-[1.6] text-gray-500 line-clamp-3 md:mb-8 md:text-[16px] md:line-clamp-2">
+          {post.excerpt}
+        </p>
+        <div className="mb-5 border-t border-gray-100/90" />
         <div className="mt-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 relative overflow-hidden rounded-full border border-gray-100">
@@ -40,17 +44,11 @@ export function BlogCard({ post }: BlogCardProps) {
                 className="object-cover"
               />
             </div>
-            {post.author?.slug ? (
-              <Link href={`/authors/${post.author.slug}`} className="text-[14px] font-bold text-heading hover:text-primary transition-colors">
-                {post.author?.name}
-              </Link>
-            ) : (
-              <span className="text-[14px] font-bold text-heading">{post.author?.name}</span>
-            )}
+            <span className="text-[14px] font-medium font-heading text-heading">{post.author?.name}</span>
           </div>
-          <span className="text-[14px] font-medium text-muted">{formatDate(post.postDate)}</span>
+          <span className="inline-flex items-center gap-1.5 text-[14px] font-medium text-muted"><Image src="/icons/date-icon.svg" alt="Date" width={14} height={14} className="h-3.5 w-3.5" />{formatUsShortDate(post.postDate)}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
