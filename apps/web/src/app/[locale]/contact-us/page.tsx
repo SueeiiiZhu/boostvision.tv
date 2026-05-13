@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function ContactUsPage({ params }: Props) {
+export default async function ContactUsPage() {
   const page = await getPageBySlug("contact-us");
 
   return (

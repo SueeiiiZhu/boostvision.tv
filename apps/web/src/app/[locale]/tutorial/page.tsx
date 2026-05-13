@@ -59,7 +59,7 @@ export default async function TutorialPage({ searchParams }: Props) {
       </section>
 
       {/* Apps Selection */}
-      <section className="py-24">
+      <section className="bg-support-bg py-24">
         <div className="container-custom">
           {/* Tabs */}
           <div className="mb-16 flex justify-center gap-6">
@@ -107,6 +107,9 @@ export default async function TutorialPage({ searchParams }: Props) {
                       className="object-cover"
                     />
                   </div>
+                  <span className="mb-2 inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-[12px] font-bold text-primary">
+                    Tutorial
+                  </span>
                   <h3 className="text-[18px] font-bold text-heading leading-tight group-hover:text-primary transition-colors">
                     {tutorial.title}
                   </h3>

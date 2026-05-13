@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { RichText, JsonLd } from "@/components/shared";
 import { FAQSectionRenderer } from "@/components/faq/FAQSectionRenderer";
-import { PageAdSlot } from "@/components/ads";
+import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
 import { getFAQPageBySlug, getFAQSeoBySlug } from "@/lib/strapi/api/faqs";
-import { generateFAQPageSchema, generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
+import { generateFAQPageSchema, generateMetadata as genMetadata, generateBreadcrumbSchema, wrapInGraph } from "@/lib/seo";
 import { Metadata } from "next";
 import { BlocksContent } from "@strapi/blocks-react-renderer";
 import { hasAdSenseSlot } from "@/config/adsense";
@@ -114,7 +114,13 @@ export default async function FAQDetailPage({ params }: Props) {
     ],
   });
 
-  const jsonLd = wrapSchema(schema);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "https://www.boostvision.tv" },
+    { name: "F.A.Q.", url: "https://www.boostvision.tv/faq" },
+    { name: faq.app?.name || faq.question, url: `https://www.boostvision.tv/faq/${slug}` },
+  ]);
+
+  const jsonLd = wrapInGraph([schema, breadcrumbSchema]);
   const showBottomAd = hasAdSenseSlot("faqBottom");
 
   return (
@@ -217,7 +223,14 @@ export default async function FAQDetailPage({ params }: Props) {
           </div>
         </section>
       ) : null}
+
+      {/* Spacer for sticky mobile ad */}
+      <div className="h-20 md:hidden" />
     </main>
+
+    {hasAdSenseSlot("faqStickyMobile") && (
+      <StickyMobileAdBanner placement="faqStickyMobile" />
+    )}
     </>
   );
 }

@@ -5,8 +5,21 @@
  * <JsonLd data={schemaObject} />
  */
 
+type JsonLdValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | JsonLdObject
+  | JsonLdValue[];
+
+type JsonLdObject = {
+  [key: string]: JsonLdValue;
+};
+
 interface JsonLdProps {
-  data: Record<string, any> | Record<string, any>[];
+  data: JsonLdObject | JsonLdObject[];
 }
 
 export function JsonLd({ data }: JsonLdProps) {

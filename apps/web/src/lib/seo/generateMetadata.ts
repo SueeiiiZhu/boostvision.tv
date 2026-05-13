@@ -24,6 +24,15 @@ interface GenerateMetadataOptions {
 const SITE_URL = "https://www.boostvision.tv";
 const SITE_NAME = "BoostVision";
 
+const OG_LOCALE_MAP: Record<string, string> = {
+  en: "en_US",
+  pt: "pt_BR",
+  es: "es_ES",
+  fr: "fr_FR",
+  de: "de_DE",
+  ja: "ja_JP",
+};
+
 export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   const {
     seo,
@@ -57,7 +66,8 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
   // 2. Otherwise, use current page path
   // Do NOT fallback to defaultSeo.canonicalUrl as it would make all pages point to the same URL
   const alternates = path ? getLocaleAlternates(path, locale) : undefined;
-  const canonical = seo?.canonicalUrl || alternates?.canonical || `${SITE_URL}${path}`;
+  const fallbackCanonical = path === "/" ? SITE_URL : `${SITE_URL}${path}`;
+  const canonical = seo?.canonicalUrl || alternates?.canonical || fallbackCanonical;
 
   // OG image fallback priority:
   // 1) Current entry SEO image
@@ -117,7 +127,7 @@ export function generateMetadata(options: GenerateMetadataOptions): Metadata {
         alt: imageAlt,
       },
     ],
-    locale: "en_US",
+    locale: OG_LOCALE_MAP[locale] || "en_US",
     type,
   };
 

@@ -5,6 +5,19 @@
 const SITE_URL = "https://www.boostvision.tv";
 const SITE_NAME = "BoostVision";
 
+type JsonLdValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | JsonLdObject
+  | JsonLdValue[];
+
+type JsonLdObject = {
+  [key: string]: JsonLdValue;
+};
+
 interface OrganizationSchemaOptions {
   socialLinks?: Array<{ platform: string; url: string }>;
 }
@@ -14,7 +27,7 @@ interface OrganizationSchemaOptions {
  */
 export function generateOrganizationSchema(
   options: OrganizationSchemaOptions = {}
-): Record<string, any> {
+): JsonLdObject {
   const { socialLinks = [] } = options;
 
   return {
@@ -33,7 +46,7 @@ export function generateOrganizationSchema(
 /**
  * Generate WebSite schema for homepage
  */
-export function generateWebSiteSchema(): Record<string, any> {
+export function generateWebSiteSchema(): JsonLdObject {
   return {
     "@type": "WebSite",
     "@id": `${SITE_URL}#website`,
@@ -66,11 +79,51 @@ interface SoftwareApplicationSchemaOptions {
 }
 
 /**
+ * Parse a download count string (e.g. "1+ Million Downloads", "3M+", "500K")
+ * into an integer for schema.org userInteractionCount.
+ * Returns undefined if the string cannot be parsed.
+ */
+function parseDownloadCount(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+
+  const cleaned = value.replace(/[,\s]/g, "").toLowerCase();
+
+  // Direct integer (e.g. "1000000" or "28000000+")
+  const directMatch = cleaned.match(/^(\d+)\+?$/);
+  if (directMatch) {
+    const num = parseInt(directMatch[1], 10);
+    return Number.isFinite(num) && num > 0 ? num : undefined;
+  }
+
+  // Patterns like "1+ million", "3m+", "500k", "1.5 million downloads"
+  const match = cleaned.match(
+    /(\d+(?:\.\d+)?)\+?\s*(million|billion|m|b|k)?/,
+  );
+  if (!match) return undefined;
+
+  const num = parseFloat(match[1]);
+  if (!Number.isFinite(num) || num <= 0) return undefined;
+
+  const multipliers: Record<string, number> = {
+    k: 1_000,
+    m: 1_000_000,
+    million: 1_000_000,
+    b: 1_000_000_000,
+    billion: 1_000_000_000,
+  };
+
+  const unit = match[2];
+  const multiplier = unit ? multipliers[unit] ?? 1 : 1;
+
+  return Math.round(num * multiplier);
+}
+
+/**
  * Generate SoftwareApplication schema for app pages
  */
 export function generateSoftwareApplicationSchema(
   options: SoftwareApplicationSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const {
     name,
     description,
@@ -91,6 +144,8 @@ export function generateSoftwareApplicationSchema(
     typeof ratingCount === "number" &&
     Number.isFinite(ratingCount) &&
     ratingCount > 0;
+
+  const parsedDownloadCount = parseDownloadCount(downloadCount);
 
   return {
     "@type": "SoftwareApplication",
@@ -114,11 +169,11 @@ export function generateSoftwareApplicationSchema(
       price: "0",
       priceCurrency: "USD",
     },
-    ...(downloadCount && {
+    ...(parsedDownloadCount && {
       interactionStatistic: {
         "@type": "InteractionCounter",
         interactionType: "https://schema.org/DownloadAction",
-        userInteractionCount: downloadCount,
+        userInteractionCount: parsedDownloadCount,
       },
     }),
   };
@@ -140,7 +195,7 @@ interface ArticleSchemaOptions {
  */
 export function generateArticleSchema(
   options: ArticleSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const {
     headline,
     description,
@@ -191,7 +246,7 @@ interface FAQPageSchemaOptions {
  */
 export function generateFAQPageSchema(
   options: FAQPageSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const { questions } = options;
 
   return {
@@ -224,7 +279,7 @@ interface HowToSchemaOptions {
  */
 export function generateHowToSchema(
   options: HowToSchemaOptions
-): Record<string, any> {
+): JsonLdObject {
   const { name, description, image, totalTime, steps } = options;
 
   return {
@@ -243,10 +298,33 @@ export function generateHowToSchema(
   };
 }
 
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+/**
+ * Generate BreadcrumbList schema from path segments.
+ * Items should be ordered from root to current page.
+ */
+export function generateBreadcrumbSchema(
+  items: BreadcrumbItem[],
+): JsonLdObject {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
 /**
  * Wrap multiple schemas in @graph for homepage
  */
-export function wrapInGraph(schemas: Record<string, any>[]): Record<string, any> {
+export function wrapInGraph(schemas: JsonLdObject[]): JsonLdObject {
   return {
     "@context": "https://schema.org",
     "@graph": schemas,
@@ -256,7 +334,7 @@ export function wrapInGraph(schemas: Record<string, any>[]): Record<string, any>
 /**
  * Wrap single schema with @context
  */
-export function wrapSchema(schema: Record<string, any>): Record<string, any> {
+export function wrapSchema(schema: JsonLdObject): JsonLdObject {
   return {
     "@context": "https://schema.org",
     ...schema,

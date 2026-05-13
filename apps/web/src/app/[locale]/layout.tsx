@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto, Poppins } from "next/font/google";
+import { unstable_cache } from 'next/cache';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
@@ -8,6 +9,7 @@ import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { IntlProvider } from "@/components/providers/IntlProvider";
 import { Header, Footer } from "@/components/layout";
 import { AnalyticsWrapper } from "@/components/analytics";
+import type { GlobalSetting, Navigation } from "@/types/strapi";
 import "../globals.css";
 
 const roboto = Roboto({
@@ -19,7 +21,7 @@ const roboto = Roboto({
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "900"],
+  weight: ["500", "700", "900"],
   variable: "--font-heading",
   display: "swap", // Prevent FOIT and reduce reflow
 });
@@ -33,6 +35,34 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+type Locale = (typeof routing.locales)[number];
+
+function isLocale(locale: string): locale is Locale {
+  return routing.locales.includes(locale as Locale);
+}
+
+// In-process cache for layout data — avoids full fetch call chain on cache hit (0ms)
+// Throw on null so unstable_cache does NOT cache failed results; outer .catch() handles fallback
+const getCachedNavigation = unstable_cache(
+  async (locale: string) => {
+    const result = await getNavigation(locale);
+    if (!result) throw new Error('Navigation fetch returned null');
+    return result;
+  },
+  ['navigation'],
+  { revalidate: 3600, tags: ['navigation'] }
+);
+
+const getCachedGlobalSetting = unstable_cache(
+  async (locale: string) => {
+    const result = await getGlobalSetting(locale);
+    if (!result) throw new Error('GlobalSetting fetch returned null');
+    return result;
+  },
+  ['global-setting'],
+  { revalidate: 3600, tags: ['global-setting'] }
+);
+
 export default async function RootLayout({
   children,
   params
@@ -43,30 +73,25 @@ export default async function RootLayout({
   const { locale } = await params;
 
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     notFound();
   }
 
   setRequestLocale(locale);
 
-  // Providing all messages to the client side
-  const messages = await getMessages();
-
-  // Fetch navigation and global settings for the layout
-  let navigation = null;
-  let globalSetting = null;
-
-  try {
-    navigation = await getNavigation(locale);
-  } catch (err) {
-    console.error('Navigation fetch error:', err);
-  }
-
-  try {
-    globalSetting = await getGlobalSetting(locale);
-  } catch (err) {
-    console.error('Global settings fetch error:', err);
-  }
+  // Fetch messages, navigation, and global settings all in parallel
+  // Navigation and globalSetting use unstable_cache for in-process caching (0ms on hit)
+  const [messages, navigation, globalSetting] = await Promise.all([
+    getMessages(),
+    getCachedNavigation(locale).catch((err) => {
+      console.error('Navigation fetch error:', err);
+      return null;
+    }),
+    getCachedGlobalSetting(locale).catch((err) => {
+      console.error('Global settings fetch error:', err);
+      return null;
+    }),
+  ]);
 
   return (
     <html lang={locale} className={`${roboto.variable} ${poppins.variable}`} suppressHydrationWarning>
@@ -76,13 +101,15 @@ export default async function RootLayout({
         {/* DNS prefetch for deferred analytics scripts */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://va.vercel-scripts.com" />
+        {/* DNS prefetch for Google AdSense */}
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <AnalyticsWrapper />
         <IntlProvider locale={locale} messages={messages}>
-          <Header navigation={navigation as any} globalSetting={globalSetting as any} />
+          <Header navigation={navigation} globalSetting={globalSetting} />
           {children}
-          <Footer navigation={navigation as any} globalSetting={globalSetting as any} />
+          <Footer navigation={navigation} globalSetting={globalSetting} />
         </IntlProvider>
       </body>
     </html>

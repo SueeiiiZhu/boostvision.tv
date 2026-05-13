@@ -1,53 +1,52 @@
 "use client";
 
-import { Suspense, useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { SearchInput } from "./SearchInput";
 import { Link, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Navigation, GlobalSetting } from "@/types/strapi";
 
 interface HeaderProps {
-  navigation: Navigation;
-  globalSetting: GlobalSetting;
+  navigation: Navigation | null;
+  globalSetting: GlobalSetting | null;
 }
 
 export function Header({ navigation, globalSetting }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const [mobileExpandedMenu, setMobileExpandedMenu] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(98);
-  const headerRef = useRef<HTMLElement>(null);
+  const headerHeight = 80;
+  const mobileHeaderTopOffset = `calc(${headerHeight}px + env(safe-area-inset-top))`;
   const t = useTranslations('Navigation');
   const pathname = usePathname();
 
   useEffect(() => {
-    const updateHeaderHeight = () => {
-      const nextHeight = headerRef.current?.offsetHeight;
-      if (nextHeight) {
-        setHeaderHeight((prev) => (prev === nextHeight ? prev : nextHeight));
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMenuOpen(false);
       }
     };
 
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-      updateHeaderHeight();
-    };
-    updateHeaderHeight();
-    handleScroll();
+    handleScroll(); // initial check
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", updateHeaderHeight);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", updateHeaderHeight);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
+    setMobileExpandedMenu(null);
   }, [pathname]);
 
   // Prevent background scroll while mobile menu is open
@@ -61,31 +60,20 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
     };
   }, [isMenuOpen]);
 
-  // Close mobile menu when switching to desktop breakpoint
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setIsMenuOpen(false);
-      }
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const headerMenu = navigation?.headerMenu || [];
   return (
     <header
-      ref={headerRef}
       className={cn(
-        "sticky top-0 z-[100] h-[98px] w-full transition-all duration-300",
-        scrolled ? "bg-white/95 backdrop-blur-sm shadow-md h-[80px]" : "bg-white"
+        "sticky top-0 z-[100] h-[80px] w-full transition-all duration-300",
+        scrolled ? "bg-white/95 backdrop-blur-sm shadow-md" : "bg-white"
       )}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <nav className="container-custom flex h-full items-center justify-between">
+      <nav className="container-custom max-w-[1320px] px-3 md:px-4 flex h-full items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center">
+        <Link href="/" target="_self" className="flex items-center">
           <Image
-            src={globalSetting?.logo?.url || "/logo.svg"}
+            src="/logo.svg"
             alt={globalSetting?.siteName || "BoostVision Logo"}
             width={180}
             height={45}
@@ -95,7 +83,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden items-center gap-2 lg:flex h-full">
+        <div className="hidden items-center gap-4 lg:flex h-full">
           {headerMenu.map((item) => (
             <div
               key={item.id}
@@ -148,10 +136,6 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
 
           {/* Language & CTA */}
           <div className="ml-4 flex items-center gap-4">
-            <Suspense fallback={null}>
-              <SearchInput />
-            </Suspense>
-
             {/* Language switcher temporarily disabled until i18n is fully configured */}
             {/* <div className="group relative">
               <button
@@ -180,7 +164,10 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               </div>
             </div> */}
 
-            <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-try-free">
+            <Link
+              href={globalSetting?.tryForFreeLink || "/app"}
+              className="btn-try-free"
+            >
               {globalSetting?.tryForFreeText || t('tryForFree')}
             </Link>
           </div>
@@ -208,48 +195,58 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
         <div
           className="fixed inset-x-0 z-[99] w-full overflow-y-auto bg-white pb-10 lg:hidden animate-fade-in"
           style={{
-            top: `${headerHeight}px`,
-            height: `calc(100dvh - ${headerHeight}px)`,
+            top: mobileHeaderTopOffset,
+            height: `calc(100dvh - ${mobileHeaderTopOffset})`,
           }}
         >
           <div className="flex flex-col p-6 gap-2">
-            {/* Mobile Search */}
-            <div className="mb-6">
-              <Suspense fallback={null}>
-                <SearchInput isMobile onSearch={() => setIsMenuOpen(false)} />
-              </Suspense>
-            </div>
-
             {headerMenu.map((item) => (
               <div key={item.id} className="mb-4">
                 {item.links?.length > 0 ? (
                   <>
-                    {item.href ? (
-                      <Link
-                        href={item.href}
-                        className="mb-4 block text-[14px] font-bold uppercase tracking-wider text-primary"
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMobileExpandedMenu((prev) => (prev === item.id ? null : item.id))
+                      }
+                      className="mb-2 flex w-full items-center justify-between border-b border-gray-100 pb-3 text-left text-[16px] font-medium tracking-wide text-muted font-heading"
+                      aria-expanded={mobileExpandedMenu === item.id}
+                      aria-controls={`mobile-submenu-${item.id}`}
+                    >
+                      <span>{item.name}</span>
+                      <svg
+                        className={cn(
+                          "h-4 w-4 transition-transform",
+                          mobileExpandedMenu === item.id ? "rotate-180" : ""
+                        )}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
-                        {item.name}
-                      </Link>
-                    ) : (
-                      <p className="mb-4 text-[14px] font-bold uppercase tracking-wider text-muted">{item.name}</p>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {mobileExpandedMenu === item.id && (
+                      <div
+                        id={`mobile-submenu-${item.id}`}
+                        className="mt-1 grid grid-cols-1 gap-1 pl-3"
+                      >
+                        {item.links.map(link => (
+                          <Link
+                            key={link.id}
+                            href={link.href}
+                            className="py-2 text-[15px] font-medium text-muted font-sans"
+                          >
+                            {link.name}
+                          </Link>
+                        ))}
+                      </div>
                     )}
-                    <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-gray-100">
-                      {item.links.map(link => (
-                        <Link
-                          key={link.id}
-                          href={link.href}
-                          className="py-2 text-[16px] font-medium text-heading"
-                        >
-                          {link.name}
-                        </Link>
-                      ))}
-                    </div>
                   </>
                 ) : (
                   <Link
                     href={item.href || "#"}
-                    className="py-4 text-[18px] font-bold text-heading border-b border-gray-50 block"
+                    className="block border-b border-gray-100 pb-3 pt-1 text-[16px] font-medium tracking-wide text-muted font-heading"
                   >
                     {item.name}
                   </Link>

@@ -1,9 +1,10 @@
+import { cache } from 'react';
 import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, globalSettingLocaleTag } from "../cacheTags";
 import { GlobalSetting } from "../../../types/strapi";
 import { normalizeGlobalSetting } from "../normalize";
 
-export async function getGlobalSetting(locale: string = 'en') {
+export const getGlobalSetting = cache(async function getGlobalSetting(locale: string = 'en') {
   try {
     const query = buildStrapiQuery({
       locale,
@@ -28,4 +29,4 @@ export async function getGlobalSetting(locale: string = 'en') {
     console.error("Failed to fetch global settings:", error);
     return null;
   }
-}
+});

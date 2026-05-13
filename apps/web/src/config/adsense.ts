@@ -6,6 +6,14 @@ export const adSenseSlots = {
   tutorialBottom: "4552265002",
   termsInline: "6517885117",
   privacyInline: "5204803446",
+  // After-title leaderboard for legal pages
+  privacyAfterTitle: "2167108347",
+  termsAfterTitle: "7812188824",
+  // Sticky mobile bottom banners
+  faqStickyMobile: "7328973093",
+  tutorialStickyMobile: "9941656585",
+  privacyStickyMobile: "2076646410",
+  termsStickyMobile: "8258911381",
 } as const;
 
 export type AdSensePlacement = keyof typeof adSenseSlots;

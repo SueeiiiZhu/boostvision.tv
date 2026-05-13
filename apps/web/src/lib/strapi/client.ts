@@ -103,15 +103,41 @@ export async function fetchStrapi<T>(
 /**
  * Recursively transform relative Strapi URLs to absolute ones
  */
-function transformMediaUrls(data: any): any {
+type StrapiQueryValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Date
+  | StrapiQueryObject
+  | StrapiQueryValue[];
+
+type StrapiQueryObject = {
+  [key: string]: StrapiQueryValue;
+};
+
+type MediaTransformValue =
+  | string
+  | number
+  | boolean
+  | null
+  | MediaTransformObject
+  | MediaTransformValue[];
+
+type MediaTransformObject = {
+  [key: string]: MediaTransformValue;
+};
+
+function transformMediaUrls<T>(data: T): T {
   if (!data) return data;
 
   if (Array.isArray(data)) {
-    return data.map((item) => transformMediaUrls(item));
+    return data.map((item) => transformMediaUrls(item)) as T;
   }
 
   if (typeof data === "object") {
-    const newData: any = { ...data };
+    const newData: MediaTransformObject = { ...(data as MediaTransformObject) };
 
     for (const key in newData) {
       if (
@@ -125,7 +151,7 @@ function transformMediaUrls(data: any): any {
         newData[key] = transformMediaUrls(newData[key]);
       }
     }
-    return newData;
+    return newData as T;
   }
 
   return data;
@@ -134,10 +160,10 @@ function transformMediaUrls(data: any): any {
 /**
  * Build Strapi query string from parameters (Standard Bracket Notation)
  */
-export function buildStrapiQuery(params: any): string {
+export function buildStrapiQuery(params: StrapiQueryObject): string {
   const searchParams = new URLSearchParams();
 
-  const flatten = (obj: any, prefix = "") => {
+  const flatten = (obj: StrapiQueryValue, prefix = "") => {
     if (obj === null || obj === undefined) return;
 
     if (Array.isArray(obj)) {

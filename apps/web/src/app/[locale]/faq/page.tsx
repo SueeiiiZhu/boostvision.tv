@@ -110,7 +110,7 @@ export default async function FAQPage({ searchParams }: Props) {
         </section>
 
         {/* Apps Selection */}
-        <section className="py-24">
+        <section className="bg-support-bg py-24">
           <div className="container-custom">
             {/* Tabs */}
             <div className="mb-16 flex justify-center gap-6">
@@ -120,7 +120,7 @@ export default async function FAQPage({ searchParams }: Props) {
                 className={cn(
                   "rounded-full px-12 py-4 text-[18px] font-bold shadow-xl transition-all",
                   type === "screen-mirroring"
-                    ? "bg-primary text-white hover:translate-y-[-2px]"
+                    ? "bg-heading text-white hover:translate-y-[-2px]"
                     : "bg-white border border-gray-100 text-heading hover:bg-section-bg card-shadow"
                 )}
               >
@@ -158,6 +158,9 @@ export default async function FAQPage({ searchParams }: Props) {
                         className="object-cover"
                       />
                     </div>
+                    <span className="mb-2 inline-flex items-center rounded-full bg-accent/20 px-3 py-1 text-[12px] font-bold text-heading">
+                      FAQ
+                    </span>
                     <h3 className="text-[18px] font-bold text-heading leading-tight group-hover:text-primary transition-colors">
                       {app?.name || faq.question}
                     </h3>

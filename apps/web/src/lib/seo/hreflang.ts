@@ -35,20 +35,24 @@ export function getLocalizedPath(path: string, locale: string): string {
   return localizedPath;
 }
 
+function buildFullUrl(localizedPath: string): string {
+  return localizedPath === "/" ? SITE_URL : `${SITE_URL}${localizedPath}`;
+}
+
 export function getHreflangLanguages(path: string): Record<string, string> {
   const languages = Object.fromEntries(
-    routing.locales.map((locale) => [locale, `${SITE_URL}${getLocalizedPath(path, locale)}`]),
+    routing.locales.map((locale) => [locale, buildFullUrl(getLocalizedPath(path, locale))]),
   );
 
   return {
     ...languages,
-    "x-default": `${SITE_URL}${getLocalizedPath(path, routing.defaultLocale)}`,
+    "x-default": buildFullUrl(getLocalizedPath(path, routing.defaultLocale)),
   };
 }
 
 export function getLocaleAlternates(path: string, locale: string) {
   return {
-    canonical: `${SITE_URL}${getLocalizedPath(path, locale)}`,
+    canonical: buildFullUrl(getLocalizedPath(path, locale)),
     languages: getHreflangLanguages(path),
   };
 }

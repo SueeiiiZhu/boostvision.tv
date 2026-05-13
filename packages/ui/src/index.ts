@@ -9,13 +9,3 @@
  */
 
 export { cn } from "@boostvision/utils";
-
-// Re-export types that might be useful for UI components
-export type { 
-  StrapiMedia,
-  App,
-  BlogPost,
-  Feature,
-  Testimonial 
-} from "@boostvision/types";
-
