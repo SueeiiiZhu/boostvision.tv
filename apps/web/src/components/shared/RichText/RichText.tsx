@@ -108,6 +108,7 @@ function convertMarkdownTables(source: string, rawBlocks: string[]) {
   return processedLines.join("\n");
 }
 
+
 // 简单的 Markdown 转换函数，处理基本标签
 function parseMarkdown(markdown: string) {
   if (!markdown) return "";
@@ -194,10 +195,17 @@ function parseMarkdown(markdown: string) {
   return html;
 }
 
+interface CtaButtonLink {
+  url: string;
+  platform?: string | null;
+  badgeUrl?: string | null;
+}
+
 interface RichTextProps {
   content: BlocksContent | string;
   className?: string;
   variant?: 'default' | 'blue-circle' | 'gray-square';
+  ctaBanners?: Record<string, { title: string; iconUrl?: string | null; buttons: CtaButtonLink[] }>;
 }
 
 interface LinkBlockProps {
@@ -206,7 +214,7 @@ interface LinkBlockProps {
   href?: string;
 }
 
-export function RichText({ content, className, variant = 'default' }: RichTextProps) {
+export function RichText({ content, className, variant = 'default', ctaBanners }: RichTextProps) {
   if (!content) return null;
 
   if (typeof content === 'string') {
@@ -230,7 +238,30 @@ export function RichText({ content, className, variant = 'default' }: RichTextPr
     let htmlContent: string;
 
     if (hasMarkdownSyntax || hasRawHtmlWrapper) {
-      htmlContent = parseMarkdown(content);
+      const withDynamicCta = content.replace(/<!--([\s\S]*?)-->/g, (match, rawInner) => {
+        const key = rawInner.trim().toLowerCase().replace(/\s+/g, " ");
+        const banner = ctaBanners?.[key];
+        if (!banner || !Array.isArray(banner.buttons) || banner.buttons.length === 0) return match;
+
+        const buttonsHtml = banner.buttons
+          .filter((b) => typeof b.url === "string" && b.url.trim())
+          .map((b) => {
+            const safeUrl = b.url.replace(/"/g, "&quot;");
+            const safeLabel = (b.platform || "Download").replace(/"/g, "&quot;");
+            const badge = b.badgeUrl
+              ? `<img src="${b.badgeUrl.replace(/"/g, "&quot;")}" alt="${safeLabel}" class="h-12 sm:h-14 w-auto" />`
+              : `<span class="${(b.platform || "").toLowerCase().includes("apple") || (b.platform || "").toLowerCase().includes("app store") ? "app-store-badge" : "google-play-badge"}"></span>`;
+            return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" aria-label="${safeLabel}">${badge}</a>`;
+          })
+          .join("");
+
+        const title = (banner.title || "Try this app").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const iconHtml = banner.iconUrl
+          ? `<img src="${banner.iconUrl.replace(/"/g, "&quot;")}" alt="${title}" class="banner-app-icon" />`
+          : "";
+        return `<raw-html><div class="blog-download-banner"><div class="banner-layout"><div class="banner-icon-col">${iconHtml}</div><div class="banner-copy"><p class="banner-eyebrow">BoostVision</p><h3 class="banner-title">${title}</h3></div><div class="banner-actions"><div class="banner-buttons">${buttonsHtml}</div></div></div></div></raw-html>`;
+      });
+      htmlContent = parseMarkdown(withDynamicCta);
     } else if (shouldTreatAsHtml) {
       // Decode HTML entities (decode &amp; last to avoid double-decoding)
       const decoded = content
