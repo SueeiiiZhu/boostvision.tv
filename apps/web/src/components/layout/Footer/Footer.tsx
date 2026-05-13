@@ -34,7 +34,7 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
 
             {/* Social Links */}
             {socialLinks.length > 0 && (
-              <div className="flex items-center gap-4">
+              <div className="mx-auto flex w-fit items-center justify-center gap-4 lg:mx-0 lg:w-auto lg:justify-start">
                 {socialLinks.map((social) => (
                   <a
                     key={social.id}
@@ -58,7 +58,7 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
           {/* Dynamic Menus from Strapi */}
           {footerColumns.map((column) => (
             <div key={column.id}>
-              <h2 className="mb-8 text-[18px] font-bold font-heading text-white">{column.title}</h2>
+              <p className="mb-8 text-[18px] font-bold font-heading text-white">{column.title}</p>
               <ul className="flex flex-col gap-3">
                 {column.links?.map((link) => (
                   <li key={link.id}>

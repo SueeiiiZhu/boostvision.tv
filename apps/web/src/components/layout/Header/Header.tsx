@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Link, usePathname } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { Link, usePathname, routing } from "@/i18n/routing";
+import { useLocale, useTranslations } from "next-intl";
 import { Navigation, GlobalSetting } from "@/types/strapi";
 
 interface HeaderProps {
@@ -16,11 +16,24 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [mobileExpandedMenu, setMobileExpandedMenu] = useState<number | null>(null);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const headerHeight = 80;
   const mobileHeaderTopOffset = `calc(${headerHeight}px + env(safe-area-inset-top))`;
   const t = useTranslations('Navigation');
+  const locale = useLocale();
   const pathname = usePathname();
+  const currentLocale = routing.locales.includes(locale as (typeof routing.locales)[number])
+    ? locale
+    : "en";
+  const localeLabelMap: Record<string, string> = {
+    en: "English",
+    pt: "Português",
+    es: "Español",
+    fr: "Français",
+    de: "Deutsch",
+    ja: "日本語",
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,6 +60,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
   useEffect(() => {
     setIsMenuOpen(false);
     setMobileExpandedMenu(null);
+    setIsLanguageOpen(false);
   }, [pathname]);
 
   // Prevent background scroll while mobile menu is open
@@ -69,7 +83,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
       )}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <nav className="container-custom max-w-[1320px] px-3 md:px-4 flex h-full items-center justify-between">
+      <nav className="container-custom max-w-[1320px] px-4 md:px-5 flex h-full items-center justify-between">
         {/* Logo */}
         <Link href="/" target="_self" className="flex items-center">
           <Image
@@ -136,33 +150,42 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
 
           {/* Language & CTA */}
           <div className="ml-4 flex items-center gap-4">
-            {/* Language switcher temporarily disabled until i18n is fully configured */}
-            {/* <div className="group relative">
+            <div className="relative">
               <button
+                type="button"
+                onClick={() => setIsLanguageOpen((prev) => !prev)}
                 className="flex items-center gap-1 text-[16px] font-bold text-heading hover:text-primary transition-colors uppercase"
-                aria-label={`Change language, current: ${locale}`}
+                aria-label={`Change language, current: ${currentLocale.toUpperCase()}`}
+                aria-haspopup="menu"
+                aria-expanded={isLanguageOpen}
               >
-                {locale}
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {currentLocale.toUpperCase()}
+                <svg className={cn("h-4 w-4 transition-transform", isLanguageOpen && "rotate-180")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              <div className="absolute right-0 top-full hidden w-32 bg-white shadow-lg rounded-xl py-2 group-hover:block border border-gray-100 animate-fade-in">
-                {['en', 'pt', 'es', 'fr', 'de', 'ja'].map((l) => (
+              <div
+                className={cn(
+                  "absolute right-0 top-full mt-2 w-40 bg-white shadow-lg rounded-xl py-2 border border-gray-100 animate-fade-in",
+                  isLanguageOpen ? "block" : "hidden"
+                )}
+              >
+                {routing.locales.map((l) => (
                   <Link
                     key={l}
                     href={pathname}
                     locale={l as any}
+                    onClick={() => setIsLanguageOpen(false)}
                     className={cn(
-                      "block px-4 py-2 text-[14px] font-bold hover:bg-gray-50 uppercase",
-                      locale === l ? "text-primary" : "text-heading"
+                      "block px-4 py-2 text-[14px] font-bold hover:bg-gray-50",
+                      currentLocale === l ? "text-primary" : "text-heading"
                     )}
                   >
-                    {l}
+                    {localeLabelMap[l] || l}
                   </Link>
                 ))}
               </div>
-            </div> */}
+            </div>
 
             <Link
               href={globalSetting?.tryForFreeLink || "/app"}
@@ -199,16 +222,18 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
             height: `calc(100dvh - ${mobileHeaderTopOffset})`,
           }}
         >
-          <div className="flex flex-col p-6 gap-2">
+          <div className="container-custom max-w-[1320px] px-4 md:px-5 py-6">
+            <div className="flex flex-col gap-2">
             {headerMenu.map((item) => (
               <div key={item.id} className="mb-4">
                 {item.links?.length > 0 ? (
                   <>
                     <button
                       type="button"
-                      onClick={() =>
-                        setMobileExpandedMenu((prev) => (prev === item.id ? null : item.id))
-                      }
+                      onClick={() => {
+                        setMobileExpandedMenu((prev) => (prev === item.id ? null : item.id));
+                        setIsLanguageOpen(false);
+                      }}
                       className="mb-2 flex w-full items-center justify-between border-b border-gray-100 pb-3 text-left text-[16px] font-medium tracking-wide text-muted font-heading"
                       aria-expanded={mobileExpandedMenu === item.id}
                       aria-controls={`mobile-submenu-${item.id}`}
@@ -254,9 +279,52 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               </div>
             ))}
 
-            <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-gradient w-full text-center mt-6">
-              {globalSetting?.tryForFreeText || t('tryForFree')}
-            </Link>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLanguageOpen((prev) => {
+                        const next = !prev;
+                        if (next) setMobileExpandedMenu(null);
+                        return next;
+                      });
+                    }}
+                    className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-primary/20 bg-white text-[14px] font-bold text-primary shadow-sm transition-colors hover:bg-primary/5"
+                    aria-label={`Change language, current: ${currentLocale.toUpperCase()}`}
+                    aria-haspopup="menu"
+                    aria-expanded={isLanguageOpen}
+                  >
+                    {currentLocale.toUpperCase()}
+                  </button>
+                  <div
+                    className={cn(
+                      "absolute left-0 top-full mt-2 w-40 rounded-xl border border-gray-100 bg-white py-2 shadow-lg",
+                      isLanguageOpen ? "block" : "hidden"
+                    )}
+                  >
+                    {routing.locales.map((l) => (
+                      <Link
+                        key={l}
+                        href={pathname}
+                        locale={l as any}
+                        onClick={() => setIsLanguageOpen(false)}
+                        className={cn(
+                          "block px-4 py-2 text-[14px] font-bold hover:bg-gray-50",
+                          currentLocale === l ? "text-primary" : "text-heading"
+                        )}
+                      >
+                        {localeLabelMap[l] || l}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-gradient h-[52px] min-w-0 flex-1 px-8 text-center leading-none whitespace-nowrap">
+                  {globalSetting?.tryForFreeText || t('tryForFree')}
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       )}

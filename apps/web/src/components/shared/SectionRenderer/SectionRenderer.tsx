@@ -10,12 +10,12 @@ interface SectionRendererProps {
   sections: Section[];
 }
 
-function renderSection(section: Section, index: number) {
+function renderSection(section: Section, index: number, featureHighlightOrder: number) {
   switch (section.__component) {
     case 'sections.hero':
       return <Hero key={index} data={section} />;
     case 'sections.feature-highlight':
-      return <FeatureHighlight key={index} data={section} />;
+      return <FeatureHighlight key={index} data={section} order={featureHighlightOrder} />;
     case 'sections.cta':
       return <CTA key={index} data={section} />;
     case 'sections.why-choose':
@@ -44,11 +44,15 @@ function renderSection(section: Section, index: number) {
  */
 export async function SectionRenderer({ sections }: SectionRendererProps) {
   if (!sections || sections.length === 0) return null;
+  let featureHighlightOrder = 0;
 
   return (
     <>
       {sections.map((section, index) => {
-        const element = renderSection(section, index);
+        if (section.__component === 'sections.feature-highlight') {
+          featureHighlightOrder += 1;
+        }
+        const element = renderSection(section, index, featureHighlightOrder);
         if (!element) return null;
 
         // First section (hero) renders immediately — critical for LCP
@@ -68,8 +72,8 @@ export async function SectionRenderer({ sections }: SectionRendererProps) {
 const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
   <section className="bg-white pt-12 md:pt-24 pb-12 overflow-hidden">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
-      <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-        <div className="text-center lg:text-left">
+      <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-16">
+        <div className="order-2 lg:order-1 text-center lg:text-left">
           <h1 className="max-w-[900px] text-[32px] md:text-[55px] font-black leading-tight">
             {data.title.includes('&') ? data.title.split('&')[0] : data.title}
             {data.title.includes('&') && (
@@ -83,7 +87,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
             {data.subtitle}
           </p>
           {data.ctaText && data.ctaLink && (
-            <div className="mt-12 flex justify-center lg:justify-start">
+            <div className="mt-6 lg:mt-12 flex justify-center lg:justify-start">
               <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
                 <Link href={data.ctaLink} className="btn-gradient inline-flex items-center gap-4 px-12">
                   {data.ctaText}
@@ -115,9 +119,6 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
                   <div className="flex items-center gap-2">
                     <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={20} height={20} />
                     <span className="text-[14px] text-heading leading-none">{stat.value}</span>
-                    <span className="text-[11px] font-medium text-muted/80 uppercase tracking-wider leading-none">
-                      {stat.label}
-                    </span>
                   </div>
                 </div>
               ))}
@@ -126,7 +127,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
         </div>
 
         {(data.image || data.backgroundImage) && (
-          <div className="flex justify-center lg:justify-end">
+          <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
             <OptimizedImage
               src={(data.image || data.backgroundImage)!.url}
               alt={data.title}
@@ -144,8 +145,8 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
   </section>
 );
 
-const FeatureHighlight: React.FC<{ data: FeatureHighlightSection }> = ({ data }) => (
-  <section className="py-20 md:py-32 bg-white">
+const FeatureHighlight: React.FC<{ data: FeatureHighlightSection; order: number }> = ({ data, order }) => (
+  <section className={cn("py-5 md:py-32", order % 2 === 1 ? "bg-white" : "bg-[#f3f9ff]")}>
     <div className="container-custom">
       <div className={cn(
         "flex flex-col lg:flex-row items-center gap-16 lg:gap-24",
@@ -166,7 +167,7 @@ const FeatureHighlight: React.FC<{ data: FeatureHighlightSection }> = ({ data })
         </div>
         <div className="w-full lg:w-1/2">
           <div className="mb-6 flex items-center gap-3 md:block md:mb-0">
-            <div className="inline-flex h-14 w-auto items-center justify-start">
+            <div className="inline-flex h-12 sm:h-14 w-auto items-center justify-center sm:justify-start">
               <Image
                 src={`/icons/${data.labelColor}-label.svg`}
                 alt={`${data.labelColor} feature label`}
@@ -212,6 +213,9 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
 const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
   <section className="pt-12 pb-20 md:pt-16 md:pb-32 bg-gradient-to-b from-white to-section-bg-2 text-center">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
+      <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
+        CORE FEATURES
+      </span>
       <h2 className="text-[24px] md:text-[40px] font-black text-heading mb-8 md:mb-14">{data.title}</h2>
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 md:gap-x-12 md:gap-y-20 lg:grid-cols-4">
         {data.features.map((feature, i) => (
@@ -228,7 +232,7 @@ const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
                 />
               )}
             </div>
-            <h3 className="text-[24px] md:text-[22px] font-bold text-heading leading-tight min-h-0 md:min-h-[60px] flex items-center justify-start text-left md:mb-4 md:justify-center md:text-center">
+            <h3 className="text-[20px] md:text-[22px] font-bold text-heading leading-tight min-h-0 md:min-h-[60px] flex items-center justify-start text-left md:mb-4 md:justify-center md:text-center">
               {feature.title}
             </h3>
             <p className="col-span-2 text-[16px] text-muted leading-[1.6] max-w-none text-left md:col-auto md:max-w-[280px] md:text-center">
@@ -270,14 +274,36 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
         <Image src="/icons/stars.svg" alt="stars" width={140} height={28} />
       </div>
       <h2 className="mb-3 text-[24px] md:text-[40px] font-bold text-heading">{data.title}</h2>
-      <p className="text-primary font-black text-[22px] mb-20">Excellent Rate：{data.rating}</p>
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+      <p className="text-primary font-black text-[18px] md:text-[22px] mb-10 md:mb-20">Excellent Rate：{data.rating}</p>
+
+      <div className="md:hidden -mx-2 px-2">
+        <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {data.reviews.map((review, i) => (
+            <div key={i} className="snap-start shrink-0 w-[88%]">
+              <div className="flex h-full flex-col items-center bg-section-bg-cta p-7 rounded-[20px] border border-[#dfe8ff] md:card-shadow text-center">
+                <p className="flex-1 text-[16px] text-muted/80 font-medium italic mb-8 leading-[1.75]">
+                  &quot;{review.text}&quot;
+                </p>
+                <p className="mt-auto inline-flex items-center gap-2 text-[19px] font-black text-heading">
+                  <Image src="/icons/user-icon.svg" alt="" width={19} height={19} className="h-[19px] w-[19px]" />
+                  <span>{review.name}</span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="hidden md:grid grid-cols-3 gap-10">
         {data.reviews.map((review, i) => (
-          <div key={i} className="flex h-full flex-col items-center bg-[#f3f9ff] p-12 rounded-[30px] border border-[#dfe8ff] card-shadow text-center">
-            <p className="flex-1 text-[17px] text-heading font-medium italic mb-10 leading-[1.8]">
+          <div key={i} className="flex h-full flex-col items-center bg-section-bg-cta p-12 rounded-[30px] border border-[#dfe8ff] card-shadow text-center">
+            <p className="flex-1 text-[17px] text-muted/80 font-medium italic mb-10 leading-[1.8]">
               &quot;{review.text}&quot;
             </p>
-            <p className="mt-auto text-[19px] font-black text-heading underline underline-offset-4 decoration-2">{review.name}</p>
+            <p className="mt-auto inline-flex items-center gap-2 text-[19px] font-black text-heading">
+              <Image src="/icons/user-icon.svg" alt="" width={19} height={19} className="h-[19px] w-[19px]" />
+              <span>{review.name}</span>
+            </p>
           </div>
         ))}
       </div>
@@ -290,17 +316,17 @@ async function AppsGrid({ data }: { data: AppsGridSection }) {
   const apps = res.data || [];
 
   return (
-    <section className={cn("pt-20 pb-32", data.backgroundColor === 'section-bg' ? "bg-section-bg" : "bg-white")}>
+    <section className={cn("pt-12 pb-16 md:pt-20 md:pb-32", data.backgroundColor === 'section-bg' ? "bg-section-bg" : "bg-white")}>
       <div className="container-custom">
-        <div className="flex flex-col items-center mb-20">
-          <span className="mb-4 inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-primary">
+        <div className="flex flex-col items-center mb-6 md:mb-20">
+          <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
             BOOSTVISION
           </span>
-          <h2 className="text-[24px] md:text-[40px] text-primary mb-6">{data.title}</h2>
+          <h2 className="text-[24px] md:text-[40px] font-bold text-primary mb-6">{data.title}</h2>
           <div className="h-1.5 w-16 bg-primary rounded-full"></div>
         </div>
 
-        <div className="grid grid-cols-1 gap-x-12 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-[5px] md:grid-cols-2 md:gap-y-16 lg:grid-cols-3">
           {apps.map((app) => (
             <AppListCard key={app.id} app={app} />
           ))}
@@ -311,18 +337,39 @@ async function AppsGrid({ data }: { data: AppsGridSection }) {
 }
 
 const BrandsGrid: React.FC<{ data: BrandsGridSection }> = ({ data }) => (
-  <section className="pt-20 pb-32 md:pt-24 text-white text-center bg-section-bg-3">
+  <section className="pt-10 pb-16 md:pt-24 md:pb-32 text-white text-center bg-section-bg-3">
     <div className="container-custom">
       <div className="mb-4 flex justify-center">
-        <div className="h-20 w-20 flex items-center justify-center">
-          <Image src="/icons/device-support.svg" alt="support" width={48} height={48} />
+        <div className="h-10 w-10 md:h-20 md:w-20 flex items-center justify-center">
+          <Image src="/icons/device-support.svg" alt="support" width={24} height={24} className="md:h-12 md:w-12 h-6 w-6" />
         </div>
       </div>
       <h2 className="text-white mb-6 text-[24px] md:text-[40px] font-bold">{data.title}</h2>
-      <p className="mx-auto max-w-[850px] text-white/70 text-[18px] leading-[1.8] mb-16">
+      <p className="mx-auto max-w-[850px] text-white/70 text-[16px] md:text-[18px] leading-[1.8] mb-5 md:mb-16">
         {data.description}
       </p>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+
+      <div className="md:hidden -mx-2 px-2">
+        <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {Array.from({ length: Math.ceil(data.brands.length / 6) }, (_, pageIndex) => (
+            <div key={pageIndex} className="snap-start shrink-0 w-[88%]">
+              <div className="grid grid-cols-2 gap-3">
+                {data.brands.slice(pageIndex * 6, pageIndex * 6 + 6).map((brand, i) => (
+                  <div key={`${pageIndex}-${i}`} className="brand-pill h-14 px-2">
+                    {brand.icon ? (
+                      <OptimizedImage src={brand.icon.url} alt={brand.title} width={100} height={32} className="h-full w-auto object-contain" fetchPriority="low" />
+                    ) : (
+                      <span className="text-[14px] font-black text-heading">{brand.title}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="hidden md:grid grid-cols-4 gap-4 lg:grid-cols-5">
         {data.brands.map((brand, i) => (
           <div key={i} className="brand-pill h-16 px-4">
             {brand.icon ? (
@@ -344,10 +391,10 @@ function AppListCard({ app }: { app: App }) {
         <OptimizedImage src={app.icon?.url || "/icons/app-placeholder.webp"} alt={app.name} fill className="object-cover" fetchPriority="low" />
       </div>
       <div className="flex flex-col pt-1">
-        <h3 className="mb-3 text-[20px] font-bold text-heading leading-tight group-hover:text-primary transition-colors">
+        <h3 className="mb-[calc(var(--spacing)*1)] md:mb-3 text-[20px] font-bold text-heading leading-tight group-hover:text-primary transition-colors">
           {app.name}
         </h3>
-        <p className="text-[13px] md:text-[14px] text-muted leading-relaxed line-clamp-3">
+        <p className="text-[13px] md:text-[14px] text-muted leading-[1.4] md:leading-relaxed line-clamp-3">
           {app.shortDescription}
         </p>
       </div>
