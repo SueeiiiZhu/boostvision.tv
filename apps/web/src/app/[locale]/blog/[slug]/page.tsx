@@ -82,7 +82,7 @@ export default async function BlogPostPage({ params }: Props) {
       if (slug) commentToSlug.set(raw, slug);
     });
     const uniqueSlugs = [...new Set([...commentToSlug.values()])];
-    const appMap = new Map<string, Awaited<ReturnType<typeof getAppBySlug>>>();
+    const appMap = new Map<string, Awaited<ReturnType<typeof getAppBySlug>> | null>();
     const apps = await Promise.all(uniqueSlugs.map((s) => getAppBySlug(s).catch(() => null)));
     uniqueSlugs.forEach((s, i) => appMap.set(s, apps[i]));
 
