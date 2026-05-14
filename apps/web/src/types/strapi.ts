@@ -327,6 +327,7 @@ export interface CTASection {
 export interface WhyChooseSection {
   id: number;
   __component: 'sections.why-choose';
+  badge?: string;
   title: string;
   features: Feature[];
 }
