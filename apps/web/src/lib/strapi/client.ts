@@ -1,6 +1,9 @@
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 const DEFAULT_REVALIDATE_SECONDS = Number(process.env.STRAPI_REVALIDATE_SECONDS || 600);
+const STRAPI_BASE_URL = STRAPI_URL.replace(/\/$/, "");
+const USE_AUTH_HEADER = STRAPI_TOKEN
+  && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(STRAPI_BASE_URL);
 
 /**
  * Strapi API Response type (Strapi 6 flattened structure)
@@ -34,11 +37,12 @@ export interface StrapiError {
  */
 export async function fetchStrapi<T>(
   endpoint: string,
-  options?: RequestInit & { revalidate?: number; tags?: string[] }
+  options?: RequestInit & { revalidate?: number; tags?: string[]; silent?: boolean }
 ): Promise<StrapiResponse<T>> {
   const {
     revalidate = DEFAULT_REVALIDATE_SECONDS,
     tags = [],
+    silent = false,
     cache = "force-cache",
     ...fetchOptions
   } = options || {};
@@ -49,15 +53,14 @@ export async function fetchStrapi<T>(
   };
 
   // Add authorization header if token is available
-  if (STRAPI_TOKEN) {
+  if (USE_AUTH_HEADER) {
     (headers as Record<string, string>)["Authorization"] =
       `Bearer ${STRAPI_TOKEN}`;
   }
 
   // Normalize URL to avoid double slashes
-  const baseUrl = STRAPI_URL.replace(/\/$/, "");
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const url = `${baseUrl}/api${cleanEndpoint}`;
+  const url = `${STRAPI_BASE_URL}/api${cleanEndpoint}`;
 
   try {
     const res = await fetch(url, {
@@ -74,12 +77,14 @@ export async function fetchStrapi<T>(
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`[Strapi] Error fetching ${endpoint}:`, {
-        status: res.status,
-        statusText: res.statusText,
-        url,
-        response: errorText
-      });
+      if (!silent) {
+        console.error(`[Strapi] Error fetching ${endpoint}:`, {
+          status: res.status,
+          statusText: res.statusText,
+          url,
+          response: errorText
+        });
+      }
 
       let errorMessage = `Failed to fetch ${endpoint} (${res.status})`;
       try {
@@ -95,7 +100,9 @@ export async function fetchStrapi<T>(
     const json = await res.json();
     return transformMediaUrls(json);
   } catch (error) {
-    console.error(`[Strapi] Exception fetching ${endpoint}:`, error);
+    if (!silent) {
+      console.error(`[Strapi] Exception fetching ${endpoint}:`, error);
+    }
     throw error;
   }
 }
@@ -145,8 +152,7 @@ function transformMediaUrls<T>(data: T): T {
         typeof newData[key] === "string" &&
         newData[key].startsWith("/")
       ) {
-        const baseUrl = STRAPI_URL.replace(/\/$/, "");
-        newData[key] = `${baseUrl}${newData[key]}`;
+        newData[key] = `${STRAPI_BASE_URL}${newData[key]}`;
       } else {
         newData[key] = transformMediaUrls(newData[key]);
       }
