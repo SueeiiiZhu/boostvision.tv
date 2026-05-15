@@ -4,8 +4,9 @@ import { Page } from "../../../types/strapi";
 import { getLegalRevalidate } from "../revalidate";
 import { normalizePage } from "../normalize";
 
-export async function getPageBySlug(slug: string) {
+export async function getPageBySlug(slug: string, locale: string = "en") {
   const query = buildStrapiQuery({
+    locale,
     populate: {
       seo: true,
       sections: {
