@@ -120,7 +120,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                     </div>
 
                     {/* Download Buttons */}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-center md:items-start justify-center md:justify-start gap-4 sm:gap-6">
                         {app.downloadLinks && app.downloadLinks.length > 0 ? (
                             app.downloadLinks.map((link) => {
                                 const ButtonContent = (
@@ -129,7 +129,7 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                             src={link.badge.url}
                                             alt={link.platform}
                                             width={180} height={54}
-                                            className="h-[54px] w-auto"
+                                            className="h-12 sm:h-14 w-auto"
                                         />
                                         {link.generateQRCode && (
                                             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100] pointer-events-none">
@@ -212,10 +212,10 @@ const AppWhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
 );
 
 const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, isEven?: boolean }> = ({ data, app, isEven }) => (
-    <section className={cn("py-32", isEven ? "bg-section-bg-2" : "bg-white")}>
+    <section className={cn("py-16 md:py-32", isEven ? "bg-section-bg-2" : "bg-white")}>
         <div className="container-custom">
             <div className={cn(
-                "flex flex-col lg:flex-row items-center gap-16 lg:gap-24",
+                "flex flex-col lg:flex-row items-center gap-8 lg:gap-24",
                 data.imagePosition === 'right' && "lg:flex-row-reverse"
             )}>
                 <div className="w-full lg:w-1/2">
@@ -235,7 +235,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                     style={{ paddingInline: 'clamp(12px, 3.5vw, 24px)' }}
                 >
                     <div className="mb-6 flex items-center gap-6 md:mb-0 md:flex-col md:items-start md:gap-[0.5em] md:text-left">
-                        <div className="flex h-14 w-auto items-center justify-start">
+                        <div className="flex h-12 sm:h-14 w-auto items-center justify-center sm:justify-start">
                             <Image
                                 src={`/icons/${data.labelColor}-label.svg`}
                                 alt={`${data.labelColor} feature label`}
@@ -260,7 +260,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                     )}
 
                     {/* Download Buttons inside column */}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-center md:items-start justify-center md:justify-start gap-4 sm:gap-6">
                         {app.downloadLinks && app.downloadLinks.length > 0 ? (
                             app.downloadLinks.map((link) => {
                                 const ButtonContent = (
@@ -269,7 +269,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                                             src={link.badge.url}
                                             alt={link.platform}
                                             width={180} height={54}
-                                            className="h-[54px] w-auto"
+                                            className="h-12 sm:h-14 w-auto"
                                         />
                                         {link.generateQRCode && (
                                             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100] pointer-events-none">
@@ -346,7 +346,7 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
                 className="text-muted/70 mb-10 md:mb-16 text-[16px] md:text-[20px] max-w-[850px] mx-auto leading-relaxed"
             />
 
-            <div className="flex flex-wrap justify-center gap-6 mb-20">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                 {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
                         <a
@@ -362,7 +362,7 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
                                 alt={link.platform}
                                 width={220}
                                 height={66}
-                                className="h-[66px] w-auto"
+                                className="h-12 sm:h-14 w-auto"
                             />
                         </a>
                     ))
@@ -380,7 +380,7 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
                         <Link
                             key={link.id}
                             href={link.href}
-                            className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                            className="inline-flex w-[220px] items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
                         >
                             {link.name}
                         </Link>
@@ -389,13 +389,13 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
                     <>
                         <Link
                             href="/tutorial"
-                            className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                            className="inline-flex w-[220px] items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
                         >
                             How-to Guides
                         </Link>
                         <Link
                             href="/faq"
-                            className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
+                            className="inline-flex w-[220px] items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
                         >
                             F.A.Q
                         </Link>

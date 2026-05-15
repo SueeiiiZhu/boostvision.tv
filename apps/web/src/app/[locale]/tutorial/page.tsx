@@ -45,7 +45,7 @@ export default async function TutorialPage({ searchParams }: Props) {
   const ctaSection = sections.find(s => s.__component === 'sections.cta') as CTASection | undefined;
 
   return (
-    <main className="bg-white">
+    <main className="bg-white poppins-headings">
       {/* Banner */}
       <section className="bg-app-hero py-24 text-center">
         <div className="container-custom">
