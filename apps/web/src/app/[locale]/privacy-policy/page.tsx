@@ -1,6 +1,7 @@
 import { RichText, SectionRenderer } from "@/components/shared";
 import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
 import { hasAdSenseSlot } from "@/config/adsense";
+import ExploreAppsLinks from "@/components/legal/ExploreAppsLinks";
 import { getLegalPageBySlug } from "@/lib/strapi/api/pages";
 import { getLocaleAlternates } from "@/lib/seo";
 import { type BlocksContent } from "@strapi/blocks-react-renderer";
@@ -160,6 +161,8 @@ export default async function PrivacyPolicyPage() {
             </div>
           </section>
         ) : null}
+
+        <ExploreAppsLinks />
 
         {page?.sections && <SectionRenderer sections={page.sections} />}
 

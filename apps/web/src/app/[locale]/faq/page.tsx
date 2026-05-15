@@ -96,7 +96,7 @@ export default async function FAQPage({ searchParams }: Props) {
   return (
     <>
       {faqJsonLd && <JsonLd data={faqJsonLd} />}
-      <main className="bg-white">
+      <main className="bg-white poppins-headings">
         {/* Banner */}
         <section className="bg-app-hero py-24 text-center">
           <div className="container-custom">

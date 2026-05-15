@@ -103,19 +103,19 @@ export default async function AppDetailPage({ params }: Props) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="bg-white">
+      <main className="bg-white poppins-headings">
         {/* 如果有动态配置的 sections，优先使用 */}
         {app.sections && app.sections.length > 0 ? (
           <AppSectionRenderer sections={app.sections} app={app} globalSetting={globalSetting} />
         ) : (
           <>
             {/* Hero Section - Two Column Layout */}
-            <section className="pt-24 pb-20 bg-white">
+            <section className="pt-0 md:pt-24 pb-20 bg-white">
               <div className="container-custom">
-                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+                <div className="flex flex-col lg:flex-row items-center gap-0 md:gap-16 lg:gap-24">
                   {/* Left Column: Text Content */}
-                  <div className="flex-1 text-left">
-                    <h1 className="text-[25px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
+                  <div className="order-2 lg:order-1 flex-1 text-left">
+                    <h1 className="text-[30px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
                       {app.displayTitle || app.name}
                     </h1>
                     <p className="text-[16px] text-muted/80 leading-relaxed mb-10 max-w-[500px]">
@@ -157,7 +157,7 @@ export default async function AppDetailPage({ params }: Props) {
                     </div>
 
                     {/* Download Buttons */}
-                    <div className="flex flex-wrap gap-6">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-center md:items-start justify-center md:justify-start gap-4 sm:gap-6">
                       {app.downloadLinks && app.downloadLinks.length > 0 ? (
                         app.downloadLinks.map((link) => {
                           const ButtonContent = (
@@ -166,7 +166,7 @@ export default async function AppDetailPage({ params }: Props) {
                                 src={link.badge.url}
                                 alt={link.platform}
                                 width={180} height={54}
-                                className="h-[54px] w-auto"
+                                className="h-12 sm:h-14 w-auto"
                               />
                               {link.generateQRCode && (
                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100] pointer-events-none">
@@ -194,7 +194,7 @@ export default async function AppDetailPage({ params }: Props) {
                   </div>
 
                   {/* Right Column: Hero Image */}
-                  <div className="flex-1 relative animate-fade-in">
+                  <div className="order-1 lg:order-2 flex-1 relative animate-fade-in">
                     {app.heroImage ? (
                       <Image
                         src={app.heroImage.url}
@@ -217,15 +217,15 @@ export default async function AppDetailPage({ params }: Props) {
 
             {/* Features Grid Section (Using Why Choose Style) */}
             {app.features && app.features.length > 0 && (
-              <section className="py-32 bg-[#f8faff] text-center">
+              <section className="pt-8 md:pt-16 pb-32 bg-[#f8faff] text-center">
                 <div className="container-custom">
-                  <h2 className="text-[40px] font-black text-heading mb-24 tracking-tight">
+                  <h2 className="text-[28px] md:text-[40px] font-black text-heading mt-[1em] mb-[1em] tracking-tight">
                     Wireless Cast with the {app.name}
                   </h2>
                   <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
                     {app.features.slice(0, 4).map((feature) => (
-                      <div key={feature.id} className="group flex flex-col items-center rounded-[40px] bg-white p-12 card-shadow hover:translate-y-[-12px] transition-all duration-500">
-                        <div className="mb-10 h-24 w-24 flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
+                      <div key={feature.id} className="group grid grid-cols-[96px_1fr] items-center gap-x-5 gap-y-4 rounded-[40px] bg-white p-8 card-shadow hover:translate-y-[-12px] transition-all duration-500 md:flex md:flex-col md:gap-0 md:p-12">
+                        <div className="h-24 w-24 shrink-0 flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110 md:mb-10 md:h-24 md:w-24">
                           {feature.icon?.url && (
                             <Image
                               src={feature.icon.url}
@@ -236,10 +236,10 @@ export default async function AppDetailPage({ params }: Props) {
                             />
                           )}
                         </div>
-                        <h3 className="mb-6 text-[22px] font-black text-heading leading-tight min-h-[60px] flex items-center justify-center">
-                          {feature.title}
+                        <h3 className="text-[22px] font-black text-heading leading-tight min-h-0 flex items-center justify-start text-left md:mb-6 md:min-h-[60px] md:justify-center md:text-center">
+                            {feature.title}
                         </h3>
-                        <p className="text-[16px] text-muted leading-[1.6] max-w-[280px]">
+                        <p className="col-span-2 text-[16px] text-muted leading-[1.6] max-w-none text-left md:col-auto md:max-w-[280px] md:text-center">
                           {feature.description}
                         </p>
                       </div>
@@ -261,7 +261,7 @@ export default async function AppDetailPage({ params }: Props) {
             {/* Device Brands Section */}
             <section className="py-32 bg-white text-center">
               <div className="container-custom">
-                <h2 className="text-[40px] font-black text-heading mb-6 tracking-tight">
+                <h2 className="text-[28px] md:text-[40px] font-black text-heading mb-6 tracking-tight">
                   {app.name} Support all Smart TVs & Sticks
                 </h2>
                 <p className="text-[18px] text-muted mb-20 max-w-[850px] mx-auto leading-relaxed">
@@ -283,7 +283,7 @@ export default async function AppDetailPage({ params }: Props) {
             {app.screenshots && app.screenshots.length > 0 && (
               <section className="py-32 bg-[#f8faff] overflow-hidden">
                 <div className="container-custom">
-                  <h2 className="text-[40px] font-black text-heading text-center mb-20 tracking-tight">App Screenshots</h2>
+                  <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-20 tracking-tight">App Screenshots</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
                     {app.screenshots.map((shot, i) => (
                       <div key={i} className="relative aspect-[9/19.5] overflow-hidden rounded-[35px] shadow-2xl hover:translate-y-[-10px] transition-transform duration-500">
@@ -298,14 +298,14 @@ export default async function AppDetailPage({ params }: Props) {
             {/* Final CTA Section */}
             <section className="py-32 text-center bg-section-bg-3 text-white">
               <div className="container-custom">
-                <h2 className="text-[42px] md:text-[50px] font-black mb-10 leading-[1.1] max-w-[950px] mx-auto tracking-tight">
+                <h2 className="text-[30px] md:text-[50px] font-black mb-10 leading-[1.1] max-w-[950px] mx-auto tracking-tight">
                   Free Download {app.name} on Android or iPhone, iPad Today!
                 </h2>
                 <p className="text-[20px] text-white/70 mb-14 max-w-[850px] mx-auto leading-relaxed">
                   Get and install the {app.name} and start screencasting from iPhone, iPad or Android phone to TV now
                 </p>
 
-                <div className="flex flex-wrap justify-center gap-6 mb-20">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                   {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
                       <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
@@ -313,7 +313,7 @@ export default async function AppDetailPage({ params }: Props) {
                           src={link.badge.url}
                           alt={link.platform}
                           width={220} height={66}
-                          className="h-[66px] w-auto"
+                          className="h-12 sm:h-14 w-auto"
                         />
                       </a>
                     ))

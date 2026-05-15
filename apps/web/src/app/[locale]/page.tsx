@@ -38,13 +38,6 @@ export default async function Home() {
     getPageBySlug("home"),
   ]).catch(() => [null, null]);
 
-  const stats = globalSetting?.statistics || {
-    downloads: "28,000,000+",
-    countries: "200+",
-    customers: "10,000,000+",
-    supportHours: "24/7/365"
-  };
-
   // Generate structured data schemas
   const organizationSchema = generateOrganizationSchema({
     socialLinks: globalSetting?.socialLinks || [],
@@ -57,74 +50,51 @@ export default async function Home() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main>
+      <main className="poppins-headings">
         {homePage?.sections && homePage.sections.length > 0 ? (
           <SectionRenderer sections={homePage.sections} />
         ) : (
           <>
             {/* Hero Section Fallback */}
-            <section className="bg-white pt-20 pb-8 text-center overflow-hidden">
-              <div className="container-custom">
-                <h1 className="mx-auto max-w-[900px] font-[family-name:var(--font-heading)] text-[36px] font-black leading-tight tracking-tight sm:text-[44px] md:text-[52px] lg:text-[58px] animate-slide-up">
-                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    Screen Mirroring
-                  </span>{" "}
-                  & TV Remote Apps
-                </h1>
-                <p className="mx-auto mt-8 max-w-[800px] text-[20px] text-muted leading-[1.6] animate-slide-up delay-100">
-                  Mirror the screen of your iPhone, iPad, Android phone & tablet
-                  directly to your Smart TV. <br className="hidden md:block" /> Try our professional remote control
-                  apps on mobile device to improve smart home control experience.{" "}
-                  <strong className="font-bold text-heading">No cables required.</strong>
-                </p>
-                <div className="mt-12 animate-slide-up delay-200">
-                  <Link href="/app" className="btn-gradient">
-                    GET IT NOW
-                  </Link>
-                </div>
-                <p className="mt-8 text-[14px] font-medium text-muted/80 uppercase tracking-wider">
-                  Best choice for 20 million+ users
-                </p>
-
-                {/* Stats Row */}
-                <div className="mt-20 flex flex-wrap items-center justify-center gap-y-10 gap-x-12 md:gap-x-20">
-                  {[
-                    { label: "Downloads", value: stats.downloads, icon: "download", href: "/app" },
-                    { label: "Countries and Regions", value: stats.countries, icon: "global", href: undefined },
-                    { label: "Satisfied Customers", value: stats.customers, icon: "users", href: "/app" },
-                    { label: "Customer Service", value: stats.supportHours, icon: "service", href: "/contact-us" },
-                  ].map((stat) => {
-                    const content = (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="flex items-center gap-3">
-                          <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={32} height={32} />
-                          <span className="text-[24px] font-black text-heading leading-none">{stat.value}</span>
-                        </div>
+            <section className="bg-white pt-20 pb-8 overflow-hidden">
+              <div className="container-custom max-w-[1320px] px-3 md:px-4">
+                <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-16">
+                  <div className="order-2 lg:order-1 text-center lg:text-left">
+                    <h1 className="max-w-[900px] font-[family-name:var(--font-heading)] text-[36px] font-black leading-tight tracking-tight sm:text-[44px] md:text-[52px] lg:text-[58px] animate-slide-up">
+                      Screen Mirroring & TV Remote Apps
+                    </h1>
+                    <p className="mx-auto mt-8 max-w-[800px] text-[20px] text-muted leading-[1.6] animate-slide-up delay-100 lg:mx-0">
+                      Mirror the screen of your iPhone, iPad, Android phone & tablet
+                      directly to your Smart TV. <br className="hidden md:block" /> Try our professional remote control
+                      apps on mobile device to improve smart home control experience.{" "}
+                      <strong className="font-bold text-heading">No cables required.</strong>
+                    </p>
+                    <div className="mt-6 lg:mt-12 animate-slide-up delay-200 flex justify-center lg:justify-start">
+                      <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
+                        <Link href="/app" className="btn-gradient">
+                          GET IT NOW
+                        </Link>
+                        <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
+                          Best choice for 20 million+ users
+                        </p>
                       </div>
-                    );
+                    </div>
 
-                    return stat.href ? (
-                      <Link key={stat.label} href={stat.href} className="transition-opacity hover:opacity-80">
-                        {content}
-                      </Link>
-                    ) : (
-                      <div key={stat.label}>{content}</div>
-                    );
-                  })}
-                </div>
+                  </div>
 
-                {/* Main Product Image */}
-                <div className="mt-16 flex justify-center scale-105 transform">
-                  <Image
-                    src="/images/hero-devices.webp"
-                    alt="BoostVision Apps"
-                    width={1200}
-                    height={600}
-                    className="h-auto w-full max-w-[1100px]"
-                    sizes="(max-width: 768px) calc(100vw - 30px), (max-width: 1200px) calc(90vw - 30px), 1100px"
-                    priority
-                    fetchPriority="high"
-                  />
+                  {/* Main Product Image */}
+                  <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
+                    <Image
+                      src="/images/hero-devices.webp"
+                      alt="BoostVision Apps"
+                      width={1200}
+                      height={600}
+                      className="h-auto w-full max-w-[720px]"
+                      sizes="(max-width: 768px) calc(100vw - 30px), (max-width: 1200px) 50vw, 720px"
+                      priority
+                      fetchPriority="high"
+                    />
+                  </div>
                 </div>
               </div>
             </section>
@@ -132,7 +102,7 @@ export default async function Home() {
             {/* Final CTA Fallback */}
             <section className="py-32 text-center bg-white border-t border-gray-50">
               <div className="container-custom">
-                <h2 className="mb-8 max-w-[900px] mx-auto text-[45px] leading-[1.1] font-black text-heading">
+                <h2 className="mb-8 max-w-[900px] mx-auto text-[28px] md:text-[45px] leading-[1.1] font-semibold text-heading">
                   Free Download BoostVision Screen Mirroring & TV Remote Apps Today!
                 </h2>
                 <p className="text-muted mb-12 text-[20px] max-w-[700px] mx-auto leading-relaxed">

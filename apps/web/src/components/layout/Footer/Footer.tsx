@@ -14,27 +14,27 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
 
   return (
     <footer className="footer-gradient pt-20 pb-10 text-white font-sans">
-      <div className="container-custom">
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="container-custom lg:max-w-[1320px]">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:[grid-template-columns:minmax(220px,1.1fr)_repeat(4,minmax(180px,1fr))]">
           {/* Logo & Info */}
           <div className="lg:col-span-1">
-            <Link href="/" className="mb-8 block">
+            <Link href="/" className="mb-8 flex justify-center lg:justify-start">
               <Image
                 src={globalSetting?.footerLogo?.url || "/logo-white.svg"}
                 alt={globalSetting?.siteName || "BoostVision"}
                 width={180}
                 height={45}
-                className="h-[45px] w-auto"
+                className="h-[34px] md:h-[45px] w-auto"
               />
             </Link>
-            <p className="text-[14px] text-white/60 leading-relaxed mb-8">
+            <p className="text-[14px] text-white/60 leading-relaxed mb-8 text-center lg:text-left">
               &copy; {new Date().getFullYear()} {globalSetting?.siteName || "BoostVision"}. <br />
               All rights reserved.
             </p>
 
             {/* Social Links */}
             {socialLinks.length > 0 && (
-              <div className="flex items-center gap-4">
+              <div className="mx-auto flex w-fit items-center justify-center gap-4 lg:mx-0 lg:w-auto lg:justify-start">
                 {socialLinks.map((social) => (
                   <a
                     key={social.id}
@@ -58,7 +58,7 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
           {/* Dynamic Menus from Strapi */}
           {footerColumns.map((column) => (
             <div key={column.id}>
-              <h2 className="mb-8 text-[18px] font-bold font-heading text-white">{column.title}</h2>
+              <p className="mb-8 text-[18px] font-bold font-heading text-white">{column.title}</p>
               <ul className="flex flex-col gap-3">
                 {column.links?.map((link) => (
                   <li key={link.id}>

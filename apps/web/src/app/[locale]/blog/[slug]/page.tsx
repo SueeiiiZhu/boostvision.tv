@@ -5,6 +5,7 @@ import { RichText, JsonLd } from "@/components/shared";
 import { BlogCard } from "../_components/BlogCard";
 import { BlogToc } from "../_components/BlogToc";
 import { getBlogPostBySlug } from "@/lib/strapi/api/blog";
+import { getAppBySlug } from "@/lib/strapi/api/apps";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata, generateArticleSchema, generateBreadcrumbSchema, wrapInGraph } from "@/lib/seo";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -68,6 +69,38 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) {
     notFound();
+  }
+
+  const ctaBanners: Record<string, { title: string; iconUrl?: string | null; buttons: { url: string; platform?: string | null; badgeUrl?: string | null }[] }> = {};
+  if (typeof post.content === "string") {
+    const commentMatches = Array.from(post.content.matchAll(/<!--([\s\S]*?)-->/g));
+    const uniqueComments = [...new Set(commentMatches.map((m) => (m[1] || "").trim()).filter(Boolean))];
+    const commentToSlug = new Map<string, string>();
+    uniqueComments.forEach((raw) => {
+      const match = raw.match(/^app:\s*([a-z0-9-]+)\s*$/i);
+      const slug = match?.[1]?.toLowerCase() || "";
+      if (slug) commentToSlug.set(raw, slug);
+    });
+    const uniqueSlugs = [...new Set([...commentToSlug.values()])];
+    const appMap = new Map<string, Awaited<ReturnType<typeof getAppBySlug>> | null>();
+    const apps = await Promise.all(uniqueSlugs.map((s) => getAppBySlug(s).catch(() => null)));
+    uniqueSlugs.forEach((s, i) => appMap.set(s, apps[i]));
+
+    uniqueComments.forEach((raw) => {
+      const normalizedCommentKey = raw.toLowerCase().replace(/\s+/g, " ");
+      const mappedSlug = commentToSlug.get(raw);
+      if (!normalizedCommentKey || !mappedSlug) return;
+      const app = appMap.get(mappedSlug);
+      if (!app?.downloadLinks?.length) return;
+      ctaBanners[normalizedCommentKey] = {
+        title: `Get ${app.displayTitle || app.name || "the App"}`,
+        iconUrl: app.icon?.url || null,
+        buttons: app.downloadLinks
+          .filter((l) => !!l?.url)
+          .slice(0, 2)
+          .map((l) => ({ url: l!.url!, platform: l?.platform || null, badgeUrl: l?.badge?.url || null })),
+      };
+    });
   }
 
   // 使用 Strapi 后台配置的相关文章，增加空值保护
@@ -153,23 +186,26 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="bg-white">
-        <article className="py-20">
-          <div className="container-custom max-w-[1200px]">
+      <main className="bg-white poppins-headings">
+        <article className="pt-[118px] pb-0 md:py-20">
+          <div className="container-custom lg:max-w-[1200px]">
             {toc.length > 0 && (
-              <details className="mb-8 rounded-[20px] border border-gray-100 bg-section-bg p-6 lg:hidden">
-                <summary className="cursor-pointer select-none text-[18px] font-black text-heading">
-                  {globalSetting?.tocTitle || "Contents"}
+              <details className="mobile-blog-toc fixed top-[86px] left-1/2 z-30 w-[calc(100%-30px)] -translate-x-1/2 rounded-[20px] border border-gray-100 bg-section-bg px-6 py-4 lg:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between select-none text-[16px] font-heading font-semibold uppercase tracking-[0.06em] text-heading/80 [&::-webkit-details-marker]:hidden">
+                  <span>{globalSetting?.tocTitle || "Contents"}</span>
+                  <svg className="h-4 w-4 shrink-0 text-heading/70 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </summary>
-                <div className="mt-4">
+                <div className="mobile-blog-toc-panel mt-4">
                   <BlogToc toc={toc} />
                 </div>
               </details>
             )}
 
-            <div className="flex flex-col gap-12 lg:flex-row">
+            <div className="flex flex-col gap-10 lg:flex-row lg:gap-12">
               {/* Main Content Area */}
-              <div className="flex-1 max-w-[880px]">
+              <div className="flex-1 max-w-[940px]">
                 {/* Header */}
                 <header className="mb-12">
                   {/* <div className="mb-6 flex items-center gap-4 text-[15px] font-medium">
@@ -181,7 +217,7 @@ export default async function BlogPostPage({ params }: Props) {
                     <span className="text-gray-300">|</span>
                     <span className="text-muted">{post.readTime || 5} min read</span>
                   </div> */}
-                  <h1 className="text-[42px] font-black text-heading leading-[1.3] mb-8">
+                  <h1 className="text-[36px] md:text-[42px] font-black text-heading leading-[1.3] mb-8">
                     {post.title}
                   </h1>
                   <div className="flex items-center gap-4">
@@ -204,7 +240,7 @@ export default async function BlogPostPage({ params }: Props) {
 
                 {/* Quick Answer */}
                 {post.excerpt && (
-                  <div className="mb-12 rounded-[20px] border border-primary/20 bg-section-bg-2 p-8">
+                  <div className="mb-12 rounded-[20px] border border-primary/20 bg-section-bg-cta p-8">
                     <h2 className="mb-3 flex items-center gap-2 text-[18px] font-black text-heading">
                       <svg className="h-5 w-5 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -212,48 +248,51 @@ export default async function BlogPostPage({ params }: Props) {
                       Quick Answer
                     </h2>
                     <p className="text-[16px] leading-[1.7] text-muted">{post.excerpt}</p>
-                    <a href="#article-content" className="mt-4 inline-block text-[14px] font-bold text-primary hover:underline">
-                      Read full article below ↓
-                    </a>
                   </div>
                 )}
 
                 {/* Content */}
                 <div id="article-content" className="prose prose-lg max-w-none text-muted leading-[1.8] post-content">
-                  <RichText content={post.content} />
+                  <RichText content={post.content} ctaBanners={ctaBanners} />
                 </div>
 
                 {/* Author Bio Section */}
-                <div className="mt-20 flex flex-col md:flex-row items-center gap-10 md:gap-0 rounded-[20px] border border-gray-200 p-10 md:p-12">
+                <div className="mt-20 flex flex-col md:flex-row items-center gap-5 md:gap-0 rounded-[20px] border border-gray-200 p-10 md:p-12">
                   <div className="flex flex-col items-center shrink-0 md:pr-12 md:min-w-[200px]">
-                    <div className="h-28 w-28 relative overflow-hidden rounded-full shadow-sm mb-4">
-                      <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
-                    </div>
-                    <span className="font-bold text-heading text-[20px] text-center">{post.author?.name}</span>
+                    {authorProfileHref ? (
+                      <Link href={authorProfileHref} className="group flex flex-col items-center">
+                        <div className="h-28 w-28 relative overflow-hidden rounded-full shadow-sm mb-4 transition-shadow duration-300 group-hover:shadow-[0_6px_18px_rgba(30,108,244,0.2)]">
+                          <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
+                        </div>
+                        <span className="font-heading font-semibold text-heading/80 text-[20px] text-center transition-colors group-hover:text-primary">{post.author?.name}</span>
+                      </Link>
+                    ) : (
+                      <>
+                        <div className="h-28 w-28 relative overflow-hidden rounded-full shadow-sm mb-4">
+                          <Image src={post.author?.avatar?.url || "/icons/author-placeholder.webp"} alt={post.author?.name} fill className="object-cover" />
+                        </div>
+                        <span className="font-bold text-heading text-[20px] text-center">{post.author?.name}</span>
+                      </>
+                    )}
                   </div>
 
                   <div className="hidden md:block self-stretch w-px bg-gray-200" />
 
-                  <div className="flex-1 md:pl-12 text-center md:text-left">
-                    <p className="text-[18px] text-muted leading-[1.8]">
+                  <div className="flex-1 md:pl-12 text-left">
+                    <p className="text-[16px] text-muted leading-[1.8]">
                       {post.author?.bio}
                     </p>
-                    {authorProfileHref && (
-                      <Link href={authorProfileHref} className="inline-block mt-4 text-primary font-bold hover:underline">
-                        View full author profile
-                      </Link>
-                    )}
                   </div>
                 </div>
               </div>
 
               {/* Sidebar - Table of Contents */}
-              <aside className="hidden w-[260px] shrink-0 lg:block">
+              <aside className="hidden lg:block lg:w-[360px] shrink-0">
                 <div className="sticky top-[120px]">
                   {/* Table of Contents */}
                   {toc.length > 0 && (
                     <div className="rounded-[30px] bg-section-bg p-8 border border-gray-100">
-                      <h4 className="text-[20px] font-black text-heading mb-6">
+                      <h4 className="text-[18px] font-heading font-semibold uppercase tracking-[0.06em] text-heading/80 mb-6">
                         {globalSetting?.tocTitle || "Contents"}
                       </h4>
                       <BlogToc toc={toc} />
@@ -278,28 +317,17 @@ export default async function BlogPostPage({ params }: Props) {
             )}
 
             {/* CTA Section - Explore Apps */}
-            <div className="mt-20 pt-20 border-t border-gray-100">
-              <div className="rounded-[40px] bg-section-bg p-16 text-center">
-                <h4 className="text-[32px] font-black text-heading mb-6">
+            <div className="mt-10 pt-10 border-t border-gray-100 md:mt-20 md:pt-20">
+              <div className="mb-6 rounded-[40px] bg-section-bg-cta px-6 py-10 text-center md:mb-0 md:p-16">
+                <h2 className="mb-6 text-[24px] font-heading font-semibold text-heading md:text-[32px]">
                   Ready to Try Our Apps?
-                </h4>
-                <p className="text-[18px] text-muted mb-10 max-w-[700px] mx-auto leading-relaxed">
+                </h2>
+                <p className="mb-10 mx-auto w-full max-w-[860px] text-[18px] text-muted leading-relaxed">
                   Discover our professional screen mirroring and TV remote control apps for iPhone, iPad, and Android devices.
                 </p>
-                <div className="flex flex-wrap justify-center gap-6">
-                  <Link
-                    href="/app?tab=screen-mirroring"
-                    className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-white bg-primary rounded-full hover:translate-y-[-2px] transition-all shadow-xl"
-                  >
-                    Screen Mirroring Apps
-                  </Link>
-                  <Link
-                    href="/app?tab=tv-remote"
-                    className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
-                  >
-                    TV Remote Apps
-                  </Link>
-                </div>
+                <Link href="/app" className="btn-gradient">
+                  GET IT NOW
+                </Link>
               </div>
             </div>
           </div>
