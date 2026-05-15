@@ -100,11 +100,9 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </Link>
-                {data.ctaSubtext && (
-                  <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
-                    {data.ctaSubtext}
-                  </p>
-                )}
+                <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
+                  Best choice for 20 million+ users
+                </p>
               </div>
             </div>
           )}
@@ -215,11 +213,9 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
 const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
   <section className="pt-12 pb-20 md:pt-16 md:pb-32 bg-gradient-to-b from-white to-section-bg-2 text-center">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
-      {data.badge && (
-        <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
-          {data.badge}
-        </span>
-      )}
+      <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
+        CORE FEATURES
+      </span>
       <h2 className="text-[24px] md:text-[40px] font-black text-heading mb-8 md:mb-14">{data.title}</h2>
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 md:gap-x-12 md:gap-y-20 lg:grid-cols-4">
         {data.features.map((feature, i) => (
@@ -278,7 +274,7 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
         <Image src="/icons/stars.svg" alt="stars" width={140} height={28} />
       </div>
       <h2 className="mb-3 text-[24px] md:text-[40px] font-bold text-heading">{data.title}</h2>
-      <p className="text-primary font-black text-[18px] md:text-[22px] mb-10 md:mb-20">{data.rating}</p>
+      <p className="text-primary font-black text-[18px] md:text-[22px] mb-10 md:mb-20">Excellent Rate：{data.rating}</p>
 
       <div className="md:hidden -mx-2 px-2">
         <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
