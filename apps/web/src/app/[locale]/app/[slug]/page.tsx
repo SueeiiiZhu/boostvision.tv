@@ -103,7 +103,7 @@ export default async function AppDetailPage({ params }: Props) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="bg-white">
+      <main className="bg-white poppins-headings">
         {/* 如果有动态配置的 sections，优先使用 */}
         {app.sections && app.sections.length > 0 ? (
           <AppSectionRenderer sections={app.sections} app={app} globalSetting={globalSetting} />
@@ -157,7 +157,7 @@ export default async function AppDetailPage({ params }: Props) {
                     </div>
 
                     {/* Download Buttons */}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-center md:items-start justify-center md:justify-start gap-4 sm:gap-6">
                       {app.downloadLinks && app.downloadLinks.length > 0 ? (
                         app.downloadLinks.map((link) => {
                           const ButtonContent = (
@@ -166,7 +166,7 @@ export default async function AppDetailPage({ params }: Props) {
                                 src={link.badge.url}
                                 alt={link.platform}
                                 width={180} height={54}
-                                className="h-[54px] w-auto"
+                                className="h-12 sm:h-14 w-auto"
                               />
                               {link.generateQRCode && (
                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100] pointer-events-none">
@@ -305,7 +305,7 @@ export default async function AppDetailPage({ params }: Props) {
                   Get and install the {app.name} and start screencasting from iPhone, iPad or Android phone to TV now
                 </p>
 
-                <div className="flex flex-wrap justify-center gap-6 mb-20">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                   {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
                       <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
@@ -313,7 +313,7 @@ export default async function AppDetailPage({ params }: Props) {
                           src={link.badge.url}
                           alt={link.platform}
                           width={220} height={66}
-                          className="h-[66px] w-auto"
+                          className="h-12 sm:h-14 w-auto"
                         />
                       </a>
                     ))

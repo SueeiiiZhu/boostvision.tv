@@ -126,7 +126,7 @@ export default async function FAQDetailPage({ params }: Props) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="bg-white pb-6">
+      <main className="bg-white pb-6 poppins-headings">
       {/* 优先使用动态 sections */}
       {faq.sections && faq.sections.length > 0 ? (
         <FAQSectionRenderer sections={faq.sections} app={app!} faq={faq} />

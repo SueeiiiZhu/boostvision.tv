@@ -72,7 +72,7 @@ export default async function TutorialDetailPage({ params }: Props) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="bg-white pb-6">
+      <main className="bg-white pb-6 poppins-headings">
       {/* 优先使用动态 sections */}
       {tutorial.sections && tutorial.sections.length > 0 ? (
         <TutorialSectionRenderer sections={tutorial.sections} app={app!} tutorial={tutorial} />
@@ -89,14 +89,14 @@ export default async function TutorialDetailPage({ params }: Props) {
               </p>
               
               {/* Download Buttons */}
-              <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 sm:gap-6">
                 {app?.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
                   <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
                     <Image
                       src={link.badge.url}
                       alt={link.platform}
                       width={180} height={54}
-                      className="h-[54px] w-auto"
+                      className="h-12 sm:h-14 w-auto"
                     />
                   </a>
                 ))}
