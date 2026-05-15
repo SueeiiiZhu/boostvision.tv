@@ -274,27 +274,8 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
         <Image src="/icons/stars.svg" alt="stars" width={140} height={28} />
       </div>
       <h2 className="mb-3 text-[24px] md:text-[40px] font-bold text-heading">{data.title}</h2>
-      <p className="text-primary font-black text-[18px] md:text-[22px] mb-10 md:mb-20">Excellent Rate：{data.rating}</p>
-
-      <div className="md:hidden -mx-2 px-2">
-        <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {data.reviews.map((review, i) => (
-            <div key={i} className="snap-start shrink-0 w-[88%]">
-              <div className="flex h-full flex-col items-center bg-section-bg-cta p-7 rounded-[20px] border border-[#dfe8ff] md:card-shadow text-center">
-                <p className="flex-1 text-[16px] text-muted/80 font-medium italic mb-8 leading-[1.75]">
-                  &quot;{review.text}&quot;
-                </p>
-                <p className="mt-auto inline-flex items-center gap-2 text-[19px] font-black text-heading">
-                  <Image src="/icons/user-icon.svg" alt="" width={19} height={19} className="h-[19px] w-[19px]" />
-                  <span>{review.name}</span>
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="hidden md:grid grid-cols-3 gap-10">
+      <p className="text-primary font-black text-[22px] mb-20">Excellent Rate：{data.rating}</p>
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
         {data.reviews.map((review, i) => (
           <div key={i} className="flex h-full flex-col items-center bg-section-bg-cta p-12 rounded-[30px] border border-[#dfe8ff] card-shadow text-center">
             <p className="flex-1 text-[17px] text-muted/80 font-medium italic mb-10 leading-[1.8]">
