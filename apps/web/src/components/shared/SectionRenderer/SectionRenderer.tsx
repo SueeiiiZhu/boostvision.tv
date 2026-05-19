@@ -295,7 +295,7 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
 );
 
 async function AppsGrid({ data }: { data: AppsGridSection }) {
-  const res = await getApps({ type: data.type, limit: data.limit });
+  const res = await getApps({ type: data.type, isFeatured: true, limit: data.limit });
   const apps = res.data || [];
 
   return (

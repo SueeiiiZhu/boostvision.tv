@@ -34,7 +34,7 @@ export default async function AppsPage({ params }: Props) {
   const { locale } = await params;
   // 并行获取 App 列表和页面配置数据
   const [appsResponse, pageData] = await Promise.all([
-    getApps({ limit: 100 }).catch(() => null),
+    getApps({ limit: 100, locale }).catch(() => null),
     getPageBySlug("app", locale).catch(() => null)
   ]);
 

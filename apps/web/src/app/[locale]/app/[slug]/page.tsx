@@ -50,7 +50,7 @@ function formatDownloadCountText(value: string | null | undefined): string {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const [app, globalSetting] = await Promise.all([
-    getAppBySlug(slug),
+    getAppBySlug(slug, locale),
     getGlobalSetting(locale),
   ]);
 
@@ -68,10 +68,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AppDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const [app, globalSetting] = await Promise.all([
-    getAppBySlug(slug),
-    getGlobalSetting()
+    getAppBySlug(slug, locale),
+    getGlobalSetting(locale)
   ]);
 
   if (!app) {

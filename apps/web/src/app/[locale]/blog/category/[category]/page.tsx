@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, locale } = await params;
 
   // Fetch category info
-  const categoriesResponse = await getBlogCategories();
+  const categoriesResponse = await getBlogCategories(locale);
   const categories = categoriesResponse?.data || [];
   const currentCategory = categories.find((cat) => cat.slug === category);
 
@@ -53,8 +53,9 @@ export default async function BlogCategoryPage({ params }: Props) {
       limit: 12,
       page: 1,
       categorySlug: category,
+      locale,
     }),
-    getBlogCategories(),
+    getBlogCategories(locale),
     getPageBySlug("blog", locale).catch(() => null),
   ]).catch(() => [null, null, null]);
 

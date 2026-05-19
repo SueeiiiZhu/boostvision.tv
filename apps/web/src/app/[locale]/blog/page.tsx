@@ -30,8 +30,9 @@ export default async function BlogPage({ params }: Props) {
     getBlogPosts({
       limit: 12,
       page: 1,
+      locale,
     }),
-    getBlogCategories(),
+    getBlogCategories(locale),
     getPageBySlug("blog", locale).catch(() => null),
   ]).catch(() => [null, null, null]);
 

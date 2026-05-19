@@ -72,7 +72,8 @@ export default async function FAQPage({ params, searchParams }: Props) {
   const [faqsResponse, pageData] = await Promise.all([
     getFAQsForList({
       appType: type as 'screen-mirroring' | 'tv-remote',
-      limit: 100
+      limit: 100,
+      locale,
     }).catch(() => null),
     getPageBySlug("faq", locale).catch(() => null)
   ]);

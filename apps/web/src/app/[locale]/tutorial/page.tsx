@@ -34,7 +34,8 @@ export default async function TutorialPage({ params, searchParams }: Props) {
   const [tutorialsResponse, pageData] = await Promise.all([
     getTutorialsForList({
       appType: type as 'screen-mirroring' | 'tv-remote',
-      limit: 100
+      limit: 100,
+      locale,
     }).catch(() => null),
     getPageBySlug("tutorial", locale).catch(() => null)
   ]);

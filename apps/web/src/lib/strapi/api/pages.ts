@@ -84,8 +84,9 @@ export async function getPageBySlug(slug: string, locale: string = "en") {
   return normalizePage(response.data?.[0] || null);
 }
 
-export async function getLegalPageBySlug(slug: "terms-of-use" | "privacy-policy") {
+export async function getLegalPageBySlug(slug: "terms-of-use" | "privacy-policy", locale: string = "en") {
   const query = buildStrapiQuery({
+    locale,
     fields: ["title", "slug", "content"],
     populate: {
       seo: true,
@@ -107,6 +108,35 @@ export async function getLegalPageBySlug(slug: "terms-of-use" | "privacy-policy"
     tags: [CACHE_TAGS.pages, pageTag(slug)],
     revalidate: getLegalRevalidate(),
   });
+
+  if (response.data?.length === 0 && locale !== "en") {
+    const fallbackQuery = buildStrapiQuery({
+      locale: "en",
+      fields: ["title", "slug", "content"],
+      populate: {
+        seo: true,
+        sections: {
+          on: {
+            "sections.cta": true,
+            "sections.hero": {
+              populate: ["backgroundImage", "image"]
+            }
+          }
+        }
+      },
+      filters: {
+        slug: { $eq: slug },
+      },
+    });
+
+    const fallbackResponse = await fetchStrapi<Page[]>(`/pages${fallbackQuery}`, {
+      tags: [CACHE_TAGS.pages, pageTag(slug)],
+      revalidate: getLegalRevalidate(),
+      silent: true,
+    });
+
+    return normalizePage(fallbackResponse.data?.[0] || null);
+  }
 
   return normalizePage(response.data?.[0] || null);
 }

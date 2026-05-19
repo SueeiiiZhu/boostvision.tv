@@ -58,8 +58,9 @@ export default async function BlogPagePaginated({ params }: Props) {
     getBlogPosts({
       limit: 12,
       page: pageNumber,
+      locale,
     }),
-    getBlogCategories(),
+    getBlogCategories(locale),
     getPageBySlug("blog", locale).catch(() => null),
   ]).catch(() => [null, null, null]);
 
