@@ -4,54 +4,57 @@ import { Page } from "../../../types/strapi";
 import { getLegalRevalidate } from "../revalidate";
 import { normalizePage } from "../normalize";
 
-export async function getPageBySlug(slug: string) {
-  const query = buildStrapiQuery({
-    populate: {
-      seo: true,
-      sections: {
-        on: {
-          'sections.hero': {
-            populate: {
-              image: true,
-              backgroundImage: true,
-              statistics: true
-            }
+const PAGE_POPULATE = {
+  seo: true,
+  sections: {
+    on: {
+      "sections.hero": {
+        populate: {
+          image: true,
+          backgroundImage: true,
+          statistics: true,
+        },
+      },
+      "sections.why-choose": {
+        populate: {
+          features: {
+            populate: ["icon"],
           },
-          'sections.why-choose': {
-            populate: {
-              features: {
-                populate: ['icon']
-              }
-            }
+        },
+      },
+      "sections.feature-highlight": {
+        populate: ["image"],
+      },
+      "sections.statistics": {
+        populate: {
+          stats: true,
+        },
+      },
+      "sections.reviews": {
+        populate: {
+          reviews: true,
+        },
+      },
+      "sections.cta": true,
+      "sections.apps-grid": true,
+      "sections.brands-grid": {
+        populate: {
+          brands: {
+            populate: ["icon"],
           },
-          'sections.feature-highlight': {
-            populate: ['image']
-          },
-          'sections.statistics': {
-            populate: {
-              stats: true
-            }
-          },
-          'sections.reviews': {
-            populate: {
-              reviews: true
-            }
-          },
-          'sections.cta': true,
-          'sections.apps-grid': true,
-          'sections.brands-grid': {
-            populate: {
-              brands: {
-                populate: ['icon']
-              }
-            }
-          },
-          'sections.apps-filter': {
-            populate: ['screenMirroringIcon', 'tvRemoteIcon']
-          }
-        }
-      }
+        },
+      },
+      "sections.apps-filter": {
+        populate: ["screenMirroringIcon", "tvRemoteIcon"],
+      },
     },
+  },
+};
+
+export async function getPageBySlug(slug: string, locale: string = "en") {
+  const query = buildStrapiQuery({
+    locale,
+    populate: PAGE_POPULATE,
     filters: {
       slug: { $eq: slug },
     },
@@ -60,6 +63,24 @@ export async function getPageBySlug(slug: string) {
   const response = await fetchStrapi<Page[]>(`/pages${query}`, {
     tags: [CACHE_TAGS.pages, pageTag(slug)],
   });
+
+  if (response.data?.length === 0 && locale !== "en") {
+    const fallbackQuery = buildStrapiQuery({
+      locale: "en",
+      populate: PAGE_POPULATE,
+      filters: {
+        slug: { $eq: slug },
+      },
+    });
+
+    const fallbackResponse = await fetchStrapi<Page[]>(`/pages${fallbackQuery}`, {
+      tags: [CACHE_TAGS.pages, pageTag(slug)],
+      silent: true,
+    });
+
+    return normalizePage(fallbackResponse.data?.[0] || null);
+  }
+
   return normalizePage(response.data?.[0] || null);
 }
 

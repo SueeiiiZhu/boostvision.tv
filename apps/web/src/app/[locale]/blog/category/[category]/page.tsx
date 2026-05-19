@@ -46,7 +46,7 @@ export async function generateStaticParams() {
 }
 
 export default async function BlogCategoryPage({ params }: Props) {
-  const { category } = await params;
+  const { category, locale } = await params;
 
   const [postsResponse, categoriesResponse, pageData] = await Promise.all([
     getBlogPosts({
@@ -55,7 +55,7 @@ export default async function BlogCategoryPage({ params }: Props) {
       categorySlug: category,
     }),
     getBlogCategories(),
-    getPageBySlug("blog").catch(() => null),
+    getPageBySlug("blog", locale).catch(() => null),
   ]).catch(() => [null, null, null]);
 
   const posts = postsResponse?.data || [];

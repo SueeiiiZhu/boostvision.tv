@@ -100,9 +100,11 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </Link>
-                <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
-                  Best choice for 20 million+ users
-                </p>
+                {data.ctaSubtext ? (
+                  <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
+                    {data.ctaSubtext}
+                  </p>
+                ) : null}
               </div>
             </div>
           )}

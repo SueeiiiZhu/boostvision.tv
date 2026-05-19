@@ -54,7 +54,7 @@ function normalizeFaqAnswer(answer: string | BlocksContent): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const pageData = await getPageBySlug("faq").catch(() => null);
+  const pageData = await getPageBySlug("faq", locale).catch(() => null);
 
   return genMetadata({
     seo: pageData?.seo,
@@ -65,7 +65,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function FAQPage({ searchParams }: Props) {
+export default async function FAQPage({ params, searchParams }: Props) {
+  const { locale } = await params;
   const { type = "screen-mirroring" } = await searchParams;
 
   const [faqsResponse, pageData] = await Promise.all([
@@ -73,7 +74,7 @@ export default async function FAQPage({ searchParams }: Props) {
       appType: type as 'screen-mirroring' | 'tv-remote',
       limit: 100
     }).catch(() => null),
-    getPageBySlug("faq").catch(() => null)
+    getPageBySlug("faq", locale).catch(() => null)
   ]);
 
   const faqs = faqsResponse?.data || [];

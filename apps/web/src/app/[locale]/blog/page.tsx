@@ -13,7 +13,7 @@ export const revalidate = 600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const pageData = await getPageBySlug("blog").catch(() => null);
+  const pageData = await getPageBySlug("blog", locale).catch(() => null);
 
   return genMetadata({
     seo: pageData?.seo,
@@ -24,14 +24,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function BlogPage() {
+export default async function BlogPage({ params }: Props) {
+  const { locale } = await params;
   const [postsResponse, categoriesResponse, pageData] = await Promise.all([
     getBlogPosts({
       limit: 12,
       page: 1,
     }),
     getBlogCategories(),
-    getPageBySlug("blog").catch(() => null),
+    getPageBySlug("blog", locale).catch(() => null),
   ]).catch(() => [null, null, null]);
 
   const posts = postsResponse?.data || [];

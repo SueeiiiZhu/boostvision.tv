@@ -67,7 +67,7 @@ export async function generateStaticParams() {
 }
 
 export default async function BlogCategoryPagePaginated({ params }: Props) {
-  const { category, page } = await params;
+  const { category, locale, page } = await params;
   const pageNumber = parseInt(page, 10);
 
   // Validate page number
@@ -82,7 +82,7 @@ export default async function BlogCategoryPagePaginated({ params }: Props) {
       categorySlug: category,
     }),
     getBlogCategories(),
-    getPageBySlug("blog").catch(() => null),
+    getPageBySlug("blog", locale).catch(() => null),
   ]).catch(() => [null, null, null]);
 
   const posts = postsResponse?.data || [];

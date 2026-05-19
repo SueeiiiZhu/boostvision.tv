@@ -16,7 +16,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const [pageData, globalSetting] = await Promise.all([
-    getPageBySlug("app").catch(() => null),
+    getPageBySlug("app", locale).catch(() => null),
     getGlobalSetting(locale).catch(() => null),
   ]);
   
@@ -30,11 +30,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function AppsPage() {
+export default async function AppsPage({ params }: Props) {
+  const { locale } = await params;
   // 并行获取 App 列表和页面配置数据
   const [appsResponse, pageData] = await Promise.all([
     getApps({ limit: 100 }).catch(() => null),
-    getPageBySlug("app").catch(() => null)
+    getPageBySlug("app", locale).catch(() => null)
   ]);
 
   const apps = appsResponse?.data || [];
