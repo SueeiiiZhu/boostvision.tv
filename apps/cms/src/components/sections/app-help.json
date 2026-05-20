@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_sections_app_helps",
+  "info": {
+    "displayName": "App Help",
+    "icon": "question",
+    "description": "Tutorial and FAQ content for app detail pages"
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "tutorialTitle": {
+      "type": "string"
+    },
+    "blogs": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::blog-post.blog-post"
+    },
+    "faqTitle": {
+      "type": "string"
+    },
+    "faqItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.faq-accordion-item"
+    }
+  }
+}

@@ -84,12 +84,33 @@ export async function getAppBySlug(slug: string, locale: string = "en") {
               populate: ["icon"]
             }
           }
+        },
+        "sections.app-help": {
+          populate: {
+            blogs: {
+              fields: ["title", "slug"]
+            },
+            faqItems: true
+          }
+        },
+        "sections.app-compatibility": {
+          populate: {
+            brandItems: {
+              populate: ["brandLogo"]
+            }
+          }
         }
       }
     },
     seo: {
       populate: ["metaImage"]
-    }
+    },
+    tutorials: {
+      fields: ["title", "slug", "order"],
+    },
+    faqs: {
+      fields: ["question", "slug", "order"],
+    },
   };
 
   // Step 1: resolve by non-localized slug

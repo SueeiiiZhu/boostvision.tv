@@ -549,6 +549,8 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
         'sections.cta',
         'sections.apps-grid',
         'sections.brands-grid',
+        'sections.app-help',
+        'sections.app-compatibility',
       ]
     > &
       Schema.Attribute.SetPluginOptions<{
@@ -1072,6 +1074,10 @@ export interface ApiTutorialTutorial extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
+    relatedBlogs: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::blog-post.blog-post'
+    >;
     sections: Schema.Attribute.DynamicZone<
       ['sections.hero', 'sections.tutorial-accordion', 'sections.cta']
     >;

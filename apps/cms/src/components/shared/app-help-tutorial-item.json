@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_shared_app_help_tutorial_items",
+  "info": {
+    "displayName": "App Help Tutorial Item",
+    "icon": "apps",
+    "description": "Blog links for app help tutorial sections"
+  },
+  "attributes": {
+    "blogs": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::blog-post.blog-post"
+    }
+  }
+}

@@ -80,6 +80,14 @@ export default async function AppDetailPage({ params }: Props) {
 
   const normalizedRating = parseRating(app.rating);
   const normalizedRatingCount = parseRatingCount(app.ratingCount);
+  const relatedTutorials = (app.tutorials ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+    .slice(0, 4);
+  const relatedFaqs = (app.faqs ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+    .slice(0, 4);
 
   // Generate SoftwareApplication schema
   const schema = generateSoftwareApplicationSchema({
@@ -290,6 +298,51 @@ export default async function AppDetailPage({ params }: Props) {
                         <Image src={shot.url} alt={`${app.name} screenshot ${i + 1}`} fill className="object-cover" />
                       </div>
                     ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {(relatedTutorials.length > 0 || relatedFaqs.length > 0) && (
+              <section className="py-24 bg-white">
+                <div className="container-custom">
+                  <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                    More Help for {app.name}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    {relatedTutorials.length > 0 && (
+                      <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related Tutorials</h3>
+                        <div className="space-y-3">
+                          {relatedTutorials.map((tutorial) => (
+                            <Link
+                              key={tutorial.id}
+                              href={`/tutorial/${tutorial.slug}`}
+                              className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                            >
+                              {tutorial.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {relatedFaqs.length > 0 && (
+                      <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related FAQs</h3>
+                        <div className="space-y-3">
+                          {relatedFaqs.map((faq) => (
+                            <Link
+                              key={faq.id}
+                              href={`/faq/${faq.slug}`}
+                              className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                            >
+                              {faq.question}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </section>

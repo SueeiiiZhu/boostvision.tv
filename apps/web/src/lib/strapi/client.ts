@@ -2,6 +2,7 @@ const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 const DEFAULT_REVALIDATE_SECONDS = Number(process.env.STRAPI_REVALIDATE_SECONDS || 600);
 const STRAPI_BASE_URL = STRAPI_URL.replace(/\/$/, "");
+const IS_DEVELOPMENT = process.env.NODE_ENV !== "production";
 const USE_AUTH_HEADER = STRAPI_TOKEN
   && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(STRAPI_BASE_URL);
 
@@ -43,7 +44,7 @@ export async function fetchStrapi<T>(
     revalidate = DEFAULT_REVALIDATE_SECONDS,
     tags = [],
     silent = false,
-    cache = "force-cache",
+    cache = IS_DEVELOPMENT ? "no-store" : "force-cache",
     ...fetchOptions
   } = options || {};
 
@@ -67,10 +68,14 @@ export async function fetchStrapi<T>(
       ...fetchOptions,
       headers,
       cache,
-      next: {
-        revalidate,
-        ...(tags.length ? { tags } : {}),
-      },
+      ...(IS_DEVELOPMENT
+        ? {}
+        : {
+            next: {
+              revalidate,
+              ...(tags.length ? { tags } : {}),
+            },
+          }),
     });
 
     // console.log(`[Strapi] ${endpoint} - Status: ${res.status}`);

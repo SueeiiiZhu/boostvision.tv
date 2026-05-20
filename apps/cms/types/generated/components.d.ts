@@ -1,5 +1,38 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface SectionsAppCompatibility extends Struct.ComponentSchema {
+  collectionName: 'components_sections_app_compatibilities';
+  info: {
+    description: 'Interactive app compatibility brands section for app detail pages';
+    displayName: 'App Compatibility';
+    icon: 'bulletList';
+  };
+  attributes: {
+    brandItems: Schema.Attribute.Component<
+      'shared.app-compatibility-brand-item',
+      true
+    >;
+    description: Schema.Attribute.Text;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface SectionsAppHelp extends Struct.ComponentSchema {
+  collectionName: 'components_sections_app_helps';
+  info: {
+    description: 'Tutorial and FAQ content for app detail pages';
+    displayName: 'App Help';
+    icon: 'question';
+  };
+  attributes: {
+    blogs: Schema.Attribute.Relation<'manyToMany', 'api::blog-post.blog-post'>;
+    faqItems: Schema.Attribute.Component<'shared.faq-accordion-item', true>;
+    faqTitle: Schema.Attribute.String;
+    title: Schema.Attribute.String;
+    tutorialTitle: Schema.Attribute.String;
+  };
+}
+
 export interface SectionsAppsFilter extends Struct.ComponentSchema {
   collectionName: 'components_sections_apps_filters';
   info: {
@@ -163,6 +196,33 @@ export interface SharedAppBadge extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedAppCompatibilityBrandItem
+  extends Struct.ComponentSchema {
+  collectionName: 'components_shared_app_compatibility_brand_items';
+  info: {
+    description: 'Brand compatibility details with logo, device list, and markdown description';
+    displayName: 'App Compatibility Brand Item';
+    icon: 'bulletList';
+  };
+  attributes: {
+    brandLogo: Schema.Attribute.Media<'images'>;
+    description: Schema.Attribute.RichText;
+    deviceList: Schema.Attribute.Text;
+  };
+}
+
+export interface SharedAppHelpTutorialItem extends Struct.ComponentSchema {
+  collectionName: 'components_shared_app_help_tutorial_items';
+  info: {
+    description: 'Blog links for app help tutorial sections';
+    displayName: 'App Help Tutorial Item';
+    icon: 'apps';
+  };
+  attributes: {
+    blogs: Schema.Attribute.Relation<'manyToMany', 'api::blog-post.blog-post'>;
+  };
+}
+
 export interface SharedDownloadLink extends Struct.ComponentSchema {
   collectionName: 'components_shared_download_links';
   info: {
@@ -180,6 +240,19 @@ export interface SharedDownloadLink extends Struct.ComponentSchema {
     > &
       Schema.Attribute.Required;
     url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedFaqAccordionItem extends Struct.ComponentSchema {
+  collectionName: 'components_shared_faq_accordion_items';
+  info: {
+    description: 'One accordion item for app FAQ sections without download buttons';
+    displayName: 'FAQ Accordion Item';
+    icon: 'list';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -326,6 +399,8 @@ export interface SharedTutorialStep extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'sections.app-compatibility': SectionsAppCompatibility;
+      'sections.app-help': SectionsAppHelp;
       'sections.apps-filter': SectionsAppsFilter;
       'sections.apps-grid': SectionsAppsGrid;
       'sections.brands-grid': SectionsBrandsGrid;
@@ -337,7 +412,10 @@ declare module '@strapi/strapi' {
       'sections.tutorial-accordion': SectionsTutorialAccordion;
       'sections.why-choose': SectionsWhyChoose;
       'shared.app-badge': SharedAppBadge;
+      'shared.app-compatibility-brand-item': SharedAppCompatibilityBrandItem;
+      'shared.app-help-tutorial-item': SharedAppHelpTutorialItem;
       'shared.download-link': SharedDownloadLink;
+      'shared.faq-accordion-item': SharedFaqAccordionItem;
       'shared.feature': SharedFeature;
       'shared.header-item': SharedHeaderItem;
       'shared.link': SharedLink;
