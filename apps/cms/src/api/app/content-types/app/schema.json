@@ -30,7 +30,9 @@
         "sections.reviews",
         "sections.cta",
         "sections.apps-grid",
-        "sections.brands-grid"
+        "sections.brands-grid",
+        "sections.app-help",
+        "sections.app-compatibility"
       ]
     },
     "downloadLinks": {
