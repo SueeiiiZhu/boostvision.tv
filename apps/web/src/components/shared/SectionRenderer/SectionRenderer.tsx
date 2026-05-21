@@ -100,9 +100,11 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </Link>
-                <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
-                  Best choice for 20 million+ users
-                </p>
+                {data.ctaSubtext ? (
+                  <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
+                    {data.ctaSubtext}
+                  </p>
+                ) : null}
               </div>
             </div>
           )}
@@ -213,9 +215,11 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
 const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
   <section className="pt-12 pb-20 md:pt-16 md:pb-32 bg-gradient-to-b from-white to-section-bg-2 text-center">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
-      <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
-        CORE FEATURES
-      </span>
+      {data.badge && (
+        <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
+          {data.badge}
+        </span>
+      )}
       <h2 className="text-[24px] md:text-[40px] font-black text-heading mb-8 md:mb-14">{data.title}</h2>
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 md:gap-x-12 md:gap-y-20 lg:grid-cols-4">
         {data.features.map((feature, i) => (
@@ -275,7 +279,24 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
       </div>
       <h2 className="mb-3 text-[24px] md:text-[40px] font-bold text-heading">{data.title}</h2>
       <p className="text-primary font-black text-[22px] mb-20">Excellent Rate：{data.rating}</p>
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+      <div className="md:hidden -mx-2 px-2">
+        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {data.reviews.map((review, i) => (
+            <div key={i} className="w-[88%] shrink-0 snap-center">
+              <div className="flex h-full min-h-[320px] flex-col items-center rounded-[30px] border border-[#dfe8ff] bg-section-bg-cta p-8 text-center card-shadow">
+                <p className="mb-8 flex-1 text-[16px] font-medium italic leading-[1.8] text-muted/80">
+                  &quot;{review.text}&quot;
+                </p>
+                <p className="mt-auto inline-flex items-center gap-2 text-[18px] font-black text-heading">
+                  <Image src="/icons/user-icon.svg" alt="" width={19} height={19} className="h-[19px] w-[19px]" />
+                  <span>{review.name}</span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="hidden grid-cols-1 gap-10 md:grid md:grid-cols-3">
         {data.reviews.map((review, i) => (
           <div key={i} className="flex h-full flex-col items-center bg-section-bg-cta p-12 rounded-[30px] border border-[#dfe8ff] card-shadow text-center">
             <p className="flex-1 text-[17px] text-muted/80 font-medium italic mb-10 leading-[1.8]">
@@ -293,7 +314,7 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
 );
 
 async function AppsGrid({ data }: { data: AppsGridSection }) {
-  const res = await getApps({ type: data.type, limit: data.limit });
+  const res = await getApps({ type: data.type, isFeatured: true, limit: data.limit });
   const apps = res.data || [];
 
   return (

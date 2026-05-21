@@ -12,7 +12,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const [page, globalSetting] = await Promise.all([
-    getPageBySlug("contact-us").catch(() => null),
+    getPageBySlug("contact-us", locale).catch(() => null),
     getGlobalSetting(locale).catch(() => null),
   ]);
 
@@ -27,8 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function ContactUsPage() {
-  const page = await getPageBySlug("contact-us");
+export default async function ContactUsPage({ params }: Props) {
+  const { locale } = await params;
+  const page = await getPageBySlug("contact-us", locale);
 
   return (
     <main className="bg-white pb-24">

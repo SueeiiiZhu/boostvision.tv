@@ -16,7 +16,7 @@ export const revalidate = 21600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const pageData = await getPageBySlug("tutorial").catch(() => null);
+  const pageData = await getPageBySlug("tutorial", locale).catch(() => null);
 
   return genMetadata({
     seo: pageData?.seo,
@@ -27,15 +27,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function TutorialPage({ searchParams }: Props) {
+export default async function TutorialPage({ params, searchParams }: Props) {
+  const { locale } = await params;
   const { type = "screen-mirroring" } = await searchParams;
 
   const [tutorialsResponse, pageData] = await Promise.all([
     getTutorialsForList({
       appType: type as 'screen-mirroring' | 'tv-remote',
-      limit: 100
+      limit: 100,
+      locale,
     }).catch(() => null),
-    getPageBySlug("tutorial").catch(() => null)
+    getPageBySlug("tutorial", locale).catch(() => null)
   ]);
 
   const tutorials = tutorialsResponse?.data || [];

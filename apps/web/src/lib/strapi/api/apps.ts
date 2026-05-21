@@ -7,8 +7,10 @@ export async function getApps(params: {
   type?: 'screen-mirroring' | 'tv-remote';
   isFeatured?: boolean;
   limit?: number;
+  locale?: string;
 } = {}) {
   const query = buildStrapiQuery({
+    ...(params.locale && { locale: params.locale }),
     populate: {
       icon: true,
       features: true,
@@ -36,60 +38,84 @@ export async function getApps(params: {
   };
 }
 
-export async function getAppBySlug(slug: string) {
-  const query = buildStrapiQuery({
-    populate: {
-      icon: true,
-      screenshots: true,
-      heroImage: true,
-      downloadLinks: {
-        populate: ['badge']
-      },
-      features: {
-        populate: ['icon']
-      },
-      sections: {
-        on: {
-          'sections.hero': {
-            populate: ['backgroundImage', 'image', 'statistics']
-          },
-          'sections.why-choose': {
-            populate: {
-              features: {
-                populate: ['icon']
-              }
+export async function getAppBySlug(slug: string, locale: string = "en") {
+  const populate = {
+    icon: true,
+    screenshots: true,
+    heroImage: true,
+    downloadLinks: {
+      populate: ["badge"]
+    },
+    features: {
+      populate: ["icon"]
+    },
+    sections: {
+      on: {
+        "sections.hero": {
+          populate: ["backgroundImage", "image", "statistics"]
+        },
+        "sections.why-choose": {
+          populate: {
+            features: {
+              populate: ["icon"]
             }
-          },
-          'sections.feature-highlight': {
-            populate: ['image']
-          },
-          'sections.statistics': {
-            populate: {
-              stats: true
+          }
+        },
+        "sections.feature-highlight": {
+          populate: ["image"]
+        },
+        "sections.statistics": {
+          populate: {
+            stats: true
+          }
+        },
+        "sections.reviews": {
+          populate: {
+            reviews: true
+          }
+        },
+        "sections.cta": {
+          populate: ["links"]
+        },
+        "sections.apps-grid": true,
+        "sections.brands-grid": {
+          populate: {
+            brands: {
+              populate: ["icon"]
             }
-          },
-          'sections.reviews': {
-            populate: {
-              reviews: true
-            }
-          },
-          'sections.cta': {
-            populate: ['links']
-          },
-          'sections.apps-grid': true,
-          'sections.brands-grid': {
-            populate: {
-              brands: {
-                populate: ['icon']
-              }
+          }
+        },
+        "sections.app-help": {
+          populate: {
+            blogs: {
+              fields: ["title", "slug"]
+            },
+            faqItems: true
+          }
+        },
+        "sections.app-compatibility": {
+          populate: {
+            brandItems: {
+              populate: ["brandLogo"]
             }
           }
         }
-      },
-      seo: {
-        populate: ['metaImage']
       }
     },
+    seo: {
+      populate: ["metaImage"]
+    },
+    tutorials: {
+      fields: ["title", "slug", "order"],
+    },
+    faqs: {
+      fields: ["question", "slug", "order"],
+    },
+  };
+
+  // Step 1: resolve by non-localized slug
+  const query = buildStrapiQuery({
+    populate,
     filters: {
       slug: { $eq: slug },
     },
@@ -98,7 +124,26 @@ export async function getAppBySlug(slug: string) {
   const response = await fetchStrapi<App[]>(`/apps${query}`, {
     tags: [CACHE_TAGS.apps, appTag(slug)],
   });
-  return normalizeApp(response.data?.[0] || null);
+  const defaultApp = response.data?.[0];
+  if (!defaultApp) return null;
+
+  // Step 2: if locale is not default, fetch localized record by documentId
+  if (locale !== "en") {
+    const localizedQuery = buildStrapiQuery({ locale, populate });
+    try {
+      const localizedResponse = await fetchStrapi<App>(
+        `/apps/${defaultApp.documentId}${localizedQuery}`,
+        {
+          tags: [CACHE_TAGS.apps, appTag(slug)],
+        }
+      );
+      if (localizedResponse.data) return normalizeApp(localizedResponse.data);
+    } catch {
+      // Localized app not available; fall back to default locale content
+    }
+  }
+
+  return normalizeApp(defaultApp);
 }
 
 export async function getAppSlugs() {

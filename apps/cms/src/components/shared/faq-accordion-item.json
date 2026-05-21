@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_faq_accordion_items",
+  "info": {
+    "displayName": "FAQ Accordion Item",
+    "icon": "list",
+    "description": "One accordion item for app FAQ sections without download buttons"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "content": {
+      "type": "blocks"
+    }
+  }
+}

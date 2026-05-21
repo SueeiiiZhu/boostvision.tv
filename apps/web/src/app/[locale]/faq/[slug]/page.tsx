@@ -29,7 +29,7 @@ export const revalidate = 7200;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const faq = await getFAQSeoBySlug(slug);
+  const faq = await getFAQSeoBySlug(slug, locale);
 
   if (!faq) return { title: "FAQ Not Found" };
 
@@ -61,9 +61,9 @@ function isTextChild(child: unknown): child is { type: string; text: string } {
 }
 
 export default async function FAQDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
 
-  const faq = await getFAQPageBySlug(slug);
+  const faq = await getFAQPageBySlug(slug, locale);
 
   if (!faq) {
     notFound();

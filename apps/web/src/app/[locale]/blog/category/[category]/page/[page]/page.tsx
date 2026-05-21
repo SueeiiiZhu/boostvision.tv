@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const pageNumber = parseInt(page, 10);
 
   // Fetch category info
-  const categoriesResponse = await getBlogCategories();
+  const categoriesResponse = await getBlogCategories(locale);
   const categories = categoriesResponse?.data || [];
   const currentCategory = categories.find((cat) => cat.slug === category);
 
@@ -67,7 +67,7 @@ export async function generateStaticParams() {
 }
 
 export default async function BlogCategoryPagePaginated({ params }: Props) {
-  const { category, page } = await params;
+  const { category, locale, page } = await params;
   const pageNumber = parseInt(page, 10);
 
   // Validate page number
@@ -80,9 +80,10 @@ export default async function BlogCategoryPagePaginated({ params }: Props) {
       limit: 12,
       page: pageNumber,
       categorySlug: category,
+      locale,
     }),
-    getBlogCategories(),
-    getPageBySlug("blog").catch(() => null),
+    getBlogCategories(locale),
+    getPageBySlug("blog", locale).catch(() => null),
   ]).catch(() => [null, null, null]);
 
   const posts = postsResponse?.data || [];
