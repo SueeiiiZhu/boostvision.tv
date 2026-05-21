@@ -215,9 +215,11 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
 const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
   <section className="pt-12 pb-20 md:pt-16 md:pb-32 bg-gradient-to-b from-white to-section-bg-2 text-center">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
-      <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
-        CORE FEATURES
-      </span>
+      {data.badge && (
+        <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
+          {data.badge}
+        </span>
+      )}
       <h2 className="text-[24px] md:text-[40px] font-black text-heading mb-8 md:mb-14">{data.title}</h2>
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 md:gap-x-12 md:gap-y-20 lg:grid-cols-4">
         {data.features.map((feature, i) => (
