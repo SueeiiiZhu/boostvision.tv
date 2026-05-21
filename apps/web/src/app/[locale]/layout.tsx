@@ -9,6 +9,7 @@ import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { IntlProvider } from "@/components/providers/IntlProvider";
 import { Header, Footer } from "@/components/layout";
 import { AnalyticsWrapper } from "@/components/analytics";
+import { LinkPolicyEnforcer } from "@/components/shared/LinkPolicyEnforcer";
 import type { GlobalSetting, Navigation } from "@/types/strapi";
 import "../globals.css";
 
@@ -106,6 +107,7 @@ export default async function RootLayout({
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <AnalyticsWrapper />
+        <LinkPolicyEnforcer />
         <IntlProvider locale={locale} messages={messages}>
           <Header navigation={navigation} globalSetting={globalSetting} />
           {children}

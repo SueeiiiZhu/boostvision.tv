@@ -50,7 +50,7 @@ function formatDownloadCountText(value: string | null | undefined): string {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const [app, globalSetting] = await Promise.all([
-    getAppBySlug(slug),
+    getAppBySlug(slug, locale),
     getGlobalSetting(locale),
   ]);
 
@@ -68,10 +68,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AppDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const [app, globalSetting] = await Promise.all([
-    getAppBySlug(slug),
-    getGlobalSetting()
+    getAppBySlug(slug, locale),
+    getGlobalSetting(locale)
   ]);
 
   if (!app) {
@@ -80,6 +80,14 @@ export default async function AppDetailPage({ params }: Props) {
 
   const normalizedRating = parseRating(app.rating);
   const normalizedRatingCount = parseRatingCount(app.ratingCount);
+  const relatedTutorials = (app.tutorials ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+    .slice(0, 4);
+  const relatedFaqs = (app.faqs ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+    .slice(0, 4);
 
   // Generate SoftwareApplication schema
   const schema = generateSoftwareApplicationSchema({
@@ -103,7 +111,7 @@ export default async function AppDetailPage({ params }: Props) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="bg-white">
+      <main className="bg-white poppins-headings">
         {/* 如果有动态配置的 sections，优先使用 */}
         {app.sections && app.sections.length > 0 ? (
           <AppSectionRenderer sections={app.sections} app={app} globalSetting={globalSetting} />
@@ -157,7 +165,7 @@ export default async function AppDetailPage({ params }: Props) {
                     </div>
 
                     {/* Download Buttons */}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-center md:items-start justify-center md:justify-start gap-4 sm:gap-6">
                       {app.downloadLinks && app.downloadLinks.length > 0 ? (
                         app.downloadLinks.map((link) => {
                           const ButtonContent = (
@@ -166,7 +174,7 @@ export default async function AppDetailPage({ params }: Props) {
                                 src={link.badge.url}
                                 alt={link.platform}
                                 width={180} height={54}
-                                className="h-[54px] w-auto"
+                                className="h-12 sm:h-14 w-auto"
                               />
                               {link.generateQRCode && (
                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100] pointer-events-none">
@@ -295,6 +303,51 @@ export default async function AppDetailPage({ params }: Props) {
               </section>
             )}
 
+            {(relatedTutorials.length > 0 || relatedFaqs.length > 0) && (
+              <section className="py-24 bg-white">
+                <div className="container-custom">
+                  <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                    More Help for {app.name}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    {relatedTutorials.length > 0 && (
+                      <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related Tutorials</h3>
+                        <div className="space-y-3">
+                          {relatedTutorials.map((tutorial) => (
+                            <Link
+                              key={tutorial.id}
+                              href={`/tutorial/${tutorial.slug}`}
+                              className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                            >
+                              {tutorial.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {relatedFaqs.length > 0 && (
+                      <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related FAQs</h3>
+                        <div className="space-y-3">
+                          {relatedFaqs.map((faq) => (
+                            <Link
+                              key={faq.id}
+                              href={`/faq/${faq.slug}`}
+                              className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                            >
+                              {faq.question}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Final CTA Section */}
             <section className="py-32 text-center bg-section-bg-3 text-white">
               <div className="container-custom">
@@ -305,7 +358,7 @@ export default async function AppDetailPage({ params }: Props) {
                   Get and install the {app.name} and start screencasting from iPhone, iPad or Android phone to TV now
                 </p>
 
-                <div className="flex flex-wrap justify-center gap-6 mb-20">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                   {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
                       <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
@@ -313,7 +366,7 @@ export default async function AppDetailPage({ params }: Props) {
                           src={link.badge.url}
                           alt={link.platform}
                           width={220} height={66}
-                          className="h-[66px] w-auto"
+                          className="h-12 sm:h-14 w-auto"
                         />
                       </a>
                     ))

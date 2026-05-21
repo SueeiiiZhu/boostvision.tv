@@ -220,14 +220,14 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App; isOpen: boolean; o
                         ) : null}
 
                         {item.showDownloadButtons && (
-                            <div className="mt-16 flex flex-wrap justify-center gap-8 pt-12 border-t border-gray-50">
+                            <div className="mt-16 flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-8 pt-12 border-t border-gray-50">
                                 {app.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
                                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
                                         <Image
                                             src={link.badge.url}
                                             alt={link.platform}
                                             width={200} height={60}
-                                            className="h-[60px] w-auto"
+                                            className="h-12 sm:h-14 w-auto"
                                         />
                                     </a>
                                 ))}

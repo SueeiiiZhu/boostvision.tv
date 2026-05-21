@@ -54,7 +54,7 @@ function normalizeFaqAnswer(answer: string | BlocksContent): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const pageData = await getPageBySlug("faq").catch(() => null);
+  const pageData = await getPageBySlug("faq", locale).catch(() => null);
 
   return genMetadata({
     seo: pageData?.seo,
@@ -65,15 +65,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function FAQPage({ searchParams }: Props) {
+export default async function FAQPage({ params, searchParams }: Props) {
+  const { locale } = await params;
   const { type = "screen-mirroring" } = await searchParams;
 
   const [faqsResponse, pageData] = await Promise.all([
     getFAQsForList({
       appType: type as 'screen-mirroring' | 'tv-remote',
-      limit: 100
+      limit: 100,
+      locale,
     }).catch(() => null),
-    getPageBySlug("faq").catch(() => null)
+    getPageBySlug("faq", locale).catch(() => null)
   ]);
 
   const faqs = faqsResponse?.data || [];
@@ -96,7 +98,7 @@ export default async function FAQPage({ searchParams }: Props) {
   return (
     <>
       {faqJsonLd && <JsonLd data={faqJsonLd} />}
-      <main className="bg-white">
+      <main className="bg-white poppins-headings">
         {/* Banner */}
         <section className="bg-app-hero py-24 text-center">
           <div className="container-custom">

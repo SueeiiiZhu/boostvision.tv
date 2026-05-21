@@ -8,8 +8,10 @@ export async function getTutorialsForList(params: {
   appSlug?: string;
   appType?: 'screen-mirroring' | 'tv-remote';
   limit?: number;
+  locale?: string;
 } = {}) {
   const query = buildStrapiQuery({
+    ...(params.locale && { locale: params.locale }),
     fields: ["title", "slug"],
     populate: {
       app: {
@@ -35,17 +37,19 @@ export async function getTutorialsForList(params: {
   });
 }
 
-export async function getTutorialSeoBySlug(slug: string) {
+export async function getTutorialSeoBySlug(slug: string, locale: string = "en") {
+  const populate = {
+    app: {
+      fields: ["name"]
+    },
+    seo: {
+      populate: ["metaImage"]
+    }
+  };
+
   const query = buildStrapiQuery({
     fields: ["title", "slug"],
-    populate: {
-      app: {
-        fields: ["name"]
-      },
-      seo: {
-        populate: ["metaImage"]
-      }
-    },
+    populate,
     filters: {
       slug: { $eq: slug },
     },
@@ -55,43 +59,63 @@ export async function getTutorialSeoBySlug(slug: string) {
     tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
     revalidate: getTutorialDetailRevalidate(),
   });
+  const defaultTutorial = response.data?.[0];
+  if (!defaultTutorial) return null;
 
-  return normalizeTutorial(response.data?.[0] || null);
+  if (locale !== "en") {
+    const localizedQuery = buildStrapiQuery({ locale, fields: ["title", "slug"], populate });
+    try {
+      const localizedResponse = await fetchStrapi<Tutorial>(
+        `/tutorials/${defaultTutorial.documentId}${localizedQuery}`,
+        {
+          tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
+          revalidate: getTutorialDetailRevalidate(),
+        }
+      );
+      if (localizedResponse.data) return normalizeTutorial(localizedResponse.data);
+    } catch {
+      // Localized tutorial not available; use default locale.
+    }
+  }
+
+  return normalizeTutorial(defaultTutorial);
 }
 
-export async function getTutorialPageBySlug(slug: string) {
+export async function getTutorialPageBySlug(slug: string, locale: string = "en") {
+  const populate = {
+    app: {
+      populate: {
+        icon: true,
+        downloadLinks: {
+          populate: ["badge"]
+        }
+      }
+    },
+    sections: {
+      on: {
+        "sections.hero": {
+          populate: ["backgroundImage", "image"]
+        },
+        "sections.tutorial-accordion": {
+          populate: {
+            items: true // blocks fields like iosContent/androidContent are automatic
+          }
+        },
+        "sections.cta": {
+          populate: ["links"]
+        }
+      }
+    },
+    steps: {
+      populate: ["image"]
+    },
+    seo: {
+      populate: ["metaImage"]
+    }
+  };
+
   const query = buildStrapiQuery({
-    populate: {
-      app: {
-        populate: {
-          icon: true,
-          downloadLinks: {
-            populate: ['badge']
-          }
-        }
-      },
-      sections: {
-        on: {
-          'sections.hero': {
-            populate: ['backgroundImage', 'image']
-          },
-          'sections.tutorial-accordion': {
-            populate: {
-              items: true // blocks fields like iosContent/androidContent are automatic
-            }
-          },
-          'sections.cta': {
-            populate: ['links']
-          }
-        }
-      },
-      steps: {
-        populate: ['image']
-      },
-      seo: {
-        populate: ['metaImage']
-      }
-    },
+    populate,
     filters: {
       slug: { $eq: slug },
     },
@@ -101,11 +125,30 @@ export async function getTutorialPageBySlug(slug: string) {
     tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
     revalidate: getTutorialDetailRevalidate(),
   });
-  return normalizeTutorial(response.data?.[0] || null);
+  const defaultTutorial = response.data?.[0];
+  if (!defaultTutorial) return null;
+
+  if (locale !== "en") {
+    const localizedQuery = buildStrapiQuery({ locale, populate });
+    try {
+      const localizedResponse = await fetchStrapi<Tutorial>(
+        `/tutorials/${defaultTutorial.documentId}${localizedQuery}`,
+        {
+          tags: [CACHE_TAGS.tutorials, tutorialTag(slug)],
+          revalidate: getTutorialDetailRevalidate(),
+        }
+      );
+      if (localizedResponse.data) return normalizeTutorial(localizedResponse.data);
+    } catch {
+      // Localized tutorial not available; use default locale.
+    }
+  }
+
+  return normalizeTutorial(defaultTutorial);
 }
 
-export async function getTutorialBySlug(slug: string) {
-  return getTutorialPageBySlug(slug);
+export async function getTutorialBySlug(slug: string, locale: string = "en") {
+  return getTutorialPageBySlug(slug, locale);
 }
 
 export async function getTutorialSlugs() {

@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_app_compatibility_brand_items",
+  "info": {
+    "displayName": "App Compatibility Brand Item",
+    "icon": "bulletList",
+    "description": "Brand compatibility details with logo, device list, and markdown description"
+  },
+  "attributes": {
+    "brandLogo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "deviceList": {
+      "type": "text"
+    },
+    "description": {
+      "type": "richtext"
+    }
+  }
+}
