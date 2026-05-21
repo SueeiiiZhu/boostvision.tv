@@ -178,6 +178,7 @@ export interface SectionsWhyChoose extends Struct.ComponentSchema {
     icon: 'bulletList';
   };
   attributes: {
+    badge: Schema.Attribute.String;
     features: Schema.Attribute.Component<'shared.feature', true>;
     title: Schema.Attribute.String;
   };
