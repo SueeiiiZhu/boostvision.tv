@@ -259,6 +259,14 @@ export function normalizeSections<T extends Section[] | null | undefined>(sectio
             ...section,
             brands: normalizeFeatures(section.brands) ?? [],
           };
+        case "sections.app-compatibility":
+          return {
+            ...section,
+            brandItems: (section.brandItems ?? []).filter(Boolean).map((item) => ({
+              ...item,
+              brandLogo: normalizeImage(item.brandLogo),
+            })),
+          };
         case "sections.apps-filter":
           return {
             ...section,

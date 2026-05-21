@@ -17,7 +17,7 @@ export const revalidate = 21600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const tutorial = await getTutorialSeoBySlug(slug);
+  const tutorial = await getTutorialSeoBySlug(slug, locale);
 
   if (!tutorial) return { title: "Tutorial Not Found" };
 
@@ -32,9 +32,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TutorialDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   
-  const tutorial = await getTutorialPageBySlug(slug);
+  const tutorial = await getTutorialPageBySlug(slug, locale);
 
   if (!tutorial) {
     notFound();

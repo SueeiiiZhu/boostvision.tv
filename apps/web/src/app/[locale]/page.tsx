@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const [globalSetting, homePage] = await Promise.all([
     getGlobalSetting(locale).catch(() => null),
-    getPageBySlug("home").catch(() => null),
+    getPageBySlug("home", locale).catch(() => null),
   ]);
 
   return genMetadata({
@@ -32,10 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function Home() {
+export default async function Home({ params }: Props) {
+  const { locale } = await params;
   const [globalSetting, homePage] = await Promise.all([
-    getGlobalSetting(),
-    getPageBySlug("home"),
+    getGlobalSetting(locale),
+    getPageBySlug("home", locale),
   ]).catch(() => [null, null]);
 
   // Generate structured data schemas
@@ -74,9 +75,6 @@ export default async function Home() {
                         <Link href="/app" className="btn-gradient">
                           GET IT NOW
                         </Link>
-                        <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
-                          Best choice for 20 million+ users
-                        </p>
                       </div>
                     </div>
 

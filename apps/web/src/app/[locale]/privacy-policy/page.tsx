@@ -71,7 +71,7 @@ function splitContentForInlineAds(content?: LegalContent | null): LegalContent[]
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const page = await getLegalPageBySlug("privacy-policy");
+  const page = await getLegalPageBySlug("privacy-policy", locale);
   const alternates = getLocaleAlternates("/privacy-policy", locale);
 
   return {
@@ -81,8 +81,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PrivacyPolicyPage() {
-  const page = await getLegalPageBySlug("privacy-policy");
+export default async function PrivacyPolicyPage({ params }: Props) {
+  const { locale } = await params;
+  const page = await getLegalPageBySlug("privacy-policy", locale);
   const showInlineAd = hasAdSenseSlot("privacyInline");
   const showAfterTitleAd = hasAdSenseSlot("privacyAfterTitle");
   const content = page?.content as LegalContent | undefined;

@@ -150,10 +150,13 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
 
           {/* Language & CTA */}
           <div className="ml-4 flex items-center gap-4">
-            <div className="relative">
+            <div
+              className="relative h-full flex items-center"
+              onMouseEnter={() => setIsLanguageOpen(true)}
+              onMouseLeave={() => setIsLanguageOpen(false)}
+            >
               <button
                 type="button"
-                onClick={() => setIsLanguageOpen((prev) => !prev)}
                 className="flex items-center gap-1 text-[16px] font-bold text-heading hover:text-primary transition-colors uppercase"
                 aria-label={`Change language, current: ${currentLocale.toUpperCase()}`}
                 aria-haspopup="menu"
@@ -166,7 +169,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               </button>
               <div
                 className={cn(
-                  "absolute right-0 top-full mt-2 w-40 bg-white shadow-lg rounded-xl py-2 border border-gray-100 animate-fade-in",
+                  "absolute right-0 top-[100%] w-40 bg-white shadow-lg rounded-xl py-2 border border-gray-100 animate-fade-in",
                   isLanguageOpen ? "block" : "hidden"
                 )}
               >

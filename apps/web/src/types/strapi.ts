@@ -59,6 +59,23 @@ export interface App {
   googlePlayRatingCount?: number;
   ratingSyncedAt?: string;
   features: Feature[];
+  tutorials?: Array<{
+    id: number;
+    title: string;
+    slug: string;
+    order?: number;
+    relatedBlogs?: Array<{
+      id: number;
+      title: string;
+      slug: string;
+    }>;
+  }>;
+  faqs?: Array<{
+    id: number;
+    question: string;
+    slug: string;
+    order?: number;
+  }>;
   isFeatured: boolean;
   order: number;
   seo?: SEO;
@@ -212,6 +229,41 @@ export interface TutorialAccordionSection {
   items: TutorialItem[];
 }
 
+export interface FAQAccordionItem {
+  id: number;
+  title: string;
+  content: BlocksContent;
+}
+
+export interface AppHelpSection {
+  id: number;
+  __component: 'sections.app-help';
+  title?: string;
+  tutorialTitle?: string;
+  blogs?: Array<{
+    id: number;
+    title: string;
+    slug: string;
+  }>;
+  faqTitle?: string;
+  faqItems?: FAQAccordionItem[];
+}
+
+export interface AppCompatibilityBrandItem {
+  id: number;
+  brandLogo?: StrapiImage;
+  deviceList?: string;
+  description?: string;
+}
+
+export interface AppCompatibilitySection {
+  id: number;
+  __component: 'sections.app-compatibility';
+  title?: string;
+  description?: string;
+  brandItems?: AppCompatibilityBrandItem[];
+}
+
 /**
  * FAQ Content Type
  */
@@ -288,7 +340,9 @@ export type Section =
   | AppsGridSection
   | BrandsGridSection
   | AppsFilterSection
-  | TutorialAccordionSection;
+  | TutorialAccordionSection
+  | AppHelpSection
+  | AppCompatibilitySection;
 
 export interface HeroSection {
   id: number;

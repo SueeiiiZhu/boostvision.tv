@@ -7,8 +7,10 @@ export async function getBlogPosts(params: {
   isFeatured?: boolean;
   limit?: number;
   page?: number;
+  locale?: string;
 } = {}) {
   const query = buildStrapiQuery({
+    ...(params.locale && { locale: params.locale }),
     populate: {
       coverImage: true,
       category: true,
@@ -82,8 +84,12 @@ export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
   return defaultPost;
 }
 
-export async function getBlogCategories() {
-  return fetchStrapi<BlogCategory[]>("/blog-categories", {
+export async function getBlogCategories(locale?: string) {
+  const query = buildStrapiQuery({
+    ...(locale ? { locale } : {}),
+  });
+
+  return fetchStrapi<BlogCategory[]>(`/blog-categories${query}`, {
     tags: [CACHE_TAGS.blogCategories],
   });
 }
