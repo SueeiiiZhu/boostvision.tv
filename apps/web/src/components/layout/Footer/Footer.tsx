@@ -18,7 +18,13 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:[grid-template-columns:minmax(220px,1.1fr)_repeat(4,minmax(180px,1fr))]">
           {/* Logo & Info */}
           <div className="lg:col-span-1">
-            <Link href="/" className="mb-8 flex justify-center lg:justify-start">
+            <Link
+              href="/"
+              className="mb-8 flex justify-center lg:justify-start"
+              data-analytics-nav-area="footer"
+              data-analytics-nav-level="top_level"
+              data-analytics-label="Logo"
+            >
               <Image
                 src={globalSetting?.footerLogo?.url || "/logo-white.svg"}
                 alt={globalSetting?.siteName || "BoostVision"}
@@ -42,6 +48,9 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    data-analytics-nav-area="footer"
+                    data-analytics-nav-level="social"
+                    data-analytics-label={social.platform}
                   >
                     <Image
                       src={`/icons/${social.platform}.svg`}
@@ -65,6 +74,10 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
                     <Link
                       href={link.href}
                       className="text-[14px] text-white/60 hover:text-white transition-colors flex items-center gap-2"
+                      data-analytics-nav-area="footer"
+                      data-analytics-nav-level="top_level"
+                      data-analytics-parent-label={column.title}
+                      data-analytics-label={link.name}
                     >
                       {link.name}
                     </Link>
@@ -85,6 +98,9 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
                   key={link.id}
                   href={link.href}
                   className="text-[16px] font-medium text-white/80 hover:text-white transition-colors"
+                  data-analytics-nav-area="footer"
+                  data-analytics-nav-level="bottom"
+                  data-analytics-label={link.name}
                 >
                   {link.name}
                 </Link>

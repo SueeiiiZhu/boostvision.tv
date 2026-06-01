@@ -113,7 +113,16 @@ export default async function SearchPage({ searchParams }: Props) {
                     We couldn&apos;t find anything matching &quot;{query}&quot;. <br />
                     Try checking your spelling or using different keywords.
                   </p>
-                  <Link href="/" className="mt-10 inline-block btn-gradient px-10">Back to Home</Link>
+                  <Link
+                    href="/"
+                    className="mt-10 inline-block btn-gradient px-10"
+                    data-analytics-event="cta_click"
+                    data-analytics-placement="search_no_results_cta"
+                    data-analytics-cta-type="internal_cta"
+                    data-analytics-label="Back to Home"
+                  >
+                    Back to Home
+                  </Link>
                 </div>
               )}
 

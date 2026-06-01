@@ -223,6 +223,10 @@ function AppCatalogCard({ app }: { app: App }) {
                     "relative z-0 mx-auto flex w-[160px] justify-center sm:w-[186px] md:mx-0 md:hover:z-[250] md:focus-within:z-[250]",
                     link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
                   )}
+                  data-analytics-placement="app_list_card"
+                  data-analytics-app-slug={app.slug}
+                  data-analytics-app-name={app.name}
+                  data-analytics-label={link.platform}
                   {...(!link.isClickable && { 'aria-disabled': 'true' })}
                 >
                   {ButtonContent}

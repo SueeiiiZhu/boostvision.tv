@@ -130,6 +130,10 @@ export function BlogList({
                 <Link
                   href={ctaSection?.buttonLink || "/download"}
                   className="btn-gradient mt-8 inline-flex w-full px-7 py-2.5 text-[22px] font-medium leading-[1.2]"
+                  data-analytics-event="cta_click"
+                  data-analytics-placement="blog_list_sidebar_cta"
+                  data-analytics-cta-type={ctaSection?.buttonLink === "/app" ? "app_entry" : "internal_cta"}
+                  data-analytics-label={ctaSection?.buttonText || "Download Now"}
                 >
                   {ctaSection?.buttonText || "Download Now"}
                 </Link>
@@ -140,6 +144,10 @@ export function BlogList({
                         key={link.id}
                         href={link.href || "#"}
                         className="text-[15px] leading-[1.4] text-primary underline underline-offset-2 hover:text-primary/80"
+                        data-analytics-event="cta_click"
+                        data-analytics-placement="blog_list_sidebar_link"
+                        data-analytics-cta-type={link.href === "/app" ? "app_entry" : "internal_cta"}
+                        data-analytics-label={link.name}
                       >
                         {link.name}
                       </Link>

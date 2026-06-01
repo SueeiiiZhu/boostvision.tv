@@ -64,7 +64,14 @@ export default async function ContactUsPage({ params }: Props) {
                 The fastest way to find the answer to your question is to seek through the frequently asked questions that we documented.
               </p>
               <div className="flex justify-center lg:justify-start">
-                <Link href="/faq" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
+                <Link
+                  href="/faq"
+                  className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal"
+                  data-analytics-event="cta_click"
+                  data-analytics-placement="contact_faq_cta"
+                  data-analytics-cta-type="internal_cta"
+                  data-analytics-label="Go to F.A.Q."
+                >
                   Go to F.A.Q.
                 </Link>
               </div>
@@ -132,7 +139,14 @@ export default async function ContactUsPage({ params }: Props) {
                 Always feel free to contact us through our customer service E-mail, we will back you up with professional solutions.
               </p>
               <div className="flex justify-center lg:justify-start">
-                <a href="mailto:support@boostvision.com.cn" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
+                <a
+                  href="mailto:support@boostvision.com.cn"
+                  className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal"
+                  data-analytics-event="cta_click"
+                  data-analytics-placement="contact_email_cta"
+                  data-analytics-cta-type="contact"
+                  data-analytics-label="E-mail us"
+                >
                   E-mail us
                 </a>
               </div>
@@ -148,7 +162,14 @@ export default async function ContactUsPage({ params }: Props) {
             Coordinate your Smart TV and Smart Phone Now
           </h2>
           <div className="flex justify-center">
-            <Link href="/app" className="btn-gradient text-[24px] px-12 py-5 rounded-[50px] font-normal">
+            <Link
+              href="/app"
+              className="btn-gradient text-[24px] px-12 py-5 rounded-[50px] font-normal"
+              data-analytics-event="cta_click"
+              data-analytics-placement="contact_bottom_cta"
+              data-analytics-cta-type="app_entry"
+              data-analytics-label="GET IT NOW"
+            >
               GET IT NOW
             </Link>
           </div>

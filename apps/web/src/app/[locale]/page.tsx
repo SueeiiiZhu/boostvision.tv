@@ -72,7 +72,14 @@ export default async function Home({ params }: Props) {
                     </p>
                     <div className="mt-6 lg:mt-12 animate-slide-up delay-200 flex justify-center lg:justify-start">
                       <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
-                        <Link href="/app" className="btn-gradient">
+                        <Link
+                          href="/app"
+                          className="btn-gradient"
+                          data-analytics-event="cta_click"
+                          data-analytics-placement="home_hero_cta"
+                          data-analytics-cta-type="app_entry"
+                          data-analytics-label="GET IT NOW"
+                        >
                           GET IT NOW
                         </Link>
                       </div>
@@ -106,7 +113,14 @@ export default async function Home({ params }: Props) {
                 <p className="text-muted mb-12 text-[20px] max-w-[700px] mx-auto leading-relaxed">
                   Go to our App download center to install screen mirroring and TV remote apps on iPhone and Android now.
                 </p>
-                <Link href="/app" className="btn-gradient">
+                <Link
+                  href="/app"
+                  className="btn-gradient"
+                  data-analytics-event="cta_click"
+                  data-analytics-placement="home_bottom_cta"
+                  data-analytics-cta-type="app_entry"
+                  data-analytics-label="GET IT NOW"
+                >
                   GET IT NOW
                 </Link>
               </div>

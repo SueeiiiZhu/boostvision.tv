@@ -89,7 +89,14 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
           {data.ctaText && data.ctaLink && (
             <div className="mt-6 lg:mt-12 flex justify-center lg:justify-start">
               <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
-                <Link href={data.ctaLink} className="btn-gradient inline-flex items-center gap-4 px-12">
+                <Link
+                  href={data.ctaLink}
+                  className="btn-gradient inline-flex items-center gap-4 px-12"
+                  data-analytics-event="cta_click"
+                  data-analytics-placement="hero_cta"
+                  data-analytics-cta-type={data.ctaLink === '/app' ? 'app_entry' : 'internal_cta'}
+                  data-analytics-label={data.ctaText}
+                >
                   {data.ctaText}
                   <svg
                     className="w-6 h-6 transition-transform group-hover:translate-x-2"
@@ -197,7 +204,14 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
       <p className="text-muted/70 mb-10 md:mb-16 text-[16px] md:text-[20px] max-w-[850px] mx-auto leading-relaxed">
         {data.description}
       </p>
-      <Link href={data.buttonLink} className="btn-gradient group inline-flex items-center gap-4 px-12">
+      <Link
+        href={data.buttonLink}
+        className="btn-gradient group inline-flex items-center gap-4 px-12"
+        data-analytics-event="cta_click"
+        data-analytics-placement="section_cta"
+        data-analytics-cta-type={data.buttonLink === '/app' ? 'app_entry' : 'internal_cta'}
+        data-analytics-label={data.buttonText}
+      >
         <span>{data.buttonText}</span>
         <svg
           className="w-6 h-6 transition-transform group-hover:translate-x-2"

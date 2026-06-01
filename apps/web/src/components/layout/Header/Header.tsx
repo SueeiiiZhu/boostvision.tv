@@ -85,7 +85,14 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
     >
       <nav className="container-custom max-w-[1320px] px-4 md:px-5 flex h-full items-center justify-between">
         {/* Logo */}
-        <Link href="/" target="_self" className="flex items-center">
+        <Link
+          href="/"
+          target="_self"
+          className="flex items-center"
+          data-analytics-nav-area="header_desktop"
+          data-analytics-nav-level="top_level"
+          data-analytics-label="Logo"
+        >
           <Image
             src="/logo.svg"
             alt={globalSetting?.siteName || "BoostVision Logo"}
@@ -106,7 +113,13 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               {item.href ? (
-                <Link href={item.href} className="nav-link flex items-center gap-1">
+                <Link
+                  href={item.href}
+                  className="nav-link flex items-center gap-1"
+                  data-analytics-nav-area="header_desktop"
+                  data-analytics-nav-level="top_level"
+                  data-analytics-label={item.name}
+                >
                   {item.name}
                   {item.links?.length > 0 && (
                     <svg className="h-3 w-3 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,6 +152,10 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                       key={link.id}
                       href={link.href}
                       className="block px-6 py-3 text-[15px] font-medium text-heading hover:bg-section-bg hover:text-primary transition-colors"
+                      data-analytics-nav-area="header_desktop"
+                      data-analytics-nav-level="dropdown"
+                      data-analytics-parent-label={item.name}
+                      data-analytics-label={link.name}
                     >
                       {link.name}
                     </Link>
@@ -177,7 +194,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   <Link
                     key={l}
                     href={pathname}
-                    locale={l as any}
+                    locale={l}
                     onClick={() => setIsLanguageOpen(false)}
                     className={cn(
                       "block px-4 py-2 text-[14px] font-bold hover:bg-gray-50",
@@ -193,6 +210,9 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
             <Link
               href={globalSetting?.tryForFreeLink || "/app"}
               className="btn-try-free"
+              data-analytics-nav-area="header_desktop"
+              data-analytics-nav-level="top_level"
+              data-analytics-label={globalSetting?.tryForFreeText || t('tryForFree')}
             >
               {globalSetting?.tryForFreeText || t('tryForFree')}
             </Link>
@@ -264,6 +284,10 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                             key={link.id}
                             href={link.href}
                             className="py-2 text-[15px] font-medium text-muted font-sans"
+                            data-analytics-nav-area="header_mobile"
+                            data-analytics-nav-level="dropdown"
+                            data-analytics-parent-label={item.name}
+                            data-analytics-label={link.name}
                           >
                             {link.name}
                           </Link>
@@ -275,6 +299,9 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   <Link
                     href={item.href || "#"}
                     className="block border-b border-gray-100 pb-3 pt-1 text-[16px] font-medium tracking-wide text-muted font-heading"
+                    data-analytics-nav-area="header_mobile"
+                    data-analytics-nav-level="top_level"
+                    data-analytics-label={item.name}
                   >
                     {item.name}
                   </Link>
@@ -310,7 +337,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                       <Link
                         key={l}
                         href={pathname}
-                        locale={l as any}
+                        locale={l}
                         onClick={() => setIsLanguageOpen(false)}
                         className={cn(
                           "block px-4 py-2 text-[14px] font-bold hover:bg-gray-50",
@@ -323,7 +350,13 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   </div>
                 </div>
 
-                <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-gradient h-[52px] min-w-0 flex-1 px-8 text-center leading-none whitespace-nowrap">
+                <Link
+                  href={globalSetting?.tryForFreeLink || "/app"}
+                  className="btn-gradient h-[52px] min-w-0 flex-1 px-8 text-center leading-none whitespace-nowrap"
+                  data-analytics-nav-area="header_mobile"
+                  data-analytics-nav-level="top_level"
+                  data-analytics-label={globalSetting?.tryForFreeText || t('tryForFree')}
+                >
                   {globalSetting?.tryForFreeText || t('tryForFree')}
                 </Link>
               </div>

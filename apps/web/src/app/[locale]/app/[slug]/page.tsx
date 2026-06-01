@@ -191,6 +191,10 @@ export default async function AppDetailPage({ params }: Props) {
                               target="_blank"
                               rel="noopener noreferrer"
                               className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                              data-analytics-placement="app_detail_hero"
+                              data-analytics-app-slug={app.slug}
+                              data-analytics-app-name={app.name}
+                              data-analytics-label={link.platform}
                               {...(!link.isClickable && { 'aria-disabled': 'true' })}
                             >
                               {ButtonContent}
@@ -361,7 +365,17 @@ export default async function AppDetailPage({ params }: Props) {
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                   {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
-                      <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="transition-transform hover:scale-105"
+                        data-analytics-placement="app_detail_bottom"
+                        data-analytics-app-slug={app.slug}
+                        data-analytics-app-name={app.name}
+                        data-analytics-label={link.platform}
+                      >
                         <Image
                           src={link.badge.url}
                           alt={link.platform}

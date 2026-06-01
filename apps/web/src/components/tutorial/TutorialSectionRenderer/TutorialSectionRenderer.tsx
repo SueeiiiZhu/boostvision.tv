@@ -62,7 +62,17 @@ const TutorialHero: React.FC<{ data: HeroSection; app: App }> = ({ data, app }) 
             {/* Download Buttons */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6">
                 {app.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                    <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="transition-transform hover:scale-105"
+                        data-analytics-placement="tutorial_section_hero"
+                        data-analytics-app-slug={app.slug}
+                        data-analytics-app-name={app.name}
+                        data-analytics-label={link.platform}
+                    >
                         <Image
                             src={link.badge.url}
                             alt={link.platform}
@@ -222,7 +232,17 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App; isOpen: boolean; o
                         {item.showDownloadButtons && (
                             <div className="mt-16 flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-8 pt-12 border-t border-gray-50">
                                 {app.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                                    <a
+                                        key={link.id}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="transition-transform hover:scale-105"
+                                        data-analytics-placement="tutorial_section_step"
+                                        data-analytics-app-slug={app.slug}
+                                        data-analytics-app-name={app.name}
+                                        data-analytics-label={link.platform}
+                                    >
                                         <Image
                                             src={link.badge.url}
                                             alt={link.platform}

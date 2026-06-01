@@ -15,6 +15,11 @@ const VercelAnalytics = dynamic(
   { ssr: false }
 );
 
+const ClickTracker = dynamic(
+  () => import('./ClickTracker').then((mod) => mod.ClickTracker),
+  { ssr: false }
+);
+
 const FALLBACK_DELAY_MS = 3000;
 const INTERACTION_EVENTS: Array<keyof WindowEventMap> = ['mousedown', 'touchstart', 'keydown', 'scroll'];
 
@@ -75,6 +80,7 @@ export function AnalyticsWrapper() {
   return (
     <>
       <AdScriptLoader />
+      <ClickTracker />
       {shouldLoad ? (
         <>
           <GoogleAnalytics />

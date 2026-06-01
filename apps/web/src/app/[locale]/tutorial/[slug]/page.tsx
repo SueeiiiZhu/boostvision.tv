@@ -91,7 +91,17 @@ export default async function TutorialDetailPage({ params }: Props) {
               {/* Download Buttons */}
               <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 sm:gap-6">
                 {app?.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                  <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-transform hover:scale-105"
+                    data-analytics-placement="tutorial_detail_hero"
+                    data-analytics-app-slug={app.slug}
+                    data-analytics-app-name={app.name}
+                    data-analytics-label={link.platform}
+                  >
                     <Image
                       src={link.badge.url}
                       alt={link.platform}

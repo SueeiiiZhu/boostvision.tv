@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting, AppHelpSection, FAQAccordionItem, TutorialItem, AppCompatibilitySection, AppCompatibilityBrandItem } from '@/types/strapi';
+import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting, AppHelpSection, FAQAccordionItem, TutorialItem, AppCompatibilitySection } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText, QRCode } from '@/components/shared';
 
@@ -704,6 +704,10 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className={link.isClickable ? "hover:z-10 transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                        data-analytics-placement="app_section_hero"
+                                        data-analytics-app-slug={app.slug}
+                                        data-analytics-app-name={app.name}
+                                        data-analytics-label={link.platform}
                                         {...(!link.isClickable && { 'aria-disabled': 'true' })}
                                     >
                                         {ButtonContent}
@@ -877,6 +881,10 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
                             target="_blank"
                             rel="noopener noreferrer"
                             className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                            data-analytics-placement="app_section_bottom"
+                            data-analytics-app-slug={app.slug}
+                            data-analytics-app-name={app.name}
+                            data-analytics-label={link.platform}
                             {...(!link.isClickable && { 'aria-disabled': 'true' })}
                         >
                             <Image

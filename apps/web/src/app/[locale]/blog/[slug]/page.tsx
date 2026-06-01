@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
-  const ctaBanners: Record<string, { title: string; iconUrl?: string | null; buttons: { url: string; platform?: string | null; badgeUrl?: string | null }[] }> = {};
+  const ctaBanners: Record<string, { title: string; iconUrl?: string | null; buttons: { url: string; platform?: string | null; badgeUrl?: string | null; appSlug?: string | null; appName?: string | null }[] }> = {};
   if (typeof post.content === "string") {
     const commentMatches = Array.from(post.content.matchAll(/<!--([\s\S]*?)-->/g));
     const uniqueComments = [...new Set(commentMatches.map((m) => (m[1] || "").trim()).filter(Boolean))];
@@ -98,7 +98,13 @@ export default async function BlogPostPage({ params }: Props) {
         buttons: app.downloadLinks
           .filter((l) => !!l?.url)
           .slice(0, 2)
-          .map((l) => ({ url: l!.url!, platform: l?.platform || null, badgeUrl: l?.badge?.url || null })),
+          .map((l) => ({
+            url: l!.url!,
+            platform: l?.platform || null,
+            badgeUrl: l?.badge?.url || null,
+            appSlug: app.slug,
+            appName: app.name,
+          })),
       };
     });
   }
@@ -325,7 +331,14 @@ export default async function BlogPostPage({ params }: Props) {
                 <p className="mb-10 mx-auto w-full max-w-[860px] text-[18px] text-muted leading-relaxed">
                   Discover our professional screen mirroring and TV remote control apps for iPhone, iPad, and Android devices.
                 </p>
-                <Link href="/app" className="btn-gradient">
+                <Link
+                  href="/app"
+                  className="btn-gradient"
+                  data-analytics-event="cta_click"
+                  data-analytics-placement="blog_detail_bottom_cta"
+                  data-analytics-cta-type="app_entry"
+                  data-analytics-label="GET IT NOW"
+                >
                   GET IT NOW
                 </Link>
               </div>
