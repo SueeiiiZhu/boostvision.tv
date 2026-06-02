@@ -49,7 +49,7 @@ function getPlacement(anchor: HTMLAnchorElement) {
   );
 }
 
-export function ClickTracker() {
+export function AnalyticsTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
