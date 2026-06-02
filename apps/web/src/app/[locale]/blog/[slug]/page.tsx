@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { AnalyticsLink } from "@/components/analytics";
 import { RichText, JsonLd } from "@/components/shared";
 import { BlogCard } from "../_components/BlogCard";
 import { BlogToc } from "../_components/BlogToc";
@@ -331,16 +332,16 @@ export default async function BlogPostPage({ params }: Props) {
                 <p className="mb-10 mx-auto w-full max-w-[860px] text-[18px] text-muted leading-relaxed">
                   Discover our professional screen mirroring and TV remote control apps for iPhone, iPad, and Android devices.
                 </p>
-                <Link
+                <AnalyticsLink
                   href="/app"
                   className="btn-gradient"
-                  data-analytics-event="cta_click"
-                  data-analytics-placement="blog_detail_bottom_cta"
-                  data-analytics-cta-type="app_entry"
-                  data-analytics-label="GET IT NOW"
+                  event="cta_click"
+                  placement="blog_detail_bottom_cta"
+                  ctaType="app_entry"
+                  label="GET IT NOW"
                 >
                   GET IT NOW
-                </Link>
+                </AnalyticsLink>
               </div>
             </div>
           </div>

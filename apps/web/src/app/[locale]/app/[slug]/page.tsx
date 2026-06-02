@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { AnalyticsLink } from "@/components/analytics";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -185,20 +186,20 @@ export default async function AppDetailPage({ params }: Props) {
                           );
 
                           return (
-                            <a
+                            <AnalyticsLink
                               key={link.id}
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
                               className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                              data-analytics-placement="app_detail_hero"
-                              data-analytics-app-slug={app.slug}
-                              data-analytics-app-name={app.name}
-                              data-analytics-label={link.platform}
+                              placement="app_detail_hero"
+                              appSlug={app.slug}
+                              appName={app.name}
+                              label={link.platform}
                               {...(!link.isClickable && { 'aria-disabled': 'true' })}
                             >
                               {ButtonContent}
-                            </a>
+                            </AnalyticsLink>
                           );
                         })
                       ) : null}
@@ -365,16 +366,16 @@ export default async function AppDetailPage({ params }: Props) {
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                   {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
-                      <a
+                      <AnalyticsLink
                         key={link.id}
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="transition-transform hover:scale-105"
-                        data-analytics-placement="app_detail_bottom"
-                        data-analytics-app-slug={app.slug}
-                        data-analytics-app-name={app.name}
-                        data-analytics-label={link.platform}
+                        placement="app_detail_bottom"
+                        appSlug={app.slug}
+                        appName={app.name}
+                        label={link.platform}
                       >
                         <Image
                           src={link.badge.url}
@@ -382,7 +383,7 @@ export default async function AppDetailPage({ params }: Props) {
                           width={220} height={66}
                           className="h-12 sm:h-14 w-auto"
                         />
-                      </a>
+                      </AnalyticsLink>
                     ))
                   ) : null}
                 </div>

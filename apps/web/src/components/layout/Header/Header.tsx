@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Link, usePathname, routing } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { Navigation, GlobalSetting } from "@/types/strapi";
+import { AnalyticsLink } from "@/components/analytics";
 
 interface HeaderProps {
   navigation: Navigation | null;
@@ -85,13 +86,13 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
     >
       <nav className="container-custom max-w-[1320px] px-4 md:px-5 flex h-full items-center justify-between">
         {/* Logo */}
-        <Link
+        <AnalyticsLink
           href="/"
           target="_self"
           className="flex items-center"
-          data-analytics-nav-area="header_desktop"
-          data-analytics-nav-level="top_level"
-          data-analytics-label="Logo"
+          navArea="header_desktop"
+          navLevel="top_level"
+          label="Logo"
         >
           <Image
             src="/logo.svg"
@@ -101,7 +102,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
             className="h-[20px] w-auto"
             priority
           />
-        </Link>
+        </AnalyticsLink>
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-4 lg:flex h-full">
@@ -113,12 +114,12 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               {item.href ? (
-                <Link
+                <AnalyticsLink
                   href={item.href}
                   className="nav-link flex items-center gap-1"
-                  data-analytics-nav-area="header_desktop"
-                  data-analytics-nav-level="top_level"
-                  data-analytics-label={item.name}
+                  navArea="header_desktop"
+                  navLevel="top_level"
+                  label={item.name}
                 >
                   {item.name}
                   {item.links?.length > 0 && (
@@ -126,7 +127,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                     </svg>
                   )}
-                </Link>
+                </AnalyticsLink>
               ) : (
                 <button
                   className="nav-link flex items-center gap-1"
@@ -148,17 +149,17 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   activeDropdown === item.id && "opacity-100 visible translate-y-0"
                 )}>
                   {item.links.map((link) => (
-                    <Link
+                    <AnalyticsLink
                       key={link.id}
                       href={link.href}
                       className="block px-6 py-3 text-[15px] font-medium text-heading hover:bg-section-bg hover:text-primary transition-colors"
-                      data-analytics-nav-area="header_desktop"
-                      data-analytics-nav-level="dropdown"
-                      data-analytics-parent-label={item.name}
-                      data-analytics-label={link.name}
+                      navArea="header_desktop"
+                      navLevel="dropdown"
+                      parentLabel={item.name}
+                      label={link.name}
                     >
                       {link.name}
-                    </Link>
+                    </AnalyticsLink>
                   ))}
                 </div>
               )}
@@ -207,15 +208,15 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               </div>
             </div>
 
-            <Link
+            <AnalyticsLink
               href={globalSetting?.tryForFreeLink || "/app"}
               className="btn-try-free"
-              data-analytics-nav-area="header_desktop"
-              data-analytics-nav-level="top_level"
-              data-analytics-label={globalSetting?.tryForFreeText || t('tryForFree')}
+              navArea="header_desktop"
+              navLevel="top_level"
+              label={globalSetting?.tryForFreeText || t('tryForFree')}
             >
               {globalSetting?.tryForFreeText || t('tryForFree')}
-            </Link>
+            </AnalyticsLink>
           </div>
         </div>
 
@@ -280,31 +281,31 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                         className="mt-1 grid grid-cols-1 gap-1 pl-3"
                       >
                         {item.links.map(link => (
-                          <Link
+                          <AnalyticsLink
                             key={link.id}
                             href={link.href}
                             className="py-2 text-[15px] font-medium text-muted font-sans"
-                            data-analytics-nav-area="header_mobile"
-                            data-analytics-nav-level="dropdown"
-                            data-analytics-parent-label={item.name}
-                            data-analytics-label={link.name}
+                            navArea="header_mobile"
+                            navLevel="dropdown"
+                            parentLabel={item.name}
+                            label={link.name}
                           >
                             {link.name}
-                          </Link>
+                          </AnalyticsLink>
                         ))}
                       </div>
                     )}
                   </>
                 ) : (
-                  <Link
+                  <AnalyticsLink
                     href={item.href || "#"}
                     className="block border-b border-gray-100 pb-3 pt-1 text-[16px] font-medium tracking-wide text-muted font-heading"
-                    data-analytics-nav-area="header_mobile"
-                    data-analytics-nav-level="top_level"
-                    data-analytics-label={item.name}
+                    navArea="header_mobile"
+                    navLevel="top_level"
+                    label={item.name}
                   >
                     {item.name}
-                  </Link>
+                  </AnalyticsLink>
                 )}
               </div>
             ))}
@@ -350,15 +351,15 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   </div>
                 </div>
 
-                <Link
+                <AnalyticsLink
                   href={globalSetting?.tryForFreeLink || "/app"}
                   className="btn-gradient h-[52px] min-w-0 flex-1 px-8 text-center leading-none whitespace-nowrap"
-                  data-analytics-nav-area="header_mobile"
-                  data-analytics-nav-level="top_level"
-                  data-analytics-label={globalSetting?.tryForFreeText || t('tryForFree')}
+                  navArea="header_mobile"
+                  navLevel="top_level"
+                  label={globalSetting?.tryForFreeText || t('tryForFree')}
                 >
                   {globalSetting?.tryForFreeText || t('tryForFree')}
-                </Link>
+                </AnalyticsLink>
               </div>
             </div>
           </div>

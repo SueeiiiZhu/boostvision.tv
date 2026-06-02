@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import { SectionRenderer, JsonLd } from "@/components/shared";
+import { AnalyticsLink } from "@/components/analytics";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { generateMetadata as genMetadata, generateOrganizationSchema, generateWebSiteSchema, wrapInGraph } from "@/lib/seo";
@@ -72,16 +72,16 @@ export default async function Home({ params }: Props) {
                     </p>
                     <div className="mt-6 lg:mt-12 animate-slide-up delay-200 flex justify-center lg:justify-start">
                       <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
-                        <Link
+                        <AnalyticsLink
                           href="/app"
                           className="btn-gradient"
-                          data-analytics-event="cta_click"
-                          data-analytics-placement="home_hero_cta"
-                          data-analytics-cta-type="app_entry"
-                          data-analytics-label="GET IT NOW"
+                          event="cta_click"
+                          placement="home_hero_cta"
+                          ctaType="app_entry"
+                          label="GET IT NOW"
                         >
                           GET IT NOW
-                        </Link>
+                        </AnalyticsLink>
                       </div>
                     </div>
 
@@ -113,16 +113,16 @@ export default async function Home({ params }: Props) {
                 <p className="text-muted mb-12 text-[20px] max-w-[700px] mx-auto leading-relaxed">
                   Go to our App download center to install screen mirroring and TV remote apps on iPhone and Android now.
                 </p>
-                <Link
+                <AnalyticsLink
                   href="/app"
                   className="btn-gradient"
-                  data-analytics-event="cta_click"
-                  data-analytics-placement="home_bottom_cta"
-                  data-analytics-cta-type="app_entry"
-                  data-analytics-label="GET IT NOW"
+                  event="cta_click"
+                  placement="home_bottom_cta"
+                  ctaType="app_entry"
+                  label="GET IT NOW"
                 >
                   GET IT NOW
-                </Link>
+                </AnalyticsLink>
               </div>
             </section>
           </>

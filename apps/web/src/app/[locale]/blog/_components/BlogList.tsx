@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
+import { AnalyticsLink } from "@/components/analytics";
 import { BlogPost, BlogCategory, HeroSection, CTASection } from "@/types/strapi";
 import { BlogCard } from "./BlogCard";
 import { Pagination } from "./Pagination";
@@ -127,30 +127,30 @@ export function BlogList({
                     </>
                   )}
                 </ul>
-                <Link
+                <AnalyticsLink
                   href={ctaSection?.buttonLink || "/download"}
                   className="btn-gradient mt-8 inline-flex w-full px-7 py-2.5 text-[22px] font-medium leading-[1.2]"
-                  data-analytics-event="cta_click"
-                  data-analytics-placement="blog_list_sidebar_cta"
-                  data-analytics-cta-type={ctaSection?.buttonLink === "/app" ? "app_entry" : "internal_cta"}
-                  data-analytics-label={ctaSection?.buttonText || "Download Now"}
+                  event="cta_click"
+                  placement="blog_list_sidebar_cta"
+                  ctaType={ctaSection?.buttonLink === "/app" ? "app_entry" : "internal_cta"}
+                  label={ctaSection?.buttonText || "Download Now"}
                 >
                   {ctaSection?.buttonText || "Download Now"}
-                </Link>
+                </AnalyticsLink>
                 {ctaSection?.links && ctaSection.links.length > 0 && (
                   <div className="mt-5 flex flex-col gap-2">
                     {ctaSection.links.map((link) => (
-                      <Link
+                      <AnalyticsLink
                         key={link.id}
                         href={link.href || "#"}
                         className="text-[15px] leading-[1.4] text-primary underline underline-offset-2 hover:text-primary/80"
-                        data-analytics-event="cta_click"
-                        data-analytics-placement="blog_list_sidebar_link"
-                        data-analytics-cta-type={link.href === "/app" ? "app_entry" : "internal_cta"}
-                        data-analytics-label={link.name}
+                        event="cta_click"
+                        placement="blog_list_sidebar_link"
+                        ctaType={link.href === "/app" ? "app_entry" : "internal_cta"}
+                        label={link.name}
                       >
                         {link.name}
-                      </Link>
+                      </AnalyticsLink>
                     ))}
                   </div>
                 )}

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Section, HeroSection, CTASection, TutorialAccordionSection, App, TutorialItem, FAQ } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText } from '@/components/shared';
+import { AnalyticsLink } from '@/components/analytics';
 import { PageAdSlot } from '@/components/ads';
 import { hasAdSenseSlot } from '@/config/adsense';
 
@@ -222,16 +223,16 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App; isOpen: boolean; o
                         {item.showDownloadButtons && (
                             <div className="mt-16 flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-8 pt-12 border-t border-gray-50">
                                 {app.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                                    <a
+                                    <AnalyticsLink
                                         key={link.id}
                                         href={link.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="transition-transform hover:scale-105"
-                                        data-analytics-placement="faq_section_step"
-                                        data-analytics-app-slug={app.slug}
-                                        data-analytics-app-name={app.name}
-                                        data-analytics-label={link.platform}
+                                        placement="faq_section_step"
+                                        appSlug={app.slug}
+                                        appName={app.name}
+                                        label={link.platform}
                                     >
                                         <Image
                                             src={link.badge.url}
@@ -239,7 +240,7 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App; isOpen: boolean; o
                                             width={200} height={60}
                                             className="h-12 sm:h-14 w-auto"
                                         />
-                                    </a>
+                                    </AnalyticsLink>
                                 ))}
                             </div>
                         )}

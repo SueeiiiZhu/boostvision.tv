@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { AnalyticsLink } from "@/components/analytics";
 import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
 import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
@@ -91,16 +92,16 @@ export default async function TutorialDetailPage({ params }: Props) {
               {/* Download Buttons */}
               <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 sm:gap-6">
                 {app?.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                  <a
+                  <AnalyticsLink
                     key={link.id}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="transition-transform hover:scale-105"
-                    data-analytics-placement="tutorial_detail_hero"
-                    data-analytics-app-slug={app.slug}
-                    data-analytics-app-name={app.name}
-                    data-analytics-label={link.platform}
+                    placement="tutorial_detail_hero"
+                    appSlug={app.slug}
+                    appName={app.name}
+                    label={link.platform}
                   >
                     <Image
                       src={link.badge.url}
@@ -108,7 +109,7 @@ export default async function TutorialDetailPage({ params }: Props) {
                       width={180} height={54}
                       className="h-12 sm:h-14 w-auto"
                     />
-                  </a>
+                  </AnalyticsLink>
                 ))}
               </div>
             </div>

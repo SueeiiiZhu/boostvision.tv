@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import Image from 'next/image';
 import OptimizedImage from '../OptimizedImage';
 import Link from 'next/link';
+import { AnalyticsLink } from '@/components/analytics';
 import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection, AppsGridSection, BrandsGridSection, App } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { getApps } from '@/lib/strapi/api/apps';
@@ -89,13 +90,13 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
           {data.ctaText && data.ctaLink && (
             <div className="mt-6 lg:mt-12 flex justify-center lg:justify-start">
               <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
-                <Link
+                <AnalyticsLink
                   href={data.ctaLink}
                   className="btn-gradient inline-flex items-center gap-4 px-12"
-                  data-analytics-event="cta_click"
-                  data-analytics-placement="hero_cta"
-                  data-analytics-cta-type={data.ctaLink === '/app' ? 'app_entry' : 'internal_cta'}
-                  data-analytics-label={data.ctaText}
+                  event="cta_click"
+                  placement="hero_cta"
+                  ctaType={data.ctaLink === '/app' ? 'app_entry' : 'internal_cta'}
+                  label={data.ctaText}
                 >
                   {data.ctaText}
                   <svg
@@ -106,7 +107,7 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
-                </Link>
+                </AnalyticsLink>
                 {data.ctaSubtext ? (
                   <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
                     {data.ctaSubtext}
@@ -204,13 +205,13 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
       <p className="text-muted/70 mb-10 md:mb-16 text-[16px] md:text-[20px] max-w-[850px] mx-auto leading-relaxed">
         {data.description}
       </p>
-      <Link
+      <AnalyticsLink
         href={data.buttonLink}
         className="btn-gradient group inline-flex items-center gap-4 px-12"
-        data-analytics-event="cta_click"
-        data-analytics-placement="section_cta"
-        data-analytics-cta-type={data.buttonLink === '/app' ? 'app_entry' : 'internal_cta'}
-        data-analytics-label={data.buttonText}
+        event="cta_click"
+        placement="section_cta"
+        ctaType={data.buttonLink === '/app' ? 'app_entry' : 'internal_cta'}
+        label={data.buttonText}
       >
         <span>{data.buttonText}</span>
         <svg
@@ -221,7 +222,7 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
-      </Link>
+      </AnalyticsLink>
     </div>
   </section>
 );

@@ -6,6 +6,7 @@ import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata } from "@/lib/seo";
 import { App, HeroSection, CTASection } from "@/types/strapi";
 import { QRCode } from "@/components/shared";
+import { AnalyticsLink } from "@/components/analytics";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
@@ -214,7 +215,7 @@ function AppCatalogCard({ app }: { app: App }) {
               );
 
               return (
-                <a
+                <AnalyticsLink
                   key={link.id}
                   href={link.url}
                   target="_blank"
@@ -223,14 +224,14 @@ function AppCatalogCard({ app }: { app: App }) {
                     "relative z-0 mx-auto flex w-[160px] justify-center sm:w-[186px] md:mx-0 md:hover:z-[250] md:focus-within:z-[250]",
                     link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
                   )}
-                  data-analytics-placement="app_list_card"
-                  data-analytics-app-slug={app.slug}
-                  data-analytics-app-name={app.name}
-                  data-analytics-label={link.platform}
+                  placement="app_list_card"
+                  appSlug={app.slug}
+                  appName={app.name}
+                  label={link.platform}
                   {...(!link.isClickable && { 'aria-disabled': 'true' })}
                 >
                   {ButtonContent}
-                </a>
+                </AnalyticsLink>
               );
             })
           ) : (

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting, AppHelpSection, FAQAccordionItem, TutorialItem, AppCompatibilitySection } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText, QRCode } from '@/components/shared';
+import { AnalyticsLink } from '@/components/analytics';
 
 interface AppSectionRendererProps {
     sections: Section[];
@@ -698,20 +699,20 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                 );
 
                                 return (
-                                    <a
+                                    <AnalyticsLink
                                         key={link.id}
                                         href={link.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className={link.isClickable ? "hover:z-10 transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                                        data-analytics-placement="app_section_hero"
-                                        data-analytics-app-slug={app.slug}
-                                        data-analytics-app-name={app.name}
-                                        data-analytics-label={link.platform}
+                                        placement="app_section_hero"
+                                        appSlug={app.slug}
+                                        appName={app.name}
+                                        label={link.platform}
                                         {...(!link.isClickable && { 'aria-disabled': 'true' })}
                                     >
                                         {ButtonContent}
-                                    </a>
+                                    </AnalyticsLink>
                                 );
                             })
                         ) : null}
@@ -875,16 +876,16 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                 {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
-                        <a
+                        <AnalyticsLink
                             key={link.id}
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                            data-analytics-placement="app_section_bottom"
-                            data-analytics-app-slug={app.slug}
-                            data-analytics-app-name={app.name}
-                            data-analytics-label={link.platform}
+                            placement="app_section_bottom"
+                            appSlug={app.slug}
+                            appName={app.name}
+                            label={link.platform}
                             {...(!link.isClickable && { 'aria-disabled': 'true' })}
                         >
                             <Image
@@ -894,7 +895,7 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
                                 height={66}
                                 className="h-12 sm:h-14 w-auto"
                             />
-                        </a>
+                        </AnalyticsLink>
                     ))
                 ) : null}
             </div>

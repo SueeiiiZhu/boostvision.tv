@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
 import { Navigation, GlobalSetting } from "@/types/strapi";
+import { AnalyticsLink } from "@/components/analytics";
 
 interface FooterProps {
   navigation: Navigation | null;
@@ -18,12 +18,12 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:[grid-template-columns:minmax(220px,1.1fr)_repeat(4,minmax(180px,1fr))]">
           {/* Logo & Info */}
           <div className="lg:col-span-1">
-            <Link
+            <AnalyticsLink
               href="/"
               className="mb-8 flex justify-center lg:justify-start"
-              data-analytics-nav-area="footer"
-              data-analytics-nav-level="top_level"
-              data-analytics-label="Logo"
+              navArea="footer"
+              navLevel="top_level"
+              label="Logo"
             >
               <Image
                 src={globalSetting?.footerLogo?.url || "/logo-white.svg"}
@@ -32,7 +32,7 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
                 height={45}
                 className="h-[34px] md:h-[45px] w-auto"
               />
-            </Link>
+            </AnalyticsLink>
             <p className="text-[14px] text-white/60 leading-relaxed mb-8 text-center lg:text-left">
               &copy; {new Date().getFullYear()} {globalSetting?.siteName || "BoostVision"}. <br />
               All rights reserved.
@@ -42,15 +42,15 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
             {socialLinks.length > 0 && (
               <div className="mx-auto flex w-fit items-center justify-center gap-4 lg:mx-0 lg:w-auto lg:justify-start">
                 {socialLinks.map((social) => (
-                  <a
+                  <AnalyticsLink
                     key={social.id}
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                    data-analytics-nav-area="footer"
-                    data-analytics-nav-level="social"
-                    data-analytics-label={social.platform}
+                    navArea="footer"
+                    navLevel="social"
+                    label={social.platform}
                   >
                     <Image
                       src={`/icons/${social.platform}.svg`}
@@ -58,7 +58,7 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
                       width={20}
                       height={20}
                     />
-                  </a>
+                  </AnalyticsLink>
                 ))}
               </div>
             )}
@@ -71,16 +71,16 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
               <ul className="flex flex-col gap-3">
                 {column.links?.map((link) => (
                   <li key={link.id}>
-                    <Link
+                    <AnalyticsLink
                       href={link.href}
                       className="text-[14px] text-white/60 hover:text-white transition-colors flex items-center gap-2"
-                      data-analytics-nav-area="footer"
-                      data-analytics-nav-level="top_level"
-                      data-analytics-parent-label={column.title}
-                      data-analytics-label={link.name}
+                      navArea="footer"
+                      navLevel="top_level"
+                      parentLabel={column.title}
+                      label={link.name}
                     >
                       {link.name}
-                    </Link>
+                    </AnalyticsLink>
                   </li>
                 ))}
               </ul>
@@ -94,16 +94,16 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
           {bottomMenu.length > 0 && (
             <div className="flex flex-wrap justify-center gap-x-12 gap-y-4 mb-10">
               {bottomMenu.map((link) => (
-                <Link
+                <AnalyticsLink
                   key={link.id}
                   href={link.href}
                   className="text-[16px] font-medium text-white/80 hover:text-white transition-colors"
-                  data-analytics-nav-area="footer"
-                  data-analytics-nav-level="bottom"
-                  data-analytics-label={link.name}
+                  navArea="footer"
+                  navLevel="bottom"
+                  label={link.name}
                 >
                   {link.name}
-                </Link>
+                </AnalyticsLink>
               ))}
             </div>
           )}

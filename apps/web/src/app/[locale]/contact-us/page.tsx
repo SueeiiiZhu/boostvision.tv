@@ -2,8 +2,8 @@ import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata } from "@/lib/seo";
 import { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
+import { AnalyticsLink } from "@/components/analytics";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -64,16 +64,16 @@ export default async function ContactUsPage({ params }: Props) {
                 The fastest way to find the answer to your question is to seek through the frequently asked questions that we documented.
               </p>
               <div className="flex justify-center lg:justify-start">
-                <Link
+                <AnalyticsLink
                   href="/faq"
                   className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal"
-                  data-analytics-event="cta_click"
-                  data-analytics-placement="contact_faq_cta"
-                  data-analytics-cta-type="internal_cta"
-                  data-analytics-label="Go to F.A.Q."
+                  event="cta_click"
+                  placement="contact_faq_cta"
+                  ctaType="internal_cta"
+                  label="Go to F.A.Q."
                 >
                   Go to F.A.Q.
-                </Link>
+                </AnalyticsLink>
               </div>
             </div>
           </div>
@@ -139,16 +139,16 @@ export default async function ContactUsPage({ params }: Props) {
                 Always feel free to contact us through our customer service E-mail, we will back you up with professional solutions.
               </p>
               <div className="flex justify-center lg:justify-start">
-                <a
+                <AnalyticsLink
                   href="mailto:support@boostvision.com.cn"
                   className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal"
-                  data-analytics-event="cta_click"
-                  data-analytics-placement="contact_email_cta"
-                  data-analytics-cta-type="contact"
-                  data-analytics-label="E-mail us"
+                  event="cta_click"
+                  placement="contact_email_cta"
+                  ctaType="contact"
+                  label="E-mail us"
                 >
                   E-mail us
-                </a>
+                </AnalyticsLink>
               </div>
             </div>
           </div>
@@ -162,16 +162,16 @@ export default async function ContactUsPage({ params }: Props) {
             Coordinate your Smart TV and Smart Phone Now
           </h2>
           <div className="flex justify-center">
-            <Link
+            <AnalyticsLink
               href="/app"
               className="btn-gradient text-[24px] px-12 py-5 rounded-[50px] font-normal"
-              data-analytics-event="cta_click"
-              data-analytics-placement="contact_bottom_cta"
-              data-analytics-cta-type="app_entry"
-              data-analytics-label="GET IT NOW"
+              event="cta_click"
+              placement="contact_bottom_cta"
+              ctaType="app_entry"
+              label="GET IT NOW"
             >
               GET IT NOW
-            </Link>
+            </AnalyticsLink>
           </div>
         </section>
       </div>
