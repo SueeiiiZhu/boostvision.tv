@@ -88,7 +88,7 @@ const AppHelp: React.FC<{ data: AppHelpSection; app: App }> = ({ data, app }) =>
         <section className="bg-gradient-to-b from-section-bg-2 to-white py-16 md:py-24">
             <div className="container-custom">
                 {data.title ? (
-                    <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                    <h2 className="text-[28px] md:text-[32px] font-black text-heading text-center mb-12 tracking-tight">
                         {data.title}
                     </h2>
                 ) : null}
@@ -244,7 +244,7 @@ const AppCompatibility: React.FC<{ data: AppCompatibilitySection }> = ({ data })
         <section className="bg-section-bg-3 py-16 text-white md:py-24">
             <div className="container-custom">
                 {data.title ? (
-                    <h2 className="mx-auto mb-6 max-w-[900px] text-center text-[28px] font-black tracking-tight md:text-[40px]">
+                    <h2 className="mx-auto mb-6 max-w-[900px] text-center text-[28px] font-black tracking-tight md:text-[32px]">
                         {data.title}
                     </h2>
                 ) : null}
@@ -559,7 +559,7 @@ const AppRelatedHelp: React.FC<{
 }> = ({ app, tutorials, faqs }) => (
     <section className="py-16 md:py-24 bg-white">
         <div className="container-custom">
-            <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+            <h2 className="text-[28px] md:text-[32px] font-black text-heading text-center mb-12 tracking-tight">
                 More Help for {app.name}
             </h2>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -607,14 +607,14 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
             <div className="flex flex-col lg:flex-row items-center gap-0 md:gap-16 lg:gap-24">
                 {/* Left Column: Text Content */}
                 <div className="order-2 lg:order-1 flex-1 text-left">
-                    <h1 className="text-[30px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
+                    <h1 className="text-[30px] md:text-[36px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
                         {data.title || app.displayTitle || app.name}
                     </h1>
 
                     {/* 使用 RichText 渲染 Hero 描述 */}
                     <RichText
                         content={data.subtitle || app.shortDescription}
-                        className="text-[16px] text-muted/80 leading-relaxed mb-10 max-w-[500px]"
+                        className="text-[16px] text-muted/80 leading-[1.25em] mb-10 max-w-[500px]"
                     />
 
                     {/* Stats Section */}
@@ -745,10 +745,10 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
 const AppWhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
     <section className="pt-6 md:pt-8 pb-14 md:pb-16 bg-section-bg-2 text-center">
         <div className="container-custom md:max-w-[1320px]">
-            <h2 className="text-[28px] md:text-[40px] font-black text-heading mt-[1em] mb-[1em]">{data.title}</h2>
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+            <h2 className="text-[28px] md:text-[32px] font-black text-heading mt-[1em] mb-[1em]">{data.title}</h2>
+            <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-2 md:gap-10 md:overflow-visible md:pb-0 lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {data.features.map((feature, i) => (
-                    <div key={i} className="group grid grid-cols-[96px_1fr] items-center gap-x-5 gap-y-4 rounded-[40px] bg-white p-6 card-shadow transition-all duration-500 hover:-translate-y-3 md:flex md:flex-col md:gap-0 md:p-8">
+                    <div key={i} className="group grid w-[86%] shrink-0 snap-center grid-cols-[96px_1fr] items-center gap-x-5 gap-y-4 rounded-[40px] bg-white p-6 text-left card-shadow transition-all duration-500 hover:-translate-y-3 md:w-auto md:flex md:flex-col md:gap-0 md:p-8 md:text-center">
                         <div className="h-24 w-24 shrink-0 flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110 md:mb-10 md:h-[120px] md:w-auto">
                             {feature.icon && (
                                 <Image
@@ -806,7 +806,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, isEven?: bo
                                 height={32}
                             />
                         </div>
-                        <h2 className="text-[28px] md:text-[40px] font-black leading-[1.1] text-heading text-left md:mb-8">{data.title}</h2>
+                        <h2 className="text-[28px] md:text-[32px] font-black leading-[1.1] text-heading text-left md:mb-8">{data.title}</h2>
                     </div>
 
                     {/* description 和 richText 现在可以共存，且都使用 RichText 渲染 */}
@@ -830,7 +830,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, isEven?: bo
 const AppBrandsGrid: React.FC<{ data: BrandsGridSection; app: App }> = ({ data, app }) => (
     <section className="py-32 bg-white text-center">
         <div className="container-custom">
-            <h2 className="text-[28px] md:text-[40px] font-black text-heading mb-6 tracking-tight">
+            <h2 className="text-[28px] md:text-[32px] font-black text-heading mb-6 tracking-tight">
                 {data.title || `${app.name} Support all Smart TVs & Sticks`}
             </h2>
             <RichText
@@ -865,7 +865,7 @@ const AppBrandsGrid: React.FC<{ data: BrandsGridSection; app: App }> = ({ data, 
 const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
     <section className="py-16 md:py-32 text-center bg-section-bg-cta text-white">
         <div className="container-custom">
-            <h2 className="mb-8 max-w-[1000px] mx-auto text-[30px] md:text-[45px] leading-[1.2] font-black text-heading">
+            <h2 className="mb-8 max-w-[1000px] mx-auto text-[30px] md:text-[32px] leading-[1.2] font-black text-heading">
                 {data.title || `Free Download ${app.name} on Android or iPhone, iPad Today!`}
             </h2>
             <RichText

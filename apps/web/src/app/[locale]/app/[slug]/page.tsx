@@ -124,10 +124,10 @@ export default async function AppDetailPage({ params }: Props) {
                 <div className="flex flex-col lg:flex-row items-center gap-0 md:gap-16 lg:gap-24">
                   {/* Left Column: Text Content */}
                   <div className="order-2 lg:order-1 flex-1 text-left">
-                    <h1 className="text-[30px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
+                    <h1 className="text-[30px] md:text-[36px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
                       {app.displayTitle || app.name}
                     </h1>
-                    <p className="text-[16px] text-muted/80 leading-relaxed mb-10 max-w-[500px]">
+                    <p className="text-[16px] text-muted/80 leading-[1.25em] mb-10 max-w-[500px]">
                       {app.shortDescription}
                     </p>
 
@@ -232,7 +232,7 @@ export default async function AppDetailPage({ params }: Props) {
             {app.features && app.features.length > 0 && (
               <section className="pt-8 md:pt-16 pb-32 bg-[#f8faff] text-center">
                 <div className="container-custom">
-                  <h2 className="text-[28px] md:text-[40px] font-black text-heading mt-[1em] mb-[1em] tracking-tight">
+                  <h2 className="text-[28px] md:text-[32px] font-black text-heading mt-[1em] mb-[1em] tracking-tight">
                     Wireless Cast with the {app.name}
                   </h2>
                   <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
@@ -274,7 +274,7 @@ export default async function AppDetailPage({ params }: Props) {
             {/* Device Brands Section */}
             <section className="py-32 bg-white text-center">
               <div className="container-custom">
-                <h2 className="text-[28px] md:text-[40px] font-black text-heading mb-6 tracking-tight">
+                <h2 className="text-[28px] md:text-[32px] font-black text-heading mb-6 tracking-tight">
                   {app.name} Support all Smart TVs & Sticks
                 </h2>
                 <p className="text-[18px] text-muted mb-20 max-w-[850px] mx-auto leading-relaxed">
@@ -296,7 +296,7 @@ export default async function AppDetailPage({ params }: Props) {
             {app.screenshots && app.screenshots.length > 0 && (
               <section className="py-32 bg-[#f8faff] overflow-hidden">
                 <div className="container-custom">
-                  <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-20 tracking-tight">App Screenshots</h2>
+                  <h2 className="text-[28px] md:text-[32px] font-black text-heading text-center mb-20 tracking-tight">App Screenshots</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
                     {app.screenshots.map((shot, i) => (
                       <div key={i} className="relative aspect-[9/19.5] overflow-hidden rounded-[35px] shadow-2xl hover:translate-y-[-10px] transition-transform duration-500">
@@ -311,7 +311,7 @@ export default async function AppDetailPage({ params }: Props) {
             {(relatedTutorials.length > 0 || relatedFaqs.length > 0) && (
               <section className="py-24 bg-white">
                 <div className="container-custom">
-                  <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                  <h2 className="text-[28px] md:text-[32px] font-black text-heading text-center mb-12 tracking-tight">
                     More Help for {app.name}
                   </h2>
                   <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -356,7 +356,7 @@ export default async function AppDetailPage({ params }: Props) {
             {/* Final CTA Section */}
             <section className="py-32 text-center bg-section-bg-3 text-white">
               <div className="container-custom">
-                <h2 className="text-[30px] md:text-[50px] font-black mb-10 leading-[1.1] max-w-[950px] mx-auto tracking-tight">
+                <h2 className="text-[30px] md:text-[32px] font-black mb-10 leading-[1.1] max-w-[950px] mx-auto tracking-tight">
                   Free Download {app.name} on Android or iPhone, iPad Today!
                 </h2>
                 <p className="text-[20px] text-white/70 mb-14 max-w-[850px] mx-auto leading-relaxed">

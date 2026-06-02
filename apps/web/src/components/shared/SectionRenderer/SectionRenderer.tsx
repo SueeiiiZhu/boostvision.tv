@@ -234,9 +234,9 @@ const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
         CORE FEATURES
       </span>
       <h2 className="text-[24px] md:text-[40px] font-black text-heading mb-8 md:mb-14">{data.title}</h2>
-      <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 md:gap-x-12 md:gap-y-20 lg:grid-cols-4">
+      <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-20 md:overflow-visible md:pb-0 lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {data.features.map((feature, i) => (
-          <div key={i} className="group grid grid-cols-[96px_1fr] items-center gap-x-5 gap-y-2 rounded-[24px] border border-[#dfe8ff] bg-white/85 p-5 shadow-[0_8px_24px_rgba(30,108,244,0.08)] transition-transform duration-300 hover:-translate-y-1 md:flex md:flex-col md:px-6 md:py-8">
+          <div key={i} className="group grid w-[86%] shrink-0 snap-center grid-cols-[96px_1fr] items-center gap-x-5 gap-y-2 rounded-[24px] border border-[#dfe8ff] bg-white/85 p-5 shadow-[0_8px_24px_rgba(30,108,244,0.08)] transition-transform duration-300 hover:-translate-y-1 md:w-auto md:flex md:flex-col md:px-6 md:py-8">
             <div className="h-24 w-24 shrink-0 flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110 md:mb-8 md:h-[120px] md:w-full md:max-w-[320px]">
               {feature.icon && (
                 <OptimizedImage
