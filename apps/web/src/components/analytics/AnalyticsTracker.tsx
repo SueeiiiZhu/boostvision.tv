@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { trackEvent, updatePageContext } from '@/lib/analytics/events';
+import { getDownloadEventSuffix, getStoreClickEventName } from './storeEvents';
 
 interface TrackEventOptions {
   category?: string;
@@ -22,24 +23,6 @@ export const trackLinkClick = (
     redirect_url: targetUrl,
   });
 };
-
-export function getDownloadEventSuffix(
-  href: string | undefined
-): 'DirectDownload' | 'GooglePlay' | 'AppStore' | 'MicrosoftStore' {
-  if (!href || typeof href !== 'string') return 'DirectDownload';
-  const lower = href.toLowerCase();
-  if (lower.includes('play.google.com')) return 'GooglePlay';
-  if (lower.includes('apps.apple.com') || lower.includes('itunes.apple.com')) return 'AppStore';
-  if (lower.includes('apps.microsoft.com')) return 'MicrosoftStore';
-  return 'DirectDownload';
-}
-
-export function getStoreClickEventName(href: string | undefined): 'appstore_click' | 'googleplay_click' | undefined {
-  const suffix = getDownloadEventSuffix(href);
-  if (suffix === 'AppStore') return 'appstore_click';
-  if (suffix === 'GooglePlay') return 'googleplay_click';
-  return undefined;
-}
 
 interface AnalyticsTrackerProps extends TrackEventOptions {
   eventName?: string;
