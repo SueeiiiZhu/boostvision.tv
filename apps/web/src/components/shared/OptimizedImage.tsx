@@ -6,7 +6,7 @@ import Image, { ImageProps } from 'next/image';
  *
  * For non-Strapi (local) images, behaves identically to next/image.
  */
-export default function OptimizedImage({ src, ...props }: ImageProps) {
+export default function OptimizedImage({ src, alt, ...props }: ImageProps) {
   let optimizedSrc = src;
 
   if (typeof src === 'string' && src.includes('strapiapp.com')) {
@@ -24,5 +24,5 @@ export default function OptimizedImage({ src, ...props }: ImageProps) {
     optimizedSrc = `${src}${separator}format=${format}`;
   }
 
-  return <Image src={optimizedSrc} {...props} />;
+  return <Image src={optimizedSrc} alt={alt} {...props} />;
 }
