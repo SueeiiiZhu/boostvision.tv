@@ -1,0 +1,66 @@
+name: CI
+
+# 推送任意分支 / 向 master|develop 提 PR 时,对 web 做一次完整编译,
+# 避免合并后才在部署时发现编译或 prerender 错误。
+on:
+  push:
+  pull_request:
+    branches: [master, develop]
+
+# 同一分支只保留最新一次运行,推送新 commit 时取消旧的 run。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: web (lint · type-check · build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.12.0
+          cache: pnpm
+
+      # 只装 web 子树,排除 cms(Strapi / React 18)。整库安装会把 cms 的
+      # @types/react@18 混入 node_modules,使 web 的 tsc 解析到 18 并与
+      # React 19 类型冲突(本地历史 node_modules 无此干扰故不复现)。
+      # 顺带显著加快 CI(无需安装 Strapi 依赖)。
+      - name: Install dependencies (web subtree only)
+        run: pnpm install --frozen-lockfile --filter web...
+
+      - name: Lint
+        run: pnpm --filter web lint
+
+      - name: Type-check
+        run: pnpm --filter web type-check
+
+      # 完整 next build:prerender 阶段会真正请求 Strapi,
+      # 这样 RSC 边界 / 预渲染类错误能在合并前被抓到。
+      # 需在仓库 Settings → Secrets and variables → Actions 配置:
+      #   NEXT_PUBLIC_STRAPI_URL  指向可达的 Strapi(生产/staging)
+      #   STRAPI_API_TOKEN        读取受保护内容的 token
+      #   NEXT_PUBLIC_GA_ID       (可选)缺失只是不注入 GA,不影响 build
+      - name: Build
+        run: |
+          if [ -z "$NEXT_PUBLIC_STRAPI_URL" ]; then
+            echo "::error::缺少 NEXT_PUBLIC_STRAPI_URL secret。请在仓库 Settings → Secrets and variables → Actions 配置 NEXT_PUBLIC_STRAPI_URL 与 STRAPI_API_TOKEN 后重跑。"
+            exit 1
+          fi
+          pnpm --filter web build
+        env:
+          NEXT_PUBLIC_STRAPI_URL: ${{ secrets.NEXT_PUBLIC_STRAPI_URL }}
+          STRAPI_API_TOKEN: ${{ secrets.STRAPI_API_TOKEN }}
+          NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID }}
