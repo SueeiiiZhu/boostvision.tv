@@ -1,55 +1,89 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { trackEvent, updatePageContext, type AnalyticsEventName } from '@/lib/analytics/events';
+import { trackEvent, updatePageContext } from '@/lib/analytics/events';
 
-function normalizeUrl(url: string) {
-  try {
-    const parsed = new URL(url, window.location.origin);
-    parsed.hash = '';
-    return parsed.toString();
-  } catch {
-    return url;
-  }
+interface TrackEventOptions {
+  category?: string;
+  label?: string;
+  value?: number;
+  redirect_url?: string;
+  [key: string]: unknown;
 }
 
-function isAppStoreUrl(url: string) {
-  return url.includes('apps.apple.com');
+export const trackLinkClick = (
+  eventName: string,
+  targetUrl: string,
+  otherOptions: TrackEventOptions = {}
+) => {
+  trackEvent(eventName, {
+    ...otherOptions,
+    redirect_url: targetUrl,
+  });
+};
+
+export function getDownloadEventSuffix(
+  href: string | undefined
+): 'DirectDownload' | 'GooglePlay' | 'AppStore' | 'MicrosoftStore' {
+  if (!href || typeof href !== 'string') return 'DirectDownload';
+  const lower = href.toLowerCase();
+  if (lower.includes('play.google.com')) return 'GooglePlay';
+  if (lower.includes('apps.apple.com') || lower.includes('itunes.apple.com')) return 'AppStore';
+  if (lower.includes('apps.microsoft.com')) return 'MicrosoftStore';
+  return 'DirectDownload';
 }
 
-function isGooglePlayUrl(url: string) {
-  return url.includes('play.google.com');
+export function getStoreClickEventName(href: string | undefined): 'appstore_click' | 'googleplay_click' | undefined {
+  const suffix = getDownloadEventSuffix(href);
+  if (suffix === 'AppStore') return 'appstore_click';
+  if (suffix === 'GooglePlay') return 'googleplay_click';
+  return undefined;
 }
 
-function isInternalAppEntry(url: string) {
-  try {
-    const parsed = new URL(url, window.location.origin);
-    return parsed.origin === window.location.origin && /^\/[a-z]{2}\/app\/?$|^\/app\/?$/.test(parsed.pathname);
-  } catch {
-    return url === '/app';
-  }
+interface AnalyticsTrackerProps extends TrackEventOptions {
+  eventName?: string;
+  eventNamePrefix?: string;
+  children: React.ReactElement<ChildLinkProps>;
 }
 
-function getText(anchor: HTMLAnchorElement) {
-  return (
-    anchor.dataset.analyticsLabel ||
-    anchor.getAttribute('aria-label') ||
-    anchor.textContent?.trim().replace(/\s+/g, ' ') ||
-    anchor.querySelector('img')?.getAttribute('alt') ||
-    ''
-  );
-}
+type ChildLinkProps = {
+  href?: string;
+  to?: string;
+  onClick?: (e: React.MouseEvent) => void;
+};
 
-function getPlacement(anchor: HTMLAnchorElement) {
-  return (
-    anchor.dataset.analyticsPlacement ||
-    anchor.closest<HTMLElement>('[data-analytics-placement]')?.dataset.analyticsPlacement ||
-    (anchor.closest('.blog-download-banner') ? 'blog_download_banner' : undefined)
-  );
-}
+export const AnalyticsTracker: React.FC<AnalyticsTrackerProps> = ({
+  eventName: eventNameProp,
+  eventNamePrefix,
+  children,
+  ...options
+}) => {
+  const child = React.Children.only(children) as React.ReactElement<ChildLinkProps>;
 
-export function AnalyticsTracker() {
+  const handleClick = (e: React.MouseEvent) => {
+    child.props.onClick?.(e);
+
+    const autoRedirectUrl = child.props.href ?? child.props.to;
+    const resolvedEventName =
+      eventNameProp != null
+        ? eventNameProp
+        : eventNamePrefix != null
+          ? `${eventNamePrefix}_${getDownloadEventSuffix(autoRedirectUrl)}`
+          : undefined;
+
+    if (resolvedEventName) {
+      trackEvent(resolvedEventName, {
+        redirect_url: autoRedirectUrl,
+        ...options,
+      });
+    }
+  };
+
+  return React.cloneElement(child, { onClick: handleClick });
+};
+
+export function PageContextTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
@@ -57,48 +91,28 @@ export function AnalyticsTracker() {
   }, [pathname]);
 
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
+    const handleRichTextDownloadClick = (event: MouseEvent) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
 
-      const anchor = target.closest<HTMLAnchorElement>('a[href]');
+      const anchor = target.closest<HTMLAnchorElement>('.blog-download-banner a[href]');
       if (!anchor) return;
 
-      const rawUrl = anchor.getAttribute('href') || '';
-      if (!rawUrl || rawUrl.startsWith('#')) return;
-
-      const linkUrl = normalizeUrl(rawUrl);
-      const navRoot = anchor.closest<HTMLElement>('[data-analytics-nav-area]');
-      const explicitEvent = anchor.dataset.analyticsEvent as AnalyticsEventName | undefined;
-      let eventName: AnalyticsEventName | undefined;
-
-      if (navRoot) {
-        eventName = 'nav_click';
-      } else if (isAppStoreUrl(linkUrl)) {
-        eventName = 'appstore_click';
-      } else if (isGooglePlayUrl(linkUrl)) {
-        eventName = 'googleplay_click';
-      } else if (explicitEvent === 'cta_click' || isInternalAppEntry(linkUrl)) {
-        eventName = 'cta_click';
-      }
-
+      const href = anchor.getAttribute('href') || undefined;
+      const eventName = getStoreClickEventName(href);
       if (!eventName) return;
 
       trackEvent(eventName, {
-        link_url: linkUrl,
-        link_text: getText(anchor),
+        redirect_url: href,
+        placement: anchor.dataset.analyticsPlacement || 'blog_download_banner',
         app_slug: anchor.dataset.analyticsAppSlug,
         app_name: anchor.dataset.analyticsAppName,
-        placement: getPlacement(anchor),
-        cta_type: anchor.dataset.analyticsCtaType,
-        nav_area: navRoot?.dataset.analyticsNavArea,
-        nav_level: anchor.dataset.analyticsNavLevel,
-        parent_label: anchor.dataset.analyticsParentLabel,
+        link_text: anchor.dataset.analyticsLabel || anchor.getAttribute('aria-label') || '',
       });
     };
 
-    document.addEventListener('click', handleClick, { capture: true });
-    return () => document.removeEventListener('click', handleClick, { capture: true });
+    document.addEventListener('click', handleRichTextDownloadClick, { capture: true });
+    return () => document.removeEventListener('click', handleRichTextDownloadClick, { capture: true });
   }, []);
 
   return null;

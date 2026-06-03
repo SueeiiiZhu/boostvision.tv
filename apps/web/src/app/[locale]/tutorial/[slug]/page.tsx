@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { AnalyticsLink } from "@/components/analytics";
+import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
 import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
@@ -92,24 +92,23 @@ export default async function TutorialDetailPage({ params }: Props) {
               {/* Download Buttons */}
               <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 sm:gap-6">
                 {app?.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                  <AnalyticsLink
+                  <AnalyticsTracker
                     key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="transition-transform hover:scale-105"
+                    eventName={getStoreClickEventName(link.url)}
                     placement="tutorial_detail_hero"
-                    appSlug={app.slug}
-                    appName={app.name}
-                    label={link.platform}
+                    app_slug={app.slug}
+                    app_name={app.name}
+                    link_text={link.platform}
                   >
-                    <Image
-                      src={link.badge.url}
-                      alt={link.platform}
-                      width={180} height={54}
-                      className="h-12 sm:h-14 w-auto"
-                    />
-                  </AnalyticsLink>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                      <Image
+                        src={link.badge.url}
+                        alt={link.platform}
+                        width={180} height={54}
+                        className="h-12 sm:h-14 w-auto"
+                      />
+                    </a>
+                  </AnalyticsTracker>
                 ))}
               </div>
             </div>

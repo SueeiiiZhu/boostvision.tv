@@ -1,4 +1,4 @@
-type AnalyticsValue = string | number | boolean | null | undefined;
+type AnalyticsValue = string | number | boolean | null | undefined | unknown;
 
 export type AnalyticsEventName =
   | 'appstore_click'
@@ -68,7 +68,7 @@ export function getPageContext() {
   };
 }
 
-export function trackEvent(eventName: AnalyticsEventName, params: AnalyticsParams = {}) {
+export function trackEvent(eventName: string, params: AnalyticsParams = {}) {
   if (typeof window === 'undefined') return;
 
   const pagePath = window.location.pathname;
@@ -76,6 +76,11 @@ export function trackEvent(eventName: AnalyticsEventName, params: AnalyticsParam
   const payload = {
     ...params,
     ...(gaId ? { send_to: gaId } : {}),
+    current_page_url: window.location.href,
+    current_page_path: pagePath,
+    page_title: document.title,
+    referrer: document.referrer,
+    timestamp: new Date().toISOString(),
     page_path: pagePath,
     page_location: window.location.href,
     page_type: getPageType(pagePath),

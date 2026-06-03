@@ -15,8 +15,8 @@ const VercelAnalytics = dynamic(
   { ssr: false }
 );
 
-const AnalyticsTracker = dynamic(
-  () => import('./AnalyticsTracker').then((mod) => mod.AnalyticsTracker),
+const PageContextTracker = dynamic(
+  () => import('./AnalyticsTracker').then((mod) => mod.PageContextTracker),
   { ssr: false }
 );
 
@@ -80,7 +80,7 @@ export function AnalyticsWrapper() {
   return (
     <>
       <AdScriptLoader />
-      <AnalyticsTracker />
+      <PageContextTracker />
       {shouldLoad ? (
         <>
           <GoogleAnalytics />

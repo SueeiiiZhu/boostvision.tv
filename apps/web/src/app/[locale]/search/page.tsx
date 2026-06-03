@@ -1,7 +1,7 @@
 import { globalSearch } from "@/lib/strapi/api/search";
 import Link from "next/link";
 import Image from "next/image";
-import { AnalyticsLink } from "@/components/analytics";
+import { AnalyticsTracker } from "@/components/analytics";
 import { getLocaleAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 
@@ -114,16 +114,11 @@ export default async function SearchPage({ searchParams }: Props) {
                     We couldn&apos;t find anything matching &quot;{query}&quot;. <br />
                     Try checking your spelling or using different keywords.
                   </p>
-                  <AnalyticsLink
-                    href="/"
-                    className="mt-10 inline-block btn-gradient px-10"
-                    event="cta_click"
-                    placement="search_no_results_cta"
-                    ctaType="internal_cta"
-                    label="Back to Home"
-                  >
-                    Back to Home
-                  </AnalyticsLink>
+                  <AnalyticsTracker eventName="cta_click" placement="search_no_results_cta" cta_type="internal_cta" link_text="Back to Home">
+                    <Link href="/" className="mt-10 inline-block btn-gradient px-10">
+                      Back to Home
+                    </Link>
+                  </AnalyticsTracker>
                 </div>
               )}
 

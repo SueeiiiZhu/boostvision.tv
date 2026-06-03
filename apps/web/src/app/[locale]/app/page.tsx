@@ -6,7 +6,7 @@ import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata } from "@/lib/seo";
 import { App, HeroSection, CTASection } from "@/types/strapi";
 import { QRCode } from "@/components/shared";
-import { AnalyticsLink } from "@/components/analytics";
+import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
@@ -215,23 +215,27 @@ function AppCatalogCard({ app }: { app: App }) {
               );
 
               return (
-                <AnalyticsLink
+                <AnalyticsTracker
                   key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "relative z-0 mx-auto flex w-[160px] justify-center sm:w-[186px] md:mx-0 md:hover:z-[250] md:focus-within:z-[250]",
-                    link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
-                  )}
+                  eventName={getStoreClickEventName(link.url)}
                   placement="app_list_card"
-                  appSlug={app.slug}
-                  appName={app.name}
-                  label={link.platform}
-                  {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                  app_slug={app.slug}
+                  app_name={app.name}
+                  link_text={link.platform}
                 >
-                  {ButtonContent}
-                </AnalyticsLink>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "relative z-0 mx-auto flex w-[160px] justify-center sm:w-[186px] md:mx-0 md:hover:z-[250] md:focus-within:z-[250]",
+                      link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
+                    )}
+                    {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                  >
+                    {ButtonContent}
+                  </a>
+                </AnalyticsTracker>
               );
             })
           ) : (
