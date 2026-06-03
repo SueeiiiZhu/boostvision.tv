@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { trackEvent, updatePageContext } from '@/lib/analytics/events';
+import { trackEvent, trackPageView, updatePageContext } from '@/lib/analytics/events';
 import { getDownloadEventSuffix, getStoreClickEventName } from './storeEvents';
 
 interface TrackEventOptions {
@@ -78,9 +78,21 @@ export const AnalyticsTracker: React.FC<AnalyticsTrackerProps> = ({
 
 export function PageContextTracker() {
   const pathname = usePathname();
+  // The landing page_view is emitted by gtag('config') on script load, so we
+  // skip the first effect run and only report page_view for subsequent
+  // client-side (SPA) navigations — otherwise those pages go uncounted.
+  const isInitialRender = useRef(true);
 
   useEffect(() => {
-    updatePageContext(pathname || window.location.pathname);
+    const path = pathname || window.location.pathname;
+    updatePageContext(path);
+
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+
+    trackPageView();
   }, [pathname]);
 
   useEffect(() => {
