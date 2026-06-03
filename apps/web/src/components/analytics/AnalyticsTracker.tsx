@@ -44,27 +44,33 @@ export function getStoreClickEventName(href: string | undefined): 'appstore_clic
 interface AnalyticsTrackerProps extends TrackEventOptions {
   eventName?: string;
   eventNamePrefix?: string;
-  children: React.ReactElement<ChildLinkProps>;
+  children: React.ReactNode;
 }
 
-type ChildLinkProps = {
-  href?: string;
-  to?: string;
-  onClick?: (e: React.MouseEvent) => void;
-};
-
+/**
+ * Wraps a link (or any clickable subtree) and fires a GA4 event on click.
+ *
+ * Implementation note: this intentionally renders a `display: contents`
+ * wrapper and listens for the bubbled click instead of using
+ * `React.Children.only` + `React.cloneElement`. The Slot/clone pattern is
+ * fragile across the RSC boundary (a Server Component passing a single
+ * Client Component element such as `next/link` / next-intl `Link` as
+ * `children`) and throws "React.Children.only expected to receive a single
+ * React element child." during static prerendering on Next 16 / React 19.
+ * The `display: contents` wrapper is transparent to layout, so the inner
+ * link keeps its place in any flex/grid container.
+ */
 export const AnalyticsTracker: React.FC<AnalyticsTrackerProps> = ({
   eventName: eventNameProp,
   eventNamePrefix,
   children,
   ...options
 }) => {
-  const child = React.Children.only(children) as React.ReactElement<ChildLinkProps>;
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    const target = e.target as Element | null;
+    const anchor = target?.closest?.('a') as HTMLAnchorElement | null;
+    const autoRedirectUrl = anchor?.getAttribute('href') ?? undefined;
 
-  const handleClick = (e: React.MouseEvent) => {
-    child.props.onClick?.(e);
-
-    const autoRedirectUrl = child.props.href ?? child.props.to;
     const resolvedEventName =
       eventNameProp != null
         ? eventNameProp
@@ -80,7 +86,11 @@ export const AnalyticsTracker: React.FC<AnalyticsTrackerProps> = ({
     }
   };
 
-  return React.cloneElement(child, { onClick: handleClick });
+  return (
+    <span style={{ display: 'contents' }} onClick={handleClick}>
+      {children}
+    </span>
+  );
 };
 
 export function PageContextTracker() {
