@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { AnalyticsTracker } from "@/components/analytics";
 import { RichText, JsonLd } from "@/components/shared";
 import { BlogCard } from "../_components/BlogCard";
 import { BlogToc } from "../_components/BlogToc";
@@ -71,7 +72,7 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
-  const ctaBanners: Record<string, { title: string; iconUrl?: string | null; buttons: { url: string; platform?: string | null; badgeUrl?: string | null }[] }> = {};
+  const ctaBanners: Record<string, { title: string; iconUrl?: string | null; buttons: { url: string; platform?: string | null; badgeUrl?: string | null; appSlug?: string | null; appName?: string | null }[] }> = {};
   if (typeof post.content === "string") {
     const commentMatches = Array.from(post.content.matchAll(/<!--([\s\S]*?)-->/g));
     const uniqueComments = [...new Set(commentMatches.map((m) => (m[1] || "").trim()).filter(Boolean))];
@@ -98,7 +99,13 @@ export default async function BlogPostPage({ params }: Props) {
         buttons: app.downloadLinks
           .filter((l) => !!l?.url)
           .slice(0, 2)
-          .map((l) => ({ url: l!.url!, platform: l?.platform || null, badgeUrl: l?.badge?.url || null })),
+          .map((l) => ({
+            url: l!.url!,
+            platform: l?.platform || null,
+            badgeUrl: l?.badge?.url || null,
+            appSlug: app.slug,
+            appName: app.name,
+          })),
       };
     });
   }
@@ -325,9 +332,11 @@ export default async function BlogPostPage({ params }: Props) {
                 <p className="mb-10 mx-auto w-full max-w-[860px] text-[18px] text-muted leading-relaxed">
                   Discover our professional screen mirroring and TV remote control apps for iPhone, iPad, and Android devices.
                 </p>
-                <Link href="/app" className="btn-gradient">
-                  GET IT NOW
-                </Link>
+                <AnalyticsTracker eventName="cta_click" placement="blog_detail_bottom_cta" cta_type="app_entry" link_text="GET IT NOW">
+                  <Link href="/app" className="btn-gradient">
+                    GET IT NOW
+                  </Link>
+                </AnalyticsTracker>
               </div>
             </div>
           </div>

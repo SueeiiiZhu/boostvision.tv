@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { Navigation, GlobalSetting } from "@/types/strapi";
+import { AnalyticsTracker } from "@/components/analytics";
 
 interface FooterProps {
   navigation: Navigation | null;
@@ -18,15 +19,17 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:[grid-template-columns:minmax(220px,1.1fr)_repeat(4,minmax(180px,1fr))]">
           {/* Logo & Info */}
           <div className="lg:col-span-1">
-            <Link href="/" className="mb-8 flex justify-center lg:justify-start">
-              <Image
-                src={globalSetting?.footerLogo?.url || "/logo-white.svg"}
-                alt={globalSetting?.siteName || "BoostVision"}
-                width={180}
-                height={45}
-                className="h-[34px] md:h-[45px] w-auto"
-              />
-            </Link>
+            <AnalyticsTracker eventName="nav_click" nav_area="footer" nav_level="top_level" link_text="Logo">
+              <Link href="/" className="mb-8 flex justify-center lg:justify-start">
+                <Image
+                  src={globalSetting?.footerLogo?.url || "/logo-white.svg"}
+                  alt={globalSetting?.siteName || "BoostVision"}
+                  width={180}
+                  height={45}
+                  className="h-[34px] md:h-[45px] w-auto"
+                />
+              </Link>
+            </AnalyticsTracker>
             <p className="text-[14px] text-white/60 leading-relaxed mb-8 text-center lg:text-left">
               &copy; {new Date().getFullYear()} {globalSetting?.siteName || "BoostVision"}. <br />
               All rights reserved.
@@ -36,20 +39,27 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
             {socialLinks.length > 0 && (
               <div className="mx-auto flex w-fit items-center justify-center gap-4 lg:mx-0 lg:w-auto lg:justify-start">
                 {socialLinks.map((social) => (
-                  <a
+                  <AnalyticsTracker
                     key={social.id}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    eventName="nav_click"
+                    nav_area="footer"
+                    nav_level="social"
+                    link_text={social.platform}
                   >
-                    <Image
-                      src={`/icons/${social.platform}.svg`}
-                      alt={social.platform}
-                      width={20}
-                      height={20}
-                    />
-                  </a>
+                    <a
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    >
+                      <Image
+                        src={`/icons/${social.platform}.svg`}
+                        alt={social.platform}
+                        width={20}
+                        height={20}
+                      />
+                    </a>
+                  </AnalyticsTracker>
                 ))}
               </div>
             )}
@@ -62,12 +72,20 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
               <ul className="flex flex-col gap-3">
                 {column.links?.map((link) => (
                   <li key={link.id}>
-                    <Link
-                      href={link.href}
-                      className="text-[14px] text-white/60 hover:text-white transition-colors flex items-center gap-2"
+                    <AnalyticsTracker
+                      eventName="nav_click"
+                      nav_area="footer"
+                      nav_level="top_level"
+                      parent_label={column.title}
+                      link_text={link.name}
                     >
-                      {link.name}
-                    </Link>
+                      <Link
+                        href={link.href}
+                        className="text-[14px] text-white/60 hover:text-white transition-colors flex items-center gap-2"
+                      >
+                        {link.name}
+                      </Link>
+                    </AnalyticsTracker>
                   </li>
                 ))}
               </ul>
@@ -81,13 +99,20 @@ export function Footer({ navigation, globalSetting }: FooterProps) {
           {bottomMenu.length > 0 && (
             <div className="flex flex-wrap justify-center gap-x-12 gap-y-4 mb-10">
               {bottomMenu.map((link) => (
-                <Link
+                <AnalyticsTracker
                   key={link.id}
-                  href={link.href}
-                  className="text-[16px] font-medium text-white/80 hover:text-white transition-colors"
+                  eventName="nav_click"
+                  nav_area="footer"
+                  nav_level="bottom"
+                  link_text={link.name}
                 >
-                  {link.name}
-                </Link>
+                  <Link
+                    href={link.href}
+                    className="text-[16px] font-medium text-white/80 hover:text-white transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </AnalyticsTracker>
               ))}
             </div>
           )}

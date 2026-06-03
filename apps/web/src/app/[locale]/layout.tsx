@@ -10,7 +10,6 @@ import { IntlProvider } from "@/components/providers/IntlProvider";
 import { Header, Footer } from "@/components/layout";
 import { AnalyticsWrapper } from "@/components/analytics";
 import { LinkPolicyEnforcer } from "@/components/shared/LinkPolicyEnforcer";
-import type { GlobalSetting, Navigation } from "@/types/strapi";
 import "../globals.css";
 
 const roboto = Roboto({

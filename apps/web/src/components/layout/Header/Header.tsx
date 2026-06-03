@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Link, usePathname, routing } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { Navigation, GlobalSetting } from "@/types/strapi";
+import { AnalyticsTracker } from "@/components/analytics";
 
 interface HeaderProps {
   navigation: Navigation | null;
@@ -85,16 +86,18 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
     >
       <nav className="container-custom max-w-[1320px] px-4 md:px-5 flex h-full items-center justify-between">
         {/* Logo */}
-        <Link href="/" target="_self" className="flex items-center">
-          <Image
-            src="/logo.svg"
-            alt={globalSetting?.siteName || "BoostVision Logo"}
-            width={180}
-            height={45}
-            className="h-[20px] w-auto"
-            priority
-          />
-        </Link>
+        <AnalyticsTracker eventName="nav_click" nav_area="header_desktop" nav_level="top_level" link_text="Logo">
+          <Link href="/" target="_self" className="flex items-center">
+            <Image
+              src="/logo.svg"
+              alt={globalSetting?.siteName || "BoostVision Logo"}
+              width={180}
+              height={45}
+              className="h-[20px] w-auto"
+              priority
+            />
+          </Link>
+        </AnalyticsTracker>
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-4 lg:flex h-full">
@@ -106,14 +109,16 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               {item.href ? (
-                <Link href={item.href} className="nav-link flex items-center gap-1">
-                  {item.name}
-                  {item.links?.length > 0 && (
-                    <svg className="h-3 w-3 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </Link>
+                <AnalyticsTracker eventName="nav_click" nav_area="header_desktop" nav_level="top_level" link_text={item.name}>
+                  <Link href={item.href} className="nav-link flex items-center gap-1">
+                    {item.name}
+                    {item.links?.length > 0 && (
+                      <svg className="h-3 w-3 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                  </Link>
+                </AnalyticsTracker>
               ) : (
                 <button
                   className="nav-link flex items-center gap-1"
@@ -135,13 +140,21 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   activeDropdown === item.id && "opacity-100 visible translate-y-0"
                 )}>
                   {item.links.map((link) => (
-                    <Link
+                    <AnalyticsTracker
                       key={link.id}
-                      href={link.href}
-                      className="block px-6 py-3 text-[15px] font-medium text-heading hover:bg-section-bg hover:text-primary transition-colors"
+                      eventName="nav_click"
+                      nav_area="header_desktop"
+                      nav_level="dropdown"
+                      parent_label={item.name}
+                      link_text={link.name}
                     >
-                      {link.name}
-                    </Link>
+                      <Link
+                        href={link.href}
+                        className="block px-6 py-3 text-[15px] font-medium text-heading hover:bg-section-bg hover:text-primary transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    </AnalyticsTracker>
                   ))}
                 </div>
               )}
@@ -177,7 +190,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   <Link
                     key={l}
                     href={pathname}
-                    locale={l as any}
+                    locale={l}
                     onClick={() => setIsLanguageOpen(false)}
                     className={cn(
                       "block px-4 py-2 text-[14px] font-bold hover:bg-gray-50",
@@ -190,12 +203,16 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
               </div>
             </div>
 
-            <Link
-              href={globalSetting?.tryForFreeLink || "/app"}
-              className="btn-try-free"
+            <AnalyticsTracker
+              eventName="nav_click"
+              nav_area="header_desktop"
+              nav_level="top_level"
+              link_text={globalSetting?.tryForFreeText || t('tryForFree')}
             >
-              {globalSetting?.tryForFreeText || t('tryForFree')}
-            </Link>
+              <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-try-free">
+                {globalSetting?.tryForFreeText || t('tryForFree')}
+              </Link>
+            </AnalyticsTracker>
           </div>
         </div>
 
@@ -260,24 +277,31 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                         className="mt-1 grid grid-cols-1 gap-1 pl-3"
                       >
                         {item.links.map(link => (
-                          <Link
+                          <AnalyticsTracker
                             key={link.id}
-                            href={link.href}
-                            className="py-2 text-[15px] font-medium text-muted font-sans"
+                            eventName="nav_click"
+                            nav_area="header_mobile"
+                            nav_level="dropdown"
+                            parent_label={item.name}
+                            link_text={link.name}
                           >
-                            {link.name}
-                          </Link>
+                            <Link href={link.href} className="py-2 text-[15px] font-medium text-muted font-sans">
+                              {link.name}
+                            </Link>
+                          </AnalyticsTracker>
                         ))}
                       </div>
                     )}
                   </>
                 ) : (
-                  <Link
-                    href={item.href || "#"}
-                    className="block border-b border-gray-100 pb-3 pt-1 text-[16px] font-medium tracking-wide text-muted font-heading"
-                  >
-                    {item.name}
-                  </Link>
+                  <AnalyticsTracker eventName="nav_click" nav_area="header_mobile" nav_level="top_level" link_text={item.name}>
+                    <Link
+                      href={item.href || "#"}
+                      className="block border-b border-gray-100 pb-3 pt-1 text-[16px] font-medium tracking-wide text-muted font-heading"
+                    >
+                      {item.name}
+                    </Link>
+                  </AnalyticsTracker>
                 )}
               </div>
             ))}
@@ -310,7 +334,7 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                       <Link
                         key={l}
                         href={pathname}
-                        locale={l as any}
+                        locale={l}
                         onClick={() => setIsLanguageOpen(false)}
                         className={cn(
                           "block px-4 py-2 text-[14px] font-bold hover:bg-gray-50",
@@ -323,9 +347,19 @@ export function Header({ navigation, globalSetting }: HeaderProps) {
                   </div>
                 </div>
 
-                <Link href={globalSetting?.tryForFreeLink || "/app"} className="btn-gradient h-[52px] min-w-0 flex-1 px-8 text-center leading-none whitespace-nowrap">
-                  {globalSetting?.tryForFreeText || t('tryForFree')}
-                </Link>
+                <AnalyticsTracker
+                  eventName="nav_click"
+                  nav_area="header_mobile"
+                  nav_level="top_level"
+                  link_text={globalSetting?.tryForFreeText || t('tryForFree')}
+                >
+                  <Link
+                    href={globalSetting?.tryForFreeLink || "/app"}
+                    className="btn-gradient h-[52px] min-w-0 flex-1 px-8 text-center leading-none whitespace-nowrap"
+                  >
+                    {globalSetting?.tryForFreeText || t('tryForFree')}
+                  </Link>
+                </AnalyticsTracker>
               </div>
             </div>
           </div>
