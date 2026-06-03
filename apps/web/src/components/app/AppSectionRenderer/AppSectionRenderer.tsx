@@ -3,9 +3,10 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting, AppHelpSection, FAQAccordionItem, TutorialItem, AppCompatibilitySection, AppCompatibilityBrandItem } from '@/types/strapi';
+import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting, AppHelpSection, FAQAccordionItem, TutorialItem, AppCompatibilitySection } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText, QRCode } from '@/components/shared';
+import { AnalyticsTracker, getStoreClickEventName } from '@/components/analytics';
 
 interface AppSectionRendererProps {
     sections: Section[];
@@ -698,16 +699,24 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                 );
 
                                 return (
-                                    <a
+                                    <AnalyticsTracker
                                         key={link.id}
-                                        href={link.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={link.isClickable ? "hover:z-10 transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                                        {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                                        eventName={getStoreClickEventName(link.url)}
+                                        placement="app_section_hero"
+                                        app_slug={app.slug}
+                                        app_name={app.name}
+                                        link_text={link.platform}
                                     >
-                                        {ButtonContent}
-                                    </a>
+                                        <a
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={link.isClickable ? "hover:z-10 transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                            {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                                        >
+                                            {ButtonContent}
+                                        </a>
+                                    </AnalyticsTracker>
                                 );
                             })
                         ) : null}
@@ -871,22 +880,30 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                 {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
-                        <a
+                        <AnalyticsTracker
                             key={link.id}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                            {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                            eventName={getStoreClickEventName(link.url)}
+                            placement="app_section_bottom"
+                            app_slug={app.slug}
+                            app_name={app.name}
+                            link_text={link.platform}
                         >
-                            <Image
-                                src={link.badge.url}
-                                alt={link.platform}
-                                width={220}
-                                height={66}
-                                className="h-12 sm:h-14 w-auto"
-                            />
-                        </a>
+                            <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                            >
+                                <Image
+                                    src={link.badge.url}
+                                    alt={link.platform}
+                                    width={220}
+                                    height={66}
+                                    className="h-12 sm:h-14 w-auto"
+                                />
+                            </a>
+                        </AnalyticsTracker>
                     ))
                 ) : null}
             </div>

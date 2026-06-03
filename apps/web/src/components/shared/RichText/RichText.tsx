@@ -199,6 +199,8 @@ interface CtaButtonLink {
   url: string;
   platform?: string | null;
   badgeUrl?: string | null;
+  appSlug?: string | null;
+  appName?: string | null;
 }
 
 interface RichTextProps {
@@ -248,10 +250,12 @@ export function RichText({ content, className, variant = 'default', ctaBanners }
           .map((b) => {
             const safeUrl = b.url.replace(/"/g, "&quot;");
             const safeLabel = (b.platform || "Download").replace(/"/g, "&quot;");
+            const safeAppSlug = (b.appSlug || "").replace(/"/g, "&quot;");
+            const safeAppName = (b.appName || banner.title || "").replace(/"/g, "&quot;");
             const badge = b.badgeUrl
               ? `<img src="${b.badgeUrl.replace(/"/g, "&quot;")}" alt="${safeLabel}" class="h-12 sm:h-14 w-auto" />`
               : `<span class="${(b.platform || "").toLowerCase().includes("apple") || (b.platform || "").toLowerCase().includes("app store") ? "app-store-badge" : "google-play-badge"}"></span>`;
-            return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" aria-label="${safeLabel}">${badge}</a>`;
+            return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" aria-label="${safeLabel}" data-analytics-placement="blog_download_banner" data-analytics-app-slug="${safeAppSlug}" data-analytics-app-name="${safeAppName}" data-analytics-label="${safeLabel}">${badge}</a>`;
           })
           .join("");
 
