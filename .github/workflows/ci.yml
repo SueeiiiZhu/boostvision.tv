@@ -34,8 +34,12 @@ jobs:
           node-version: 20.12.0
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      # 只装 web 子树,排除 cms(Strapi / React 18)。整库安装会把 cms 的
+      # @types/react@18 混入 node_modules,使 web 的 tsc 解析到 18 并与
+      # React 19 类型冲突(本地历史 node_modules 无此干扰故不复现)。
+      # 顺带显著加快 CI(无需安装 Strapi 依赖)。
+      - name: Install dependencies (web subtree only)
+        run: pnpm install --frozen-lockfile --filter web...
 
       - name: Lint
         run: pnpm --filter web lint
