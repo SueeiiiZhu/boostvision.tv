@@ -2,8 +2,9 @@ import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata } from "@/lib/seo";
 import { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { AnalyticsTracker } from "@/components/analytics";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -64,9 +65,11 @@ export default async function ContactUsPage({ params }: Props) {
                 The fastest way to find the answer to your question is to seek through the frequently asked questions that we documented.
               </p>
               <div className="flex justify-center lg:justify-start">
-                <Link href="/faq" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
-                  Go to F.A.Q.
-                </Link>
+                <AnalyticsTracker eventName="cta_click" placement="contact_faq_cta" cta_type="internal_cta" link_text="Go to F.A.Q.">
+                  <Link href="/faq" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
+                    Go to F.A.Q.
+                  </Link>
+                </AnalyticsTracker>
               </div>
             </div>
           </div>
@@ -132,9 +135,11 @@ export default async function ContactUsPage({ params }: Props) {
                 Always feel free to contact us through our customer service E-mail, we will back you up with professional solutions.
               </p>
               <div className="flex justify-center lg:justify-start">
-                <a href="mailto:support@boostvision.com.cn" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
-                  E-mail us
-                </a>
+                <AnalyticsTracker eventName="cta_click" placement="contact_email_cta" cta_type="contact" link_text="E-mail us">
+                  <a href="mailto:support@boostvision.com.cn" className="btn-gradient text-[24px] px-8 py-4 rounded-[50px] font-normal">
+                    E-mail us
+                  </a>
+                </AnalyticsTracker>
               </div>
             </div>
           </div>
@@ -148,9 +153,11 @@ export default async function ContactUsPage({ params }: Props) {
             Coordinate your Smart TV and Smart Phone Now
           </h2>
           <div className="flex justify-center">
-            <Link href="/app" className="btn-gradient text-[24px] px-12 py-5 rounded-[50px] font-normal">
-              GET IT NOW
-            </Link>
+            <AnalyticsTracker eventName="cta_click" placement="contact_bottom_cta" cta_type="app_entry" link_text="GET IT NOW">
+              <Link href="/app" className="btn-gradient text-[24px] px-12 py-5 rounded-[50px] font-normal">
+                GET IT NOW
+              </Link>
+            </AnalyticsTracker>
           </div>
         </section>
       </div>

@@ -49,11 +49,6 @@
       "target": "api::app.app",
       "inversedBy": "tutorials"
     },
-    "relatedBlogs": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::blog-post.blog-post"
-    },
     "steps": {
       "type": "component",
       "pluginOptions": {

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Section, HeroSection, CTASection, TutorialAccordionSection, App, Tutorial, TutorialItem } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText } from '@/components/shared';
+import { AnalyticsTracker, getStoreClickEventName } from '@/components/analytics';
 import { PageAdSlot } from '@/components/ads';
 import { hasAdSenseSlot } from '@/config/adsense';
 
@@ -62,14 +63,23 @@ const TutorialHero: React.FC<{ data: HeroSection; app: App }> = ({ data, app }) 
             {/* Download Buttons */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6">
                 {app.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
-                        <Image
-                            src={link.badge.url}
-                            alt={link.platform}
-                            width={180} height={54}
-                            className="h-12 sm:h-14 w-auto"
-                        />
-                    </a>
+                    <AnalyticsTracker
+                        key={link.id}
+                        eventName={getStoreClickEventName(link.url)}
+                        placement="tutorial_section_hero"
+                        app_slug={app.slug}
+                        app_name={app.name}
+                        link_text={link.platform}
+                    >
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                            <Image
+                                src={link.badge.url}
+                                alt={link.platform}
+                                width={180} height={54}
+                                className="h-12 sm:h-14 w-auto"
+                            />
+                        </a>
+                    </AnalyticsTracker>
                 ))}
             </div>
         </div>
@@ -222,14 +232,23 @@ const AccordionItem: React.FC<{ item: TutorialItem; app: App; isOpen: boolean; o
                         {item.showDownloadButtons && (
                             <div className="mt-16 flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-8 pt-12 border-t border-gray-50">
                                 {app.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
-                                        <Image
-                                            src={link.badge.url}
-                                            alt={link.platform}
-                                            width={200} height={60}
-                                            className="h-12 sm:h-14 w-auto"
-                                        />
-                                    </a>
+                                    <AnalyticsTracker
+                                        key={link.id}
+                                        eventName={getStoreClickEventName(link.url)}
+                                        placement="tutorial_section_step"
+                                        app_slug={app.slug}
+                                        app_name={app.name}
+                                        link_text={link.platform}
+                                    >
+                                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                                            <Image
+                                                src={link.badge.url}
+                                                alt={link.platform}
+                                                width={200} height={60}
+                                                className="h-12 sm:h-14 w-auto"
+                                            />
+                                        </a>
+                                    </AnalyticsTracker>
                                 ))}
                             </div>
                         )}

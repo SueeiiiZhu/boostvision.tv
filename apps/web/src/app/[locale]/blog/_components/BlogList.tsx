@@ -1,5 +1,6 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { AnalyticsTracker } from "@/components/analytics";
 import { BlogPost, BlogCategory, HeroSection, CTASection } from "@/types/strapi";
 import { BlogCard } from "./BlogCard";
 import { Pagination } from "./Pagination";
@@ -127,22 +128,36 @@ export function BlogList({
                     </>
                   )}
                 </ul>
-                <Link
-                  href={ctaSection?.buttonLink || "/download"}
-                  className="btn-gradient mt-8 inline-flex w-full px-7 py-2.5 text-[22px] font-medium leading-[1.2]"
+                <AnalyticsTracker
+                  eventName="cta_click"
+                  placement="blog_list_sidebar_cta"
+                  cta_type={ctaSection?.buttonLink === "/app" ? "app_entry" : "internal_cta"}
+                  link_text={ctaSection?.buttonText || "Download Now"}
                 >
-                  {ctaSection?.buttonText || "Download Now"}
-                </Link>
+                  <Link
+                    href={ctaSection?.buttonLink || "/download"}
+                    className="btn-gradient mt-8 inline-flex w-full px-7 py-2.5 text-[22px] font-medium leading-[1.2]"
+                  >
+                    {ctaSection?.buttonText || "Download Now"}
+                  </Link>
+                </AnalyticsTracker>
                 {ctaSection?.links && ctaSection.links.length > 0 && (
                   <div className="mt-5 flex flex-col gap-2">
                     {ctaSection.links.map((link) => (
-                      <Link
+                      <AnalyticsTracker
                         key={link.id}
-                        href={link.href || "#"}
-                        className="text-[15px] leading-[1.4] text-primary underline underline-offset-2 hover:text-primary/80"
+                        placement="blog_list_sidebar_link"
+                        eventName="cta_click"
+                        cta_type={link.href === "/app" ? "app_entry" : "internal_cta"}
+                        link_text={link.name}
                       >
-                        {link.name}
-                      </Link>
+                        <Link
+                          href={link.href || "#"}
+                          className="text-[15px] leading-[1.4] text-primary underline underline-offset-2 hover:text-primary/80"
+                        >
+                          {link.name}
+                        </Link>
+                      </AnalyticsTracker>
                     ))}
                   </div>
                 )}

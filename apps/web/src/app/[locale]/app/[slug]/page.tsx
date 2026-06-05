@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -185,16 +186,24 @@ export default async function AppDetailPage({ params }: Props) {
                           );
 
                           return (
-                            <a
+                            <AnalyticsTracker
                               key={link.id}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                              {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                              eventName={getStoreClickEventName(link.url)}
+                              placement="app_detail_hero"
+                              app_slug={app.slug}
+                              app_name={app.name}
+                              link_text={link.platform}
                             >
-                              {ButtonContent}
-                            </a>
+                              <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                              >
+                                {ButtonContent}
+                              </a>
+                            </AnalyticsTracker>
                           );
                         })
                       ) : null}
@@ -361,14 +370,23 @@ export default async function AppDetailPage({ params }: Props) {
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                   {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
-                      <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
-                        <Image
-                          src={link.badge.url}
-                          alt={link.platform}
-                          width={220} height={66}
-                          className="h-12 sm:h-14 w-auto"
-                        />
-                      </a>
+                      <AnalyticsTracker
+                        key={link.id}
+                        eventName={getStoreClickEventName(link.url)}
+                        placement="app_detail_bottom"
+                        app_slug={app.slug}
+                        app_name={app.name}
+                        link_text={link.platform}
+                      >
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                          <Image
+                            src={link.badge.url}
+                            alt={link.platform}
+                            width={220} height={66}
+                            className="h-12 sm:h-14 w-auto"
+                          />
+                        </a>
+                      </AnalyticsTracker>
                     ))
                   ) : null}
                 </div>

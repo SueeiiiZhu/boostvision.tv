@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { SectionRenderer, JsonLd } from "@/components/shared";
+import { AnalyticsTracker } from "@/components/analytics";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { generateMetadata as genMetadata, generateOrganizationSchema, generateWebSiteSchema, wrapInGraph } from "@/lib/seo";
@@ -72,9 +73,11 @@ export default async function Home({ params }: Props) {
                     </p>
                     <div className="mt-6 lg:mt-12 animate-slide-up delay-200 flex justify-center lg:justify-start">
                       <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
-                        <Link href="/app" className="btn-gradient">
-                          GET IT NOW
-                        </Link>
+                        <AnalyticsTracker eventName="cta_click" placement="home_hero_cta" cta_type="app_entry" link_text="GET IT NOW">
+                          <Link href="/app" className="btn-gradient">
+                            GET IT NOW
+                          </Link>
+                        </AnalyticsTracker>
                       </div>
                     </div>
 
@@ -106,9 +109,11 @@ export default async function Home({ params }: Props) {
                 <p className="text-muted mb-12 text-[20px] max-w-[700px] mx-auto leading-relaxed">
                   Go to our App download center to install screen mirroring and TV remote apps on iPhone and Android now.
                 </p>
-                <Link href="/app" className="btn-gradient">
-                  GET IT NOW
-                </Link>
+                <AnalyticsTracker eventName="cta_click" placement="home_bottom_cta" cta_type="app_entry" link_text="GET IT NOW">
+                  <Link href="/app" className="btn-gradient">
+                    GET IT NOW
+                  </Link>
+                </AnalyticsTracker>
               </div>
             </section>
           </>
