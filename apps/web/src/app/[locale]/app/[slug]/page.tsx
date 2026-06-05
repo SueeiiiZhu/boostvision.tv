@@ -124,7 +124,7 @@ export default async function AppDetailPage({ params }: Props) {
                 <div className="flex flex-col lg:flex-row items-center gap-0 md:gap-16 lg:gap-24">
                   {/* Left Column: Text Content */}
                   <div className="order-2 lg:order-1 flex-1 text-left">
-                    <h1 className="text-[30px] md:text-[36px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
+                    <h1 className="text-[28px] md:text-[36px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
                       {app.displayTitle || app.name}
                     </h1>
                     <p className="text-[16px] text-muted/80 leading-[1.25em] mb-10 max-w-[500px]">
@@ -356,7 +356,7 @@ export default async function AppDetailPage({ params }: Props) {
             {/* Final CTA Section */}
             <section className="py-32 text-center bg-section-bg-3 text-white">
               <div className="container-custom">
-                <h2 className="text-[30px] md:text-[32px] font-black mb-10 leading-[1.1] max-w-[950px] mx-auto tracking-tight">
+                <h2 className="text-[24px] md:text-[32px] font-black mb-10 leading-[1.1] max-w-[950px] mx-auto tracking-tight">
                   Free Download {app.name} on Android or iPhone, iPad Today!
                 </h2>
                 <p className="text-[20px] text-white/70 mb-14 max-w-[850px] mx-auto leading-relaxed">
