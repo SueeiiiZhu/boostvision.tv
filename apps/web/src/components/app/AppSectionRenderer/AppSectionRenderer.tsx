@@ -81,6 +81,7 @@ const AppHelp: React.FC<{ data: AppHelpSection; app: App }> = ({ data, app }) =>
     const topLevelBlogs = data.blogs ?? [];
     const blogs = topLevelBlogs.filter((blog, index, arr) => arr.findIndex((item) => item.id === blog.id) === index);
     const faqItems = data.faqItems ?? [];
+    const [openFaqItemId, setOpenFaqItemId] = React.useState<number | null>(null);
 
     if (blogs.length === 0 && faqItems.length === 0) return null;
 
@@ -88,7 +89,7 @@ const AppHelp: React.FC<{ data: AppHelpSection; app: App }> = ({ data, app }) =>
         <section className="bg-gradient-to-b from-section-bg-2 to-white py-16 md:py-24">
             <div className="container-custom">
                 {data.title ? (
-                    <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                    <h2 className="text-[28px] md:text-[32px] font-black text-heading text-center mb-12 tracking-tight">
                         {data.title}
                     </h2>
                 ) : null}
@@ -139,7 +140,14 @@ const AppHelp: React.FC<{ data: AppHelpSection; app: App }> = ({ data, app }) =>
                             </h3>
                             <div className="space-y-4">
                                 {faqItems.map((item) => (
-                                    <AppHelpAccordionItem key={item.id} item={item} />
+                                    <AppHelpAccordionItem
+                                        key={item.id}
+                                        item={item}
+                                        isOpen={openFaqItemId === item.id}
+                                        onToggle={() => {
+                                            setOpenFaqItemId((currentId) => currentId === item.id ? null : item.id);
+                                        }}
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -244,7 +252,7 @@ const AppCompatibility: React.FC<{ data: AppCompatibilitySection }> = ({ data })
         <section className="bg-section-bg-3 py-16 text-white md:py-24">
             <div className="container-custom">
                 {data.title ? (
-                    <h2 className="mx-auto mb-6 max-w-[900px] text-center text-[28px] font-black tracking-tight md:text-[40px]">
+                    <h2 className="mx-auto mb-6 max-w-[900px] text-center text-[28px] font-black tracking-tight md:text-[32px]">
                         {data.title}
                     </h2>
                 ) : null}
@@ -258,7 +266,12 @@ const AppCompatibility: React.FC<{ data: AppCompatibilitySection }> = ({ data })
                     ref={mobileCardTrackRef}
                     onScroll={handleMobileCardScroll}
                     onTouchEnd={handleMobileCardTouchEnd}
-                    className="flex snap-x snap-mandatory gap-4 overflow-x-auto md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    className={cn(
+                        "flex gap-4 md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+                        brandItems.length === 1
+                            ? "justify-center overflow-visible"
+                            : "snap-x snap-mandatory overflow-x-auto"
+                    )}
                 >
                     {brandItems.map((item, index) => (
                         <div
@@ -266,7 +279,12 @@ const AppCompatibility: React.FC<{ data: AppCompatibilitySection }> = ({ data })
                             ref={(element) => {
                                 mobileCardRefs.current[index] = element;
                             }}
-                            className="w-[88%] shrink-0 snap-center rounded-[30px] border border-white/12 bg-white/6 p-6 backdrop-blur-[2px]"
+                            className={cn(
+                                "shrink-0 rounded-[30px] border border-white/12 bg-white/6 p-6 backdrop-blur-[2px]",
+                                brandItems.length === 1
+                                    ? "w-full max-w-[420px]"
+                                    : "w-[88%] snap-center"
+                            )}
                         >
                             <div className="mb-6 flex min-h-[52px] items-center justify-center border-b border-white/12 pb-5">
                                 {item.brandLogo ? (
@@ -448,8 +466,11 @@ function renderDeviceList(deviceList: string[]) {
     );
 }
 
-const AppHelpAccordionItem: React.FC<{ item: FAQAccordionItem }> = ({ item }) => {
-    const [isOpen, setIsOpen] = React.useState(false);
+const AppHelpAccordionItem: React.FC<{
+    item: FAQAccordionItem;
+    isOpen: boolean;
+    onToggle: () => void;
+}> = ({ item, isOpen, onToggle }) => {
     const [isMounted, setIsMounted] = React.useState(false);
 
     const decodeHtmlEntities = (text: string): string => {
@@ -515,7 +536,7 @@ const AppHelpAccordionItem: React.FC<{ item: FAQAccordionItem }> = ({ item }) =>
             isOpen ? "translate-y-[-2px]" : "hover:border-primary/30"
         )}>
             <button
-                onClick={() => setIsOpen((prev) => !prev)}
+                onClick={onToggle}
                 className="flex w-full items-center justify-between px-4 py-5 text-left md:px-6"
             >
                 <h4 className="text-[15px] font-black text-heading">{item.title}</h4>
@@ -536,11 +557,11 @@ const AppHelpAccordionItem: React.FC<{ item: FAQAccordionItem }> = ({ item }) =>
                             processedContent.useRichText ? (
                                 <RichText
                                     content={item.content}
-                                    className="text-[16px] text-muted font-light leading-[1.8]"
+                                    className="text-[14px] text-muted font-light leading-[1.25em] [&_*]:!text-[14px] [&_li]:!leading-[1.25em] [&_ol]:!my-3 [&_ol]:!space-y-2 [&_p]:!mb-3 [&_p]:!leading-[1.25em] [&_ul]:!my-3 [&_ul]:!space-y-2"
                                 />
                             ) : processedContent.html ? (
                                 <div
-                                    className="text-[16px] text-muted font-light leading-[1.8] prose max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline [&_a]:text-primary [&_a]:font-bold [&_a:hover]:underline"
+                                    className="text-[14px] text-muted font-light leading-[1.25em] prose max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline [&_*]:!text-[14px] [&_a]:text-primary [&_a]:font-bold [&_a:hover]:underline [&_li]:!leading-[1.25em] [&_p]:!leading-[1.25em]"
                                     dangerouslySetInnerHTML={{ __html: processedContent.html }}
                                 />
                             ) : null
@@ -559,7 +580,7 @@ const AppRelatedHelp: React.FC<{
 }> = ({ app, tutorials, faqs }) => (
     <section className="py-16 md:py-24 bg-white">
         <div className="container-custom">
-            <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+            <h2 className="text-[28px] md:text-[32px] font-black text-heading text-center mb-12 tracking-tight">
                 More Help for {app.name}
             </h2>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -607,14 +628,14 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
             <div className="flex flex-col lg:flex-row items-center gap-0 md:gap-16 lg:gap-24">
                 {/* Left Column: Text Content */}
                 <div className="order-2 lg:order-1 flex-1 text-left">
-                    <h1 className="text-[30px] md:text-[55px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
+                    <h1 className="text-[28px] md:text-[36px] font-black text-heading leading-[1.1] mb-8 tracking-tight">
                         {data.title || app.displayTitle || app.name}
                     </h1>
 
                     {/* 使用 RichText 渲染 Hero 描述 */}
                     <RichText
                         content={data.subtitle || app.shortDescription}
-                        className="text-[16px] text-muted/80 leading-relaxed mb-10 max-w-[500px]"
+                        className="text-[16px] text-muted/80 leading-[1.25em] mb-10 max-w-[500px]"
                     />
 
                     {/* Stats Section */}
@@ -749,10 +770,10 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
 const AppWhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
     <section className="pt-6 md:pt-8 pb-14 md:pb-16 bg-section-bg-2 text-center">
         <div className="container-custom md:max-w-[1320px]">
-            <h2 className="text-[28px] md:text-[40px] font-black text-heading mt-[1em] mb-[1em]">{data.title}</h2>
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+            <h2 className="text-[28px] md:text-[32px] font-black text-heading mt-[1em] mb-[1em]">{data.title}</h2>
+            <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-2 md:gap-10 md:overflow-visible md:pb-0 lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {data.features.map((feature, i) => (
-                    <div key={i} className="group grid grid-cols-[96px_1fr] items-center gap-x-5 gap-y-4 rounded-[40px] bg-white p-6 card-shadow transition-all duration-500 hover:-translate-y-3 md:flex md:flex-col md:gap-0 md:p-8">
+                    <div key={i} className="group grid w-[86%] shrink-0 snap-center grid-cols-[96px_1fr] items-center gap-x-5 gap-y-4 rounded-[40px] bg-white p-6 text-left card-shadow transition-all duration-500 hover:-translate-y-3 md:w-auto md:flex md:flex-col md:gap-0 md:p-8 md:text-center">
                         <div className="h-24 w-24 shrink-0 flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110 md:mb-10 md:h-[120px] md:w-auto">
                             {feature.icon && (
                                 <Image
@@ -810,18 +831,18 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, isEven?: bo
                                 height={32}
                             />
                         </div>
-                        <h2 className="text-[28px] md:text-[40px] font-black leading-[1.1] text-heading text-left md:mb-8">{data.title}</h2>
+                        <h2 className="text-[20px] md:text-[32px] font-black leading-[1.1] text-heading text-left md:mb-4">{data.title}</h2>
                     </div>
 
                     {/* description 和 richText 现在可以共存，且都使用 RichText 渲染 */}
                     {data.description && (
-                        <RichText content={data.description} className="mb-6" />
+                        <RichText content={data.description} className="mb-6 md:mb-3" />
                     )}
 
                     {data.richText && (
                         <RichText
                             content={data.richText}
-                            className="mb-10 app-zigzag-list-tight"
+                            className="mb-10 md:mb-5 app-zigzag-list-tight"
                             variant={data.labelColor === 'blue' ? 'blue-circle' : 'gray-square'}
                         />
                     )}
@@ -834,7 +855,7 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, isEven?: bo
 const AppBrandsGrid: React.FC<{ data: BrandsGridSection; app: App }> = ({ data, app }) => (
     <section className="py-32 bg-white text-center">
         <div className="container-custom">
-            <h2 className="text-[28px] md:text-[40px] font-black text-heading mb-6 tracking-tight">
+            <h2 className="text-[28px] md:text-[32px] font-black text-heading mb-6 tracking-tight">
                 {data.title || `${app.name} Support all Smart TVs & Sticks`}
             </h2>
             <RichText
@@ -869,7 +890,7 @@ const AppBrandsGrid: React.FC<{ data: BrandsGridSection; app: App }> = ({ data, 
 const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
     <section className="py-16 md:py-32 text-center bg-section-bg-cta text-white">
         <div className="container-custom">
-            <h2 className="mb-8 max-w-[1000px] mx-auto text-[30px] md:text-[45px] leading-[1.2] font-black text-heading">
+            <h2 className="mb-8 max-w-[1000px] mx-auto text-[24px] md:text-[32px] leading-[1.2] font-black text-heading">
                 {data.title || `Free Download ${app.name} on Android or iPhone, iPad Today!`}
             </h2>
             <RichText
