@@ -99,7 +99,12 @@
       }
     },
     "postDate": {
-      "type": "datetime"
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
     },
     "isFeatured": {
       "type": "boolean",

@@ -3,13 +3,11 @@ import Image from "next/image";
 import { getTutorialsForList } from "@/lib/strapi/api/tutorials";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { generateMetadata as genMetadata } from "@/lib/seo";
-import { HeroSection, CTASection } from "@/types/strapi";
-import { cn } from "@/lib/utils";
+import { HeroSection, CTASection, Tutorial } from "@/types/strapi";
 import type { Metadata } from "next";
 
 interface Props {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ type?: string }>;
 }
 
 export const revalidate = 21600;
@@ -27,20 +25,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function TutorialPage({ params, searchParams }: Props) {
+export default async function TutorialPage({ params }: Props) {
   const { locale } = await params;
-  const { type = "screen-mirroring" } = await searchParams;
 
-  const [tutorialsResponse, pageData] = await Promise.all([
+  const [screenMirroringResponse, tvRemoteResponse, pageData] = await Promise.all([
     getTutorialsForList({
-      appType: type as 'screen-mirroring' | 'tv-remote',
+      appType: "screen-mirroring",
+      limit: 100,
+      locale,
+    }).catch(() => null),
+    getTutorialsForList({
+      appType: "tv-remote",
       limit: 100,
       locale,
     }).catch(() => null),
     getPageBySlug("tutorial", locale).catch(() => null)
   ]);
 
-  const tutorials = tutorialsResponse?.data || [];
+  const screenMirroringTutorials = screenMirroringResponse?.data || [];
+  const tvRemoteTutorials = tvRemoteResponse?.data || [];
   const sections = pageData?.sections || [];
 
   const heroSection = sections.find(s => s.__component === 'sections.hero') as HeroSection | undefined;
@@ -61,67 +64,19 @@ export default async function TutorialPage({ params, searchParams }: Props) {
       </section>
 
       {/* Apps Selection */}
-      <section className="bg-support-bg py-24">
+      <section className="bg-section-bg-cta py-24">
         <div className="container-custom">
-          {/* Tabs */}
-          <div className="mb-16 flex justify-center gap-6">
-            <Link
-              href="/tutorial?type=screen-mirroring"
-              scroll={false}
-              className={cn(
-                "rounded-full px-12 py-4 text-[18px] font-bold shadow-xl transition-all",
-                type === "screen-mirroring"
-                  ? "bg-primary text-white hover:translate-y-[-2px]"
-                  : "bg-white border border-gray-100 text-heading hover:bg-section-bg card-shadow"
-              )}
-            >
-              Screen Mirroring
-            </Link>
-            <Link
-              href="/tutorial?type=tv-remote"
-              scroll={false}
-              className={cn(
-                "rounded-full px-12 py-4 text-[18px] font-bold shadow-xl transition-all",
-                type === "tv-remote"
-                  ? "bg-primary text-white hover:translate-y-[-2px]"
-                  : "bg-white border border-gray-100 text-heading hover:bg-section-bg card-shadow"
-              )}
-            >
-              TV Remote App
-            </Link>
-          </div>
-
-          {/* Tutorials Grid */}
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
-            {tutorials.length > 0 ? tutorials.map((tutorial) => {
-              const app = tutorial.app;
-              return (
-                <Link
-                  key={tutorial.id}
-                  href={`/tutorial/${app?.slug}`}
-                  className="group flex flex-col items-center rounded-[30px] bg-white p-8 text-center card-shadow transition-all duration-300 hover:translate-y-[-10px]"
-                >
-                  <div className="mb-6 h-20 w-20 relative overflow-hidden rounded-2xl shadow-md group-hover:scale-110 transition-transform">
-                    <Image
-                      src={app?.icon?.url || "/icons/app-placeholder.webp"}
-                      alt={tutorial.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <span className="mb-2 inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-[12px] font-bold text-primary">
-                    Tutorial
-                  </span>
-                  <h3 className="text-[18px] font-bold text-heading leading-tight group-hover:text-primary transition-colors">
-                    {tutorial.title}
-                  </h3>
-                </Link>
-              );
-            }) : (
-              <div className="col-span-full py-20 text-center">
-                <p className="text-[18px] text-muted">No tutorials found.</p>
-              </div>
-            )}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <TutorialCategory
+              title="Screen Mirroring Apps"
+              tutorials={screenMirroringTutorials}
+              className="bg-[#eef6ff]"
+            />
+            <TutorialCategory
+              title="TV Remote Apps"
+              tutorials={tvRemoteTutorials}
+              className="bg-[#f1f8f0]"
+            />
           </div>
         </div>
       </section>
@@ -175,5 +130,52 @@ export default async function TutorialPage({ params, searchParams }: Props) {
         </p>
       </div>
     </main>
+  );
+}
+
+function TutorialCategory({
+  title,
+  tutorials,
+  className,
+}: {
+  title: string;
+  tutorials: Tutorial[];
+  className: string;
+}) {
+  return (
+    <section className={`${className} rounded-[28px] p-5 md:p-8`}>
+      <h2 className="mb-6 text-[24px] font-black text-heading md:text-[28px]">
+        {title}
+      </h2>
+      <div className="flex flex-col gap-4">
+        {tutorials.length > 0 ? tutorials.map((tutorial) => {
+          const app = tutorial.app;
+          const tutorialHref = tutorial.slug ? `/tutorial/${tutorial.slug}` : app?.slug ? `/tutorial/${app.slug}` : "/tutorial";
+          return (
+            <Link
+              key={tutorial.id}
+              href={tutorialHref}
+              className="group flex min-h-[84px] w-full items-center gap-4 rounded-[18px] border border-white/70 bg-white px-4 py-4 text-left shadow-[0_10px_30px_rgba(20,48,92,0.08)] transition-colors duration-300 hover:border-primary/25 hover:bg-white/95 md:px-5"
+            >
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[14px] shadow-sm">
+                <Image
+                  src={app?.icon?.url || "/icons/app-placeholder.webp"}
+                  alt={app?.name || tutorial.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="min-w-0 flex-1 text-[17px] font-bold leading-tight text-heading transition-colors group-hover:text-primary">
+                {app?.name || tutorial.title}
+              </span>
+            </Link>
+          );
+        }) : (
+          <div className="rounded-[18px] border border-white/70 bg-white px-5 py-10 text-center">
+            <p className="text-[16px] text-muted">No tutorials found.</p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
