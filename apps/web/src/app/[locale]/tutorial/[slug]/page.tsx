@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 import { RichText, JsonLd } from "@/components/shared";
 import { TutorialSectionRenderer } from "@/components/tutorial/TutorialSectionRenderer";
 import { PageAdSlot, StickyMobileAdBanner } from "@/components/ads";
@@ -17,7 +18,7 @@ export const revalidate = 21600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
-  const tutorial = await getTutorialSeoBySlug(slug);
+  const tutorial = await getTutorialSeoBySlug(slug, locale);
 
   if (!tutorial) return { title: "Tutorial Not Found" };
 
@@ -32,9 +33,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TutorialDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   
-  const tutorial = await getTutorialPageBySlug(slug);
+  const tutorial = await getTutorialPageBySlug(slug, locale);
 
   if (!tutorial) {
     notFound();
@@ -91,14 +92,23 @@ export default async function TutorialDetailPage({ params }: Props) {
               {/* Download Buttons */}
               <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 sm:gap-6">
                 {app?.downloadLinks && app.downloadLinks.slice(0, 2).map((link) => (
-                  <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
-                    <Image
-                      src={link.badge.url}
-                      alt={link.platform}
-                      width={180} height={54}
-                      className="h-12 sm:h-14 w-auto"
-                    />
-                  </a>
+                  <AnalyticsTracker
+                    key={link.id}
+                    eventName={getStoreClickEventName(link.url)}
+                    placement="tutorial_detail_hero"
+                    app_slug={app.slug}
+                    app_name={app.name}
+                    link_text={link.platform}
+                  >
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                      <Image
+                        src={link.badge.url}
+                        alt={link.platform}
+                        width={180} height={54}
+                        className="h-12 sm:h-14 w-auto"
+                      />
+                    </a>
+                  </AnalyticsTracker>
                 ))}
               </div>
             </div>

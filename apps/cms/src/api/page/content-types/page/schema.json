@@ -63,8 +63,8 @@
           "localized": true
         }
       },
-      "repeatable": false,
-      "component": "shared.seo"
+      "component": "shared.seo",
+      "repeatable": false
     }
   }
 }

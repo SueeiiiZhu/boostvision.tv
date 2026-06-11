@@ -447,6 +447,31 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
+    appStoreRating: Schema.Attribute.Decimal &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+          min: 0;
+        },
+        number
+      >;
+    appStoreRatingCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -481,6 +506,31 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    googlePlayRating: Schema.Attribute.Decimal &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+          min: 0;
+        },
+        number
+      >;
+    googlePlayRatingCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
     heroImage: Schema.Attribute.Media<'images'> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -533,6 +583,24 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
         },
         number
       >;
+    ratingCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    ratingSyncedAt: Schema.Attribute.DateTime &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     screenshots: Schema.Attribute.Media<'images', true> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -549,6 +617,8 @@ export interface ApiAppApp extends Struct.CollectionTypeSchema {
         'sections.cta',
         'sections.apps-grid',
         'sections.brands-grid',
+        'sections.app-help',
+        'sections.app-compatibility',
       ]
     > &
       Schema.Attribute.SetPluginOptions<{
@@ -609,7 +679,12 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
-    avatar: Schema.Attribute.Media<'images'>;
+    avatar: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     bio: Schema.Attribute.Text &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -623,7 +698,12 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    email: Schema.Attribute.Email;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     expertise: Schema.Attribute.Text &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -647,7 +727,12 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
       }>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
-    socialLinks: Schema.Attribute.Component<'shared.social-link', true>;
+    socialLinks: Schema.Attribute.Component<'shared.social-link', true> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -769,7 +854,12 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::blog-post.blog-post'
     >;
-    postDate: Schema.Attribute.DateTime;
+    postDate: Schema.Attribute.DateTime &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     readTime: Schema.Attribute.Integer &
       Schema.Attribute.SetPluginOptions<{

@@ -6,6 +6,7 @@ import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata } from "@/lib/seo";
 import { App, HeroSection, CTASection } from "@/types/strapi";
 import { QRCode } from "@/components/shared";
+import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 
@@ -16,7 +17,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const [pageData, globalSetting] = await Promise.all([
-    getPageBySlug("app").catch(() => null),
+    getPageBySlug("app", locale).catch(() => null),
     getGlobalSetting(locale).catch(() => null),
   ]);
   
@@ -30,11 +31,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function AppsPage() {
+export default async function AppsPage({ params }: Props) {
+  const { locale } = await params;
   // 并行获取 App 列表和页面配置数据
   const [appsResponse, pageData] = await Promise.all([
-    getApps({ limit: 100 }).catch(() => null),
-    getPageBySlug("app").catch(() => null)
+    getApps({ limit: 100, locale }).catch(() => null),
+    getPageBySlug("app", locale).catch(() => null)
   ]);
 
   const apps = appsResponse?.data || [];
@@ -213,19 +215,27 @@ function AppCatalogCard({ app }: { app: App }) {
               );
 
               return (
-                <a
+                <AnalyticsTracker
                   key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "relative z-0 mx-auto flex w-[160px] justify-center sm:w-[186px] md:mx-0 md:hover:z-[250] md:focus-within:z-[250]",
-                    link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
-                  )}
-                  {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                  eventName={getStoreClickEventName(link.url)}
+                  placement="app_list_card"
+                  app_slug={app.slug}
+                  app_name={app.name}
+                  link_text={link.platform}
                 >
-                  {ButtonContent}
-                </a>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "relative z-0 mx-auto flex w-[160px] justify-center sm:w-[186px] md:mx-0 md:hover:z-[250] md:focus-within:z-[250]",
+                      link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
+                    )}
+                    {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                  >
+                    {ButtonContent}
+                  </a>
+                </AnalyticsTracker>
               );
             })
           ) : (

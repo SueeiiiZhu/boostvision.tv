@@ -1,9 +1,12 @@
+"use client";
+
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting } from '@/types/strapi';
+import { Section, HeroSection, FeatureHighlightSection, WhyChooseSection, CTASection, BrandsGridSection, App, GlobalSetting, AppHelpSection, FAQAccordionItem, TutorialItem, AppCompatibilitySection } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { RichText, QRCode } from '@/components/shared';
+import { AnalyticsTracker, getStoreClickEventName } from '@/components/analytics';
 
 interface AppSectionRendererProps {
     sections: Section[];
@@ -12,11 +15,21 @@ interface AppSectionRendererProps {
 }
 
 /**
- * AppSectionRenderer - Server Component
+ * AppSectionRenderer - Client Component
  * Dedicated renderer for App Detail pages to match their unique style
  */
 export function AppSectionRenderer({ sections, app, globalSetting }: AppSectionRendererProps) {
     if (!sections || sections.length === 0) return null;
+    const hasAppHelpSection = sections.some((section) => section.__component === 'sections.app-help');
+    const relatedTutorials = (app.tutorials ?? [])
+        .slice()
+        .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+        .slice(0, 4);
+    const relatedFaqs = (app.faqs ?? [])
+        .slice()
+        .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+        .slice(0, 4);
+    const hasRelatedHelp = relatedTutorials.length > 0 || relatedFaqs.length > 0;
 
     return (
         <>
@@ -26,12 +39,27 @@ export function AppSectionRenderer({ sections, app, globalSetting }: AppSectionR
                         return <AppHero key={index} data={section} app={app} globalSetting={globalSetting} />;
                     case 'sections.why-choose':
                         return <AppWhyChoose key={index} data={section} />;
+                    case 'sections.app-help':
+                        return <AppHelp key={index} data={section} app={app} />;
+                    case 'sections.app-compatibility':
+                        return <AppCompatibility key={index} data={section} />;
                     case 'sections.cta':
-                        return <AppCTA key={index} data={section} app={app} />;
+                        return (
+                            <React.Fragment key={index}>
+                                {!hasAppHelpSection && hasRelatedHelp ? (
+                                    <AppRelatedHelp
+                                        app={app}
+                                        tutorials={relatedTutorials}
+                                        faqs={relatedFaqs}
+                                    />
+                                ) : null}
+                                <AppCTA data={section} app={app} />
+                            </React.Fragment>
+                        );
                     case 'sections.brands-grid':
                         return <AppBrandsGrid key={index} data={section} app={app} />;
                     case 'sections.feature-highlight':
-                        return <AppFeatureHighlight key={index} data={section} app={app} isEven={index % 2 === 1} />;
+                        return <AppFeatureHighlight key={index} data={section} isEven={index % 2 === 1} />;
                     default:
                         // For sections not specifically styled for App pages, 
                         // we could potentially fallback to standard SectionRenderer components
@@ -41,6 +69,537 @@ export function AppSectionRenderer({ sections, app, globalSetting }: AppSectionR
         </>
     );
 }
+
+type TextNode = {
+    type: 'text';
+    text: string;
+};
+
+type ParagraphBlock = Extract<TutorialItem["content"][number], { type: 'paragraph' }>;
+
+const AppHelp: React.FC<{ data: AppHelpSection; app: App }> = ({ data, app }) => {
+    const topLevelBlogs = data.blogs ?? [];
+    const blogs = topLevelBlogs.filter((blog, index, arr) => arr.findIndex((item) => item.id === blog.id) === index);
+    const faqItems = data.faqItems ?? [];
+
+    if (blogs.length === 0 && faqItems.length === 0) return null;
+
+    return (
+        <section className="bg-gradient-to-b from-section-bg-2 to-white py-16 md:py-24">
+            <div className="container-custom">
+                {data.title ? (
+                    <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                        {data.title}
+                    </h2>
+                ) : null}
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    {blogs.length > 0 ? (
+                        <div className="rounded-[28px] bg-transparent p-0 md:bg-transparent md:p-10">
+                            <h3 className="mb-6 flex items-center justify-center gap-[0.5em] text-[22px] font-black text-heading md:inline-flex md:justify-start">
+                                <Image
+                                    src="/icons/guide-icon.svg"
+                                    alt=""
+                                    width={24}
+                                    height={24}
+                                    className="h-[1em] w-[1em] shrink-0"
+                                    aria-hidden="true"
+                                />
+                                <span>{data.tutorialTitle || 'Related Tutorials'}</span>
+                            </h3>
+                            <div className="flex flex-col items-start gap-3">
+                                {blogs.map((blog) => (
+                                    <Link
+                                        key={blog.id}
+                                        href={`/blog/${blog.slug}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group inline-flex min-h-[64px] w-full items-center rounded-[40px] border border-gray-200 bg-white px-5 py-4 text-left transition-all duration-300 hover:border-primary/30 md:px-8"
+                                    >
+                                        <span className="block min-w-0 flex-1 truncate text-[16px] font-black text-heading transition-colors group-hover:text-[#1e6cf4]">
+                                            {blog.title}
+                                        </span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    ) : null}
+
+                    {faqItems.length > 0 ? (
+                        <div className="rounded-[28px] bg-transparent p-0 md:bg-transparent md:p-10">
+                            <h3 className="mb-6 flex items-center justify-center gap-[0.5em] text-[22px] font-black text-heading md:inline-flex md:justify-start">
+                                <Image
+                                    src="/icons/faq-icon.svg"
+                                    alt=""
+                                    width={24}
+                                    height={24}
+                                    className="h-[1em] w-[1em] shrink-0"
+                                    aria-hidden="true"
+                                />
+                                <span>{data.faqTitle || `FAQ for ${app.name}`}</span>
+                            </h3>
+                            <div className="space-y-4">
+                                {faqItems.map((item) => (
+                                    <AppHelpAccordionItem key={item.id} item={item} />
+                                ))}
+                            </div>
+                        </div>
+                    ) : null}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+const AppCompatibility: React.FC<{ data: AppCompatibilitySection }> = ({ data }) => {
+    const brandItems = (data.brandItems ?? []).filter((item) => item.brandLogo || item.deviceList || item.description);
+    const [activeIndex, setActiveIndex] = React.useState(0);
+    const activeIndexRef = React.useRef(0);
+    const panelRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+    const [maxPanelHeight, setMaxPanelHeight] = React.useState(0);
+    const mobileCardTrackRef = React.useRef<HTMLDivElement | null>(null);
+    const mobileCardRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+    const cardSettleTimerRef = React.useRef<number | null>(null);
+
+    React.useEffect(() => {
+        setActiveIndex(0);
+        activeIndexRef.current = 0;
+    }, [brandItems.length]);
+
+    React.useEffect(() => {
+        activeIndexRef.current = activeIndex;
+    }, [activeIndex]);
+
+    React.useEffect(() => {
+        const measure = () => {
+            const nextHeight = panelRefs.current.reduce((max, element) => {
+                const height = element?.offsetHeight ?? 0;
+                return height > max ? height : max;
+            }, 0);
+            setMaxPanelHeight(nextHeight);
+        };
+
+        const frame = window.requestAnimationFrame(measure);
+        window.addEventListener("resize", measure);
+
+        return () => {
+            window.cancelAnimationFrame(frame);
+            window.removeEventListener("resize", measure);
+        };
+    }, [brandItems]);
+
+    React.useEffect(() => {
+        return () => {
+            if (cardSettleTimerRef.current) window.clearTimeout(cardSettleTimerRef.current);
+        };
+    }, []);
+
+    if (brandItems.length === 0) return null;
+
+    const activeItem = brandItems[Math.min(activeIndex, brandItems.length - 1)];
+    const deviceList = parseDeviceList(activeItem?.deviceList);
+
+    const resolveClosestIndex = (container: HTMLDivElement, items: Array<HTMLDivElement | null>) => {
+        const containerCenter = container.scrollLeft + container.clientWidth / 2;
+        let closestIndex = 0;
+        let smallestDistance = Number.POSITIVE_INFINITY;
+
+        items.forEach((item, index) => {
+            if (!item) return;
+            const itemCenter = item.offsetLeft + item.clientWidth / 2;
+            const distance = Math.abs(itemCenter - containerCenter);
+            if (distance < smallestDistance) {
+                smallestDistance = distance;
+                closestIndex = index;
+            }
+        });
+
+        return closestIndex;
+    };
+
+    const handleMobileCardScroll = () => {
+        const container = mobileCardTrackRef.current;
+        if (!container) return;
+        if (cardSettleTimerRef.current) window.clearTimeout(cardSettleTimerRef.current);
+        cardSettleTimerRef.current = window.setTimeout(() => {
+            const nextIndex = resolveClosestIndex(container, mobileCardRefs.current);
+            if (nextIndex !== activeIndexRef.current) {
+                setActiveIndex(nextIndex);
+                activeIndexRef.current = nextIndex;
+            }
+        }, 80);
+    };
+
+    const handleMobileCardTouchEnd = () => {
+        const container = mobileCardTrackRef.current;
+        if (!container) return;
+        if (cardSettleTimerRef.current) window.clearTimeout(cardSettleTimerRef.current);
+        const nextIndex = resolveClosestIndex(container, mobileCardRefs.current);
+        if (nextIndex !== activeIndexRef.current) {
+            setActiveIndex(nextIndex);
+            activeIndexRef.current = nextIndex;
+        }
+    };
+
+    return (
+        <section className="bg-section-bg-3 py-16 text-white md:py-24">
+            <div className="container-custom">
+                {data.title ? (
+                    <h2 className="mx-auto mb-6 max-w-[900px] text-center text-[28px] font-black tracking-tight md:text-[40px]">
+                        {data.title}
+                    </h2>
+                ) : null}
+                {data.description ? (
+                    <p className="mx-auto mb-14 max-w-[900px] text-center text-[16px] leading-[1.8] text-white/70 md:text-[18px]">
+                        {data.description}
+                    </p>
+                ) : null}
+
+                <div
+                    ref={mobileCardTrackRef}
+                    onScroll={handleMobileCardScroll}
+                    onTouchEnd={handleMobileCardTouchEnd}
+                    className="flex snap-x snap-mandatory gap-4 overflow-x-auto md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
+                    {brandItems.map((item, index) => (
+                        <div
+                            key={item.id}
+                            ref={(element) => {
+                                mobileCardRefs.current[index] = element;
+                            }}
+                            className="w-[88%] shrink-0 snap-center rounded-[30px] border border-white/12 bg-white/6 p-6 backdrop-blur-[2px]"
+                        >
+                            <div className="mb-6 flex min-h-[52px] items-center justify-center border-b border-white/12 pb-5">
+                                {item.brandLogo ? (
+                                    <Image
+                                        src={item.brandLogo.url}
+                                        alt={item.brandLogo.alternativeText || item.brandLogo.name || `Brand ${index + 1}`}
+                                        width={160}
+                                        height={56}
+                                        className="h-10 w-auto object-contain"
+                                    />
+                                ) : (
+                                    <span className="text-[16px] font-black text-white">
+                                        {`Brand ${index + 1}`}
+                                    </span>
+                                )}
+                            </div>
+                            <div>
+                                {item.description ? (
+                                    <RichText
+                                        content={item.description}
+                                        className="mb-8 [&_a]:text-[#b8f732] [&_a]:font-bold [&_blockquote]:bg-white/8 [&_blockquote]:text-white/90 [&_code]:bg-white/10 [&_code]:text-white [&_em]:text-white/90 [&_h1]:!text-white [&_h2]:!text-white [&_h3]:!text-white [&_h4]:!text-white [&_li]:!text-white/80 [&_ol]:!text-white/80 [&_p]:!text-white/80 [&_strong]:!text-white [&_table]:text-white/80 [&_td]:border-white/10 [&_th]:border-white/10 [&_ul]:!text-white/80"
+                                    />
+                                ) : (
+                                    <p className="mb-8 text-[16px] leading-[1.75] text-white/60">
+                                        No compatibility details provided.
+                                    </p>
+                                )}
+                            </div>
+                            <div>
+                                {renderDeviceList(parseDeviceList(item.deviceList))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mb-10 hidden flex-wrap items-end justify-center gap-x-8 gap-y-5 border-b border-white/12 pb-5 md:flex">
+                    {brandItems.map((item, index) => {
+                        const isActive = index === activeIndex;
+                        const fallbackName = item.brandLogo?.alternativeText || item.brandLogo?.name || `Brand ${index + 1}`;
+
+                        return (
+                            <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => setActiveIndex(index)}
+                                className={cn(
+                                    "relative flex min-h-[52px] items-center justify-center px-2 py-2 transition-all duration-300",
+                                    isActive
+                                        ? "text-white"
+                                        : "text-white/55 hover:text-white/80"
+                                )}
+                            >
+                                {item.brandLogo ? (
+                                    <Image
+                                        src={item.brandLogo.url}
+                                        alt={fallbackName}
+                                        width={160}
+                                        height={56}
+                                        className={cn(
+                                            "h-10 w-auto object-contain transition-opacity duration-300",
+                                            isActive ? "opacity-100" : "opacity-60"
+                                        )}
+                                    />
+                                ) : (
+                                    <span className={cn("text-[16px] font-black", isActive ? "text-white" : "text-white/70")}>
+                                        {fallbackName}
+                                    </span>
+                                )}
+                                <span
+                                    className={cn(
+                                        "absolute inset-x-0 -bottom-[21px] h-[3px] rounded-full bg-[#b8f732] transition-opacity duration-300",
+                                        isActive ? "opacity-100" : "opacity-0"
+                                    )}
+                                />
+                            </button>
+                        );
+                    })}
+                </div>
+
+                <div
+                    className="hidden gap-8 rounded-[36px] border border-white/12 bg-white/6 p-8 backdrop-blur-[2px] md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:p-10"
+                    style={maxPanelHeight > 0 ? { minHeight: `${maxPanelHeight}px` } : undefined}
+                >
+                    <div>
+                        {deviceList.length > 0 ? (
+                            <ul className="space-y-4">
+                                {deviceList.map((device, index) => (
+                                    <li key={`${device}-${index}`} className="flex items-start gap-4">
+                                        <span className="mt-[0.45em] h-3 w-3 shrink-0 bg-[#b8f732]" />
+                                        <span className="text-[16px] leading-[1.75] text-white/82 md:text-[17px]">
+                                            {device}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-[16px] leading-[1.75] text-white/60">
+                                No device list provided.
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="relative">
+                        {activeItem?.description ? (
+                            <RichText
+                                content={activeItem.description}
+                                className="[&_a]:text-[#b8f732] [&_a]:font-bold [&_blockquote]:bg-white/8 [&_blockquote]:text-white/90 [&_code]:bg-white/10 [&_code]:text-white [&_em]:text-white/90 [&_h1]:!text-white [&_h2]:!text-white [&_h3]:!text-white [&_h4]:!text-white [&_li]:!text-white/80 [&_ol]:!text-white/80 [&_p]:!text-white/80 [&_strong]:!text-white [&_table]:text-white/80 [&_td]:border-white/10 [&_th]:border-white/10 [&_ul]:!text-white/80"
+                            />
+                        ) : (
+                            <p className="text-[16px] leading-[1.75] text-white/60">
+                                No compatibility details provided.
+                            </p>
+                        )}
+                        <div className="pointer-events-none absolute left-0 top-0 -z-10 invisible w-full">
+                            {brandItems.map((item, index) => (
+                                <div
+                                    key={item.id}
+                                    ref={(element) => {
+                                        panelRefs.current[index] = element;
+                                    }}
+                                    className="grid w-full gap-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
+                                >
+                                    <div>
+                                        {renderDeviceList(parseDeviceList(item.deviceList))}
+                                    </div>
+                                    <div>
+                                        {item.description ? (
+                                            <RichText
+                                                content={item.description}
+                                                className="[&_a]:text-[#b8f732] [&_a]:font-bold [&_blockquote]:bg-white/8 [&_blockquote]:text-white/90 [&_code]:bg-white/10 [&_code]:text-white [&_em]:text-white/90 [&_h1]:!text-white [&_h2]:!text-white [&_h3]:!text-white [&_h4]:!text-white [&_li]:!text-white/80 [&_ol]:!text-white/80 [&_p]:!text-white/80 [&_strong]:!text-white [&_table]:text-white/80 [&_td]:border-white/10 [&_th]:border-white/10 [&_ul]:!text-white/80"
+                                            />
+                                        ) : (
+                                            <p className="text-[16px] leading-[1.75] text-white/60">
+                                                No compatibility details provided.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+function parseDeviceList(value?: string | null): string[] {
+    if (!value) return [];
+
+    const normalized = value
+        .split(/\r?\n|,|;/)
+        .map((item) => item.replace(/^\s*([-*•]|\d+\.)\s*/, "").trim())
+        .filter(Boolean);
+
+    return Array.from(new Set(normalized));
+}
+
+function renderDeviceList(deviceList: string[]) {
+    if (deviceList.length > 0) {
+        return (
+            <ul className="space-y-4">
+                {deviceList.map((device, index) => (
+                    <li key={`${device}-${index}`} className="flex items-start gap-4">
+                        <span className="mt-[0.45em] h-3 w-3 shrink-0 bg-[#b8f732]" />
+                        <span className="text-[16px] leading-[1.75] text-white/82 md:text-[17px]">
+                            {device}
+                        </span>
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+
+    return (
+        <p className="text-[16px] leading-[1.75] text-white/60">
+            No device list provided.
+        </p>
+    );
+}
+
+const AppHelpAccordionItem: React.FC<{ item: FAQAccordionItem }> = ({ item }) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [isMounted, setIsMounted] = React.useState(false);
+
+    const decodeHtmlEntities = (text: string): string => {
+        return text
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&apos;/g, "'")
+            .replace(/&amp;/g, '&');
+    };
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    const extractTextFromBlocks = (content: FAQAccordionItem["content"]) => {
+        if (!Array.isArray(content)) {
+            return "";
+        }
+
+        return content
+            .filter((block): block is ParagraphBlock => block.type === 'paragraph')
+            .map((block) =>
+                block.children
+                    .filter((child): child is TextNode => child.type === 'text')
+                    .map((child) => child.text)
+                    .join('')
+            )
+            .join('\n');
+    };
+
+    const getProcessedContent = () => {
+        if (!item.content || !isMounted) {
+            return { html: null, useRichText: true };
+        }
+
+        let htmlContent: string | null = null;
+        let shouldUseRichText = true;
+
+        if (typeof item.content === 'string') {
+            if (/<[a-z][\s\S]*>/i.test(item.content)) {
+                htmlContent = decodeHtmlEntities(item.content);
+                shouldUseRichText = false;
+            }
+        } else if (Array.isArray(item.content)) {
+            const allText = extractTextFromBlocks(item.content);
+
+            if (/<[a-z][\s\S]*>/i.test(allText)) {
+                htmlContent = decodeHtmlEntities(allText);
+                shouldUseRichText = false;
+            }
+        }
+
+        return { html: htmlContent, useRichText: shouldUseRichText };
+    };
+
+    const processedContent = getProcessedContent();
+
+    return (
+        <div className={cn(
+            "rounded-[24px] border border-gray-200 bg-white transition-all duration-300 overflow-hidden",
+            isOpen ? "translate-y-[-2px]" : "hover:border-primary/30"
+        )}>
+            <button
+                onClick={() => setIsOpen((prev) => !prev)}
+                className="flex w-full items-center justify-between px-4 py-5 text-left md:px-6"
+            >
+                <h4 className="text-[15px] font-black text-heading">{item.title}</h4>
+                <span className={cn("text-muted transition-transform duration-300", isOpen ? "rotate-180" : "")}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                </span>
+            </button>
+
+            <div className={cn(
+                "grid transition-all duration-300 ease-in-out",
+                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            )}>
+                <div className="overflow-hidden">
+                    <div className="border-t border-gray-100 px-4 pb-6 pt-5 md:px-6" suppressHydrationWarning>
+                        {item.content && (
+                            processedContent.useRichText ? (
+                                <RichText
+                                    content={item.content}
+                                    className="text-[16px] text-muted font-light leading-[1.8]"
+                                />
+                            ) : processedContent.html ? (
+                                <div
+                                    className="text-[16px] text-muted font-light leading-[1.8] prose max-w-none prose-a:text-primary prose-a:font-bold hover:prose-a:underline [&_a]:text-primary [&_a]:font-bold [&_a:hover]:underline"
+                                    dangerouslySetInnerHTML={{ __html: processedContent.html }}
+                                />
+                            ) : null
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const AppRelatedHelp: React.FC<{
+    app: App;
+    tutorials: Array<{ id: number; title: string; slug: string; order?: number }>;
+    faqs: Array<{ id: number; question: string; slug: string; order?: number }>;
+}> = ({ app, tutorials, faqs }) => (
+    <section className="py-16 md:py-24 bg-white">
+        <div className="container-custom">
+            <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                More Help for {app.name}
+            </h2>
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                {tutorials.length > 0 ? (
+                    <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related Tutorials</h3>
+                        <div className="space-y-3">
+                            {tutorials.map((tutorial) => (
+                                <Link
+                                    key={tutorial.id}
+                                    href={`/tutorial/${tutorial.slug}`}
+                                    className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                                >
+                                    {tutorial.title}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                ) : null}
+
+                {faqs.length > 0 ? (
+                    <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related FAQs</h3>
+                        <div className="space-y-3">
+                            {faqs.map((faq) => (
+                                <Link
+                                    key={faq.id}
+                                    href={`/faq/${faq.slug}`}
+                                    className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                                >
+                                    {faq.question}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                ) : null}
+            </div>
+        </div>
+    </section>
+);
 
 const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSetting | null }> = ({ data, app, globalSetting }) => (
     <section className="pt-0 md:pt-24 pb-20 bg-white">
@@ -140,16 +699,24 @@ const AppHero: React.FC<{ data: HeroSection; app: App; globalSetting?: GlobalSet
                                 );
 
                                 return (
-                                    <a
+                                    <AnalyticsTracker
                                         key={link.id}
-                                        href={link.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={link.isClickable ? "hover:z-10 transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                                        {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                                        eventName={getStoreClickEventName(link.url)}
+                                        placement="app_section_hero"
+                                        app_slug={app.slug}
+                                        app_name={app.name}
+                                        link_text={link.platform}
                                     >
-                                        {ButtonContent}
-                                    </a>
+                                        <a
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={link.isClickable ? "hover:z-10 transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                            {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                                        >
+                                            {ButtonContent}
+                                        </a>
+                                    </AnalyticsTracker>
                                 );
                             })
                         ) : null}
@@ -211,7 +778,7 @@ const AppWhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
     </section>
 );
 
-const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, isEven?: boolean }> = ({ data, app, isEven }) => (
+const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, isEven?: boolean }> = ({ data, isEven }) => (
     <section className={cn("py-16 md:py-32", isEven ? "bg-section-bg-2" : "bg-white")}>
         <div className="container-custom">
             <div className={cn(
@@ -258,42 +825,6 @@ const AppFeatureHighlight: React.FC<{ data: FeatureHighlightSection, app: App, i
                             variant={data.labelColor === 'blue' ? 'blue-circle' : 'gray-square'}
                         />
                     )}
-
-                    {/* Download Buttons inside column */}
-                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-center md:items-start justify-center md:justify-start gap-4 sm:gap-6">
-                        {app.downloadLinks && app.downloadLinks.length > 0 ? (
-                            app.downloadLinks.map((link) => {
-                                const ButtonContent = (
-                                    <div className="relative group/qr">
-                                        <Image
-                                            src={link.badge.url}
-                                            alt={link.platform}
-                                            width={180} height={54}
-                                            className="h-12 sm:h-14 w-auto"
-                                        />
-                                        {link.generateQRCode && (
-                                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[100] pointer-events-none">
-                                                <QRCode data={link.url} size={120} />
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-
-                                return (
-                                    <a
-                                        key={link.id}
-                                        href={link.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={link.isClickable ? "hover:z-10 transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                                        {...(!link.isClickable && { 'aria-disabled': 'true' })}
-                                    >
-                                        {ButtonContent}
-                                    </a>
-                                );
-                            })
-                        ) : null}
-                    </div>
                 </div>
             </div>
         </div>
@@ -349,60 +880,33 @@ const AppCTA: React.FC<{ data: CTASection; app: App }> = ({ data, app }) => (
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                 {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
-                        <a
+                        <AnalyticsTracker
                             key={link.id}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                            {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                            eventName={getStoreClickEventName(link.url)}
+                            placement="app_section_bottom"
+                            app_slug={app.slug}
+                            app_name={app.name}
+                            link_text={link.platform}
                         >
-                            <Image
-                                src={link.badge.url}
-                                alt={link.platform}
-                                width={220}
-                                height={66}
-                                className="h-12 sm:h-14 w-auto"
-                            />
-                        </a>
+                            <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                            >
+                                <Image
+                                    src={link.badge.url}
+                                    alt={link.platform}
+                                    width={220}
+                                    height={66}
+                                    className="h-12 sm:h-14 w-auto"
+                                />
+                            </a>
+                        </AnalyticsTracker>
                     ))
                 ) : null}
             </div>
-
-            {/* <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
-                <Link href="/tutorial" className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all">Tutorial</Link>
-                <Link href="/faq" className="inline-flex items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all">F.A.Q.</Link>
-            </div> */}
-            {/* Links as Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
-                {data?.links && data.links.length > 0 ? (
-                    data.links.map((link) => (
-                        <Link
-                            key={link.id}
-                            href={link.href}
-                            className="inline-flex w-[220px] items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
-                        >
-                            {link.name}
-                        </Link>
-                    ))
-                ) : (
-                    <>
-                        <Link
-                            href="/tutorial"
-                            className="inline-flex w-[220px] items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
-                        >
-                            How-to Guides
-                        </Link>
-                        <Link
-                            href="/faq"
-                            className="inline-flex w-[220px] items-center justify-center px-10 py-4 text-[18px] font-bold text-heading bg-white border-2 border-gray-200 rounded-full hover:border-primary hover:text-primary transition-all"
-                        >
-                            F.A.Q
-                        </Link>
-                    </>
-                )}
-            </div>
-
             <div className="max-w-[800px] mx-auto pt-10 border-t border-white/10">
                 <p className="text-[18px] text-muted leading-relaxed">
                     {data.buttonText || "If you have any thoughts and questions, you can contact us at:"}{" "}

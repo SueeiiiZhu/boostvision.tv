@@ -49,7 +49,9 @@
         "sections.reviews",
         "sections.cta",
         "sections.apps-grid",
-        "sections.brands-grid"
+        "sections.brands-grid",
+        "sections.app-help",
+        "sections.app-compatibility"
       ]
     },
     "downloadLinks": {
@@ -149,6 +151,61 @@
       },
       "min": 0,
       "max": 5
+    },
+    "ratingCount": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "min": 0
+    },
+    "appStoreRating": {
+      "type": "decimal",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "min": 0,
+      "max": 5
+    },
+    "appStoreRatingCount": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "min": 0
+    },
+    "googlePlayRating": {
+      "type": "decimal",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "min": 0,
+      "max": 5
+    },
+    "googlePlayRatingCount": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "min": 0
+    },
+    "ratingSyncedAt": {
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
     },
     "features": {
       "type": "component",

@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -50,7 +51,7 @@ function formatDownloadCountText(value: string | null | undefined): string {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const [app, globalSetting] = await Promise.all([
-    getAppBySlug(slug),
+    getAppBySlug(slug, locale),
     getGlobalSetting(locale),
   ]);
 
@@ -68,10 +69,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AppDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const [app, globalSetting] = await Promise.all([
-    getAppBySlug(slug),
-    getGlobalSetting()
+    getAppBySlug(slug, locale),
+    getGlobalSetting(locale)
   ]);
 
   if (!app) {
@@ -80,6 +81,14 @@ export default async function AppDetailPage({ params }: Props) {
 
   const normalizedRating = parseRating(app.rating);
   const normalizedRatingCount = parseRatingCount(app.ratingCount);
+  const relatedTutorials = (app.tutorials ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+    .slice(0, 4);
+  const relatedFaqs = (app.faqs ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999))
+    .slice(0, 4);
 
   // Generate SoftwareApplication schema
   const schema = generateSoftwareApplicationSchema({
@@ -177,16 +186,24 @@ export default async function AppDetailPage({ params }: Props) {
                           );
 
                           return (
-                            <a
+                            <AnalyticsTracker
                               key={link.id}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
-                              {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                              eventName={getStoreClickEventName(link.url)}
+                              placement="app_detail_hero"
+                              app_slug={app.slug}
+                              app_name={app.name}
+                              link_text={link.platform}
                             >
-                              {ButtonContent}
-                            </a>
+                              <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={link.isClickable ? "transition-transform hover:scale-105" : "pointer-events-none opacity-70"}
+                                {...(!link.isClickable && { 'aria-disabled': 'true' })}
+                              >
+                                {ButtonContent}
+                              </a>
+                            </AnalyticsTracker>
                           );
                         })
                       ) : null}
@@ -295,6 +312,51 @@ export default async function AppDetailPage({ params }: Props) {
               </section>
             )}
 
+            {(relatedTutorials.length > 0 || relatedFaqs.length > 0) && (
+              <section className="py-24 bg-white">
+                <div className="container-custom">
+                  <h2 className="text-[28px] md:text-[40px] font-black text-heading text-center mb-12 tracking-tight">
+                    More Help for {app.name}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    {relatedTutorials.length > 0 && (
+                      <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related Tutorials</h3>
+                        <div className="space-y-3">
+                          {relatedTutorials.map((tutorial) => (
+                            <Link
+                              key={tutorial.id}
+                              href={`/tutorial/${tutorial.slug}`}
+                              className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                            >
+                              {tutorial.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {relatedFaqs.length > 0 && (
+                      <div className="rounded-[28px] border border-gray-100 bg-[#f8faff] p-8 md:p-10">
+                        <h3 className="text-[22px] font-black text-heading mb-6">Related FAQs</h3>
+                        <div className="space-y-3">
+                          {relatedFaqs.map((faq) => (
+                            <Link
+                              key={faq.id}
+                              href={`/faq/${faq.slug}`}
+                              className="block rounded-xl bg-white px-4 py-3 text-[16px] font-semibold text-heading transition-colors hover:text-primary"
+                            >
+                              {faq.question}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Final CTA Section */}
             <section className="py-32 text-center bg-section-bg-3 text-white">
               <div className="container-custom">
@@ -308,14 +370,23 @@ export default async function AppDetailPage({ params }: Props) {
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-6 mb-20">
                   {app.downloadLinks && app.downloadLinks.length > 0 ? (
                     app.downloadLinks.map((link) => (
-                      <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
-                        <Image
-                          src={link.badge.url}
-                          alt={link.platform}
-                          width={220} height={66}
-                          className="h-12 sm:h-14 w-auto"
-                        />
-                      </a>
+                      <AnalyticsTracker
+                        key={link.id}
+                        eventName={getStoreClickEventName(link.url)}
+                        placement="app_detail_bottom"
+                        app_slug={app.slug}
+                        app_name={app.name}
+                        link_text={link.platform}
+                      >
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-105">
+                          <Image
+                            src={link.badge.url}
+                            alt={link.platform}
+                            width={220} height={66}
+                            className="h-12 sm:h-14 w-auto"
+                          />
+                        </a>
+                      </AnalyticsTracker>
                     ))
                   ) : null}
                 </div>

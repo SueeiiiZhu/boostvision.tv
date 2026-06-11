@@ -71,7 +71,7 @@ function splitContentForInlineAds(content?: LegalContent | null): LegalContent[]
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const page = await getLegalPageBySlug("terms-of-use");
+  const page = await getLegalPageBySlug("terms-of-use", locale);
   const alternates = getLocaleAlternates("/terms-of-use", locale);
 
   return {
@@ -81,8 +81,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function TermsOfUsePage() {
-  const page = await getLegalPageBySlug("terms-of-use");
+export default async function TermsOfUsePage({ params }: Props) {
+  const { locale } = await params;
+  const page = await getLegalPageBySlug("terms-of-use", locale);
   const showInlineAd = hasAdSenseSlot("termsInline");
   const showAfterTitleAd = hasAdSenseSlot("termsAfterTitle");
   const content = page?.content as LegalContent | undefined;

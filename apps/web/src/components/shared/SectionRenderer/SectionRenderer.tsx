@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import Image from 'next/image';
 import OptimizedImage from '../OptimizedImage';
 import Link from 'next/link';
+import { AnalyticsTracker } from '@/components/analytics';
 import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection, AppsGridSection, BrandsGridSection, App } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { getApps } from '@/lib/strapi/api/apps';
@@ -89,20 +90,29 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
           {data.ctaText && data.ctaLink && (
             <div className="mt-6 lg:mt-12 flex justify-center lg:justify-start">
               <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
-                <Link href={data.ctaLink} className="btn-gradient inline-flex items-center gap-4 px-12">
-                  {data.ctaText}
-                  <svg
-                    className="w-6 h-6 transition-transform group-hover:translate-x-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
-                <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
-                  Best choice for 20 million+ users
-                </p>
+                <AnalyticsTracker
+                  eventName="cta_click"
+                  placement="hero_cta"
+                  cta_type={data.ctaLink === '/app' ? 'app_entry' : 'internal_cta'}
+                  link_text={data.ctaText}
+                >
+                  <Link href={data.ctaLink} className="btn-gradient inline-flex items-center gap-4 px-12">
+                    {data.ctaText}
+                    <svg
+                      className="w-6 h-6 transition-transform group-hover:translate-x-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
+                </AnalyticsTracker>
+                {data.ctaSubtext ? (
+                  <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
+                    {data.ctaSubtext}
+                  </p>
+                ) : null}
               </div>
             </div>
           )}
@@ -195,17 +205,24 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
       <p className="text-muted/70 mb-10 md:mb-16 text-[16px] md:text-[20px] max-w-[850px] mx-auto leading-relaxed">
         {data.description}
       </p>
-      <Link href={data.buttonLink} className="btn-gradient group inline-flex items-center gap-4 px-12">
-        <span>{data.buttonText}</span>
-        <svg
-          className="w-6 h-6 transition-transform group-hover:translate-x-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
-      </Link>
+      <AnalyticsTracker
+        eventName="cta_click"
+        placement="section_cta"
+        cta_type={data.buttonLink === '/app' ? 'app_entry' : 'internal_cta'}
+        link_text={data.buttonText}
+      >
+        <Link href={data.buttonLink} className="btn-gradient group inline-flex items-center gap-4 px-12">
+          <span>{data.buttonText}</span>
+          <svg
+            className="w-6 h-6 transition-transform group-hover:translate-x-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </Link>
+      </AnalyticsTracker>
     </div>
   </section>
 );
@@ -213,9 +230,11 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
 const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
   <section className="pt-12 pb-20 md:pt-16 md:pb-32 bg-gradient-to-b from-white to-section-bg-2 text-center">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
-      <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
-        CORE FEATURES
-      </span>
+      {data.badge && (
+        <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
+          {data.badge}
+        </span>
+      )}
       <h2 className="text-[24px] md:text-[40px] font-black text-heading mb-8 md:mb-14">{data.title}</h2>
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 md:gap-x-12 md:gap-y-20 lg:grid-cols-4">
         {data.features.map((feature, i) => (
@@ -275,7 +294,24 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
       </div>
       <h2 className="mb-3 text-[24px] md:text-[40px] font-bold text-heading">{data.title}</h2>
       <p className="text-primary font-black text-[22px] mb-20">Excellent Rate：{data.rating}</p>
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+      <div className="md:hidden -mx-2 px-2">
+        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {data.reviews.map((review, i) => (
+            <div key={i} className="w-[88%] shrink-0 snap-center">
+              <div className="flex h-full min-h-[320px] flex-col items-center rounded-[30px] border border-[#dfe8ff] bg-section-bg-cta p-8 text-center card-shadow">
+                <p className="mb-8 flex-1 text-[16px] font-medium italic leading-[1.8] text-muted/80">
+                  &quot;{review.text}&quot;
+                </p>
+                <p className="mt-auto inline-flex items-center gap-2 text-[18px] font-black text-heading">
+                  <Image src="/icons/user-icon.svg" alt="" width={19} height={19} className="h-[19px] w-[19px]" />
+                  <span>{review.name}</span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="hidden grid-cols-1 gap-10 md:grid md:grid-cols-3">
         {data.reviews.map((review, i) => (
           <div key={i} className="flex h-full flex-col items-center bg-section-bg-cta p-12 rounded-[30px] border border-[#dfe8ff] card-shadow text-center">
             <p className="flex-1 text-[17px] text-muted/80 font-medium italic mb-10 leading-[1.8]">
@@ -293,7 +329,7 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
 );
 
 async function AppsGrid({ data }: { data: AppsGridSection }) {
-  const res = await getApps({ type: data.type, limit: data.limit });
+  const res = await getApps({ type: data.type, isFeatured: true, limit: data.limit });
   const apps = res.data || [];
 
   return (
