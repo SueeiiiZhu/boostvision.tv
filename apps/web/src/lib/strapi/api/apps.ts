@@ -14,6 +14,7 @@ export async function getApps(params: {
     populate: {
       icon: true,
       features: true,
+      seo: true,
       downloadLinks: {
         populate: ['badge']
       }
@@ -34,7 +35,7 @@ export async function getApps(params: {
 
   return {
     ...response,
-    data: normalizeApps(response.data),
+    data: normalizeApps(response.data).filter((app) => !app.seo?.noIndex),
   };
 }
 
