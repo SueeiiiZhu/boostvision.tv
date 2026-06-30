@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { JsonLd } from "@/components/shared";
+import { JsonLd, ListPageHero } from "@/components/shared";
 import { getFAQsForList } from "@/lib/strapi/api/faqs";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { generateFAQPageSchema, generateMetadata as genMetadata, wrapSchema } from "@/lib/seo";
@@ -99,17 +99,11 @@ export default async function FAQPage({ params, searchParams }: Props) {
     <>
       {faqJsonLd && <JsonLd data={faqJsonLd} />}
       <main className="bg-white poppins-headings">
-        {/* Banner */}
-        <section className="bg-app-hero py-24 text-center">
-          <div className="container-custom">
-            <h1 className="mb-6 !text-[35px] text-white font-black leading-[1.2]">
-              {heroSection?.title || "F.A.Q. of Screen Mirroring and TV Remote Apps"}
-            </h1>
-            <p className="mx-auto max-w-[800px] text-[20px] text-white/70 leading-relaxed">
-              {heroSection?.subtitle || "Find answers by selecting your app."}
-            </p>
-          </div>
-        </section>
+        <ListPageHero
+          heroSection={heroSection}
+          fallbackTitle="F.A.Q. of Screen Mirroring and TV Remote Apps"
+          fallbackSubtitle="Find answers by selecting your app."
+        />
 
         {/* Apps Selection */}
         <section className="bg-support-bg py-24">

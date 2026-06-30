@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AnalyticsTracker } from "@/components/analytics";
+import { ListPageHero } from "@/components/shared";
 import { BlogPost, BlogCategory, HeroSection, CTASection } from "@/types/strapi";
 import { BlogCard } from "./BlogCard";
 import { Pagination } from "./Pagination";
@@ -32,17 +33,11 @@ export function BlogList({
 
   return (
     <main className="bg-white poppins-headings">
-      {/* Banner */}
-      <section className="bg-app-hero py-12 text-center">
-        <div className="container-custom">
-          <h1 className="mb-4 text-[40px] font-black text-white tracking-tight">
-            {heroSection?.title || "Blogs"}
-          </h1>
-          <p className="mx-auto max-w-[700px] text-[16px] md:text-[20px] text-white/70 leading-relaxed">
-            {heroSection?.subtitle || "Acquire informations about streaming application, level up your entertainment experience."}
-          </p>
-        </div>
-      </section>
+      <ListPageHero
+        heroSection={heroSection}
+        fallbackTitle="Blogs"
+        fallbackSubtitle="Acquire informations about streaming application, level up your entertainment experience."
+      />
 
       {/* Categories & Posts */}
       <section className="py-24">
