@@ -197,14 +197,14 @@ export default async function BlogPostPage({ params }: Props) {
         <article className="pt-[118px] pb-0 md:py-20">
           <div className="container-custom lg:max-w-[1200px]">
             {toc.length > 0 && (
-              <details className="mobile-blog-toc fixed top-[86px] left-1/2 z-30 w-[calc(100%-30px)] -translate-x-1/2 rounded-[20px] border border-gray-100 bg-section-bg px-6 py-4 lg:hidden">
+              <details className="mobile-blog-toc fixed top-[86px] left-1/2 z-30 w-[calc(100%-30px)] max-h-[calc(100vh-104px)] -translate-x-1/2 overflow-hidden rounded-[20px] border border-gray-100 bg-section-bg px-6 py-4 lg:hidden">
                 <summary className="flex cursor-pointer list-none items-center justify-between select-none text-[16px] font-heading font-semibold uppercase tracking-[0.06em] text-heading/80 [&::-webkit-details-marker]:hidden">
                   <span>{globalSetting?.tocTitle || "Contents"}</span>
                   <svg className="h-4 w-4 shrink-0 text-heading/70 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="mobile-blog-toc-panel mt-4">
+                <div className="mobile-blog-toc-panel mt-4 max-h-[calc(100vh-168px)] overflow-y-auto pr-[1.5em]">
                   <BlogToc toc={toc} />
                 </div>
               </details>
@@ -298,11 +298,13 @@ export default async function BlogPostPage({ params }: Props) {
                 <div className="sticky top-[120px]">
                   {/* Table of Contents */}
                   {toc.length > 0 && (
-                    <div className="rounded-[30px] bg-section-bg p-8 border border-gray-100">
+                    <div className="flex max-h-[calc(100vh-152px)] flex-col overflow-hidden rounded-[30px] border border-gray-100 bg-section-bg p-8">
                       <h4 className="text-[18px] font-heading font-semibold uppercase tracking-[0.06em] text-heading/80 mb-6">
                         {globalSetting?.tocTitle || "Contents"}
                       </h4>
-                      <BlogToc toc={toc} />
+                      <div className="min-h-0 flex-1 overflow-y-auto pr-[1.5em]">
+                        <BlogToc toc={toc} />
+                      </div>
                     </div>
                   )}
                 </div>

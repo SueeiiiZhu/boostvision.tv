@@ -5,7 +5,7 @@ import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata } from "@/lib/seo";
 import { App, HeroSection, CTASection } from "@/types/strapi";
-import { QRCode } from "@/components/shared";
+import { ListPageHero, QRCode } from "@/components/shared";
 import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
@@ -57,17 +57,11 @@ export default async function AppsPage({ params }: Props) {
   return (
     <>
       <main className="bg-white poppins-headings">
-        {/* Banner */}
-        <section className="bg-app-hero py-12 text-center">
-          <div className="container-custom">
-            <h1 className="mb-4 text-[40px] font-black text-white tracking-tight">
-              {heroSection?.title || "Download Screen Mirroring & TV Remote Apps ｜BoostVision"}
-            </h1>
-            <p className="mx-auto max-w-[700px] text-[16px] md:text-[20px] text-white/70 leading-relaxed">
-              {heroSection?.subtitle || "Download screen mirroring & TV remote apps for free at App Store and Google Play Store."}
-            </p>
-          </div>
-        </section>
+        <ListPageHero
+          heroSection={heroSection}
+          fallbackTitle="Download Screen Mirroring & TV Remote Apps ｜BoostVision"
+          fallbackSubtitle="Download screen mirroring & TV remote apps for free at App Store and Google Play Store."
+        />
 
         {/* Apps List */}
         <section className="py-12 md:py-24">

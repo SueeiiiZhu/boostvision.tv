@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ListPageHero } from "@/components/shared";
 import { getTutorialsForList } from "@/lib/strapi/api/tutorials";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { generateMetadata as genMetadata } from "@/lib/seo";
@@ -51,17 +52,11 @@ export default async function TutorialPage({ params }: Props) {
 
   return (
     <main className="bg-white poppins-headings">
-      {/* Banner */}
-      <section className="bg-app-hero py-24 text-center">
-        <div className="container-custom">
-          <h1 className="mb-6 !text-[35px] text-white font-black leading-[1.2]">
-            {heroSection?.title || "Screen Mirroring & TV Remote Tutorials ｜BoostVision"}
-          </h1>
-          <p className="mx-auto max-w-[800px] text-[20px] text-white/70 leading-relaxed">
-            {heroSection?.subtitle || "Download screen mirroring & TV remote apps for free at App Store and Google Play Store."}
-          </p>
-        </div>
-      </section>
+      <ListPageHero
+        heroSection={heroSection}
+        fallbackTitle="Screen Mirroring & TV Remote Tutorials ｜BoostVision"
+        fallbackSubtitle="Download screen mirroring & TV remote apps for free at App Store and Google Play Store."
+      />
 
       {/* Apps Selection */}
       <section className="bg-section-bg-cta py-24">

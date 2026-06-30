@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "noEmitOnError": true,
     "noImplicitThis": true,
+    "types": ["node"],
     "outDir": "dist",
     "rootDir": "."
   },
