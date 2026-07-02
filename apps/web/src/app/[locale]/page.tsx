@@ -51,10 +51,10 @@ export default async function Home({ params }: Props) {
 
   return (
     <>
-      <JsonLd data={jsonLd} />
+        <JsonLd data={jsonLd} />
       <main className="poppins-headings">
         {homePage?.sections && homePage.sections.length > 0 ? (
-          <SectionRenderer sections={homePage.sections} />
+          <SectionRenderer sections={homePage.sections} locale={locale} />
         ) : (
           <>
             {/* Hero Section Fallback */}

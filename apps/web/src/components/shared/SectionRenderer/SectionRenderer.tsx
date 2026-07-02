@@ -2,19 +2,20 @@ import React, { Suspense } from 'react';
 import Image from 'next/image';
 import OptimizedImage from '../OptimizedImage';
 import Link from 'next/link';
-import { AnalyticsTracker } from '@/components/analytics';
+import { AnalyticsTracker, getStoreClickEventName } from '@/components/analytics';
 import { Section, HeroSection, FeatureHighlightSection, CTASection, WhyChooseSection, StatisticsSection, ReviewsSection, AppsGridSection, BrandsGridSection, App } from '@/types/strapi';
 import { cn } from '@/lib/utils';
 import { getApps } from '@/lib/strapi/api/apps';
 
 interface SectionRendererProps {
   sections: Section[];
+  locale?: string;
 }
 
-function renderSection(section: Section, index: number, featureHighlightOrder: number) {
+function renderSection(section: Section, index: number, featureHighlightOrder: number, locale?: string) {
   switch (section.__component) {
     case 'sections.hero':
-      return <Hero key={index} data={section} />;
+      return <Hero key={index} data={section} locale={locale} />;
     case 'sections.feature-highlight':
       return <FeatureHighlight key={index} data={section} order={featureHighlightOrder} />;
     case 'sections.cta':
@@ -26,7 +27,7 @@ function renderSection(section: Section, index: number, featureHighlightOrder: n
     case 'sections.reviews':
       return <Reviews key={index} data={section} />;
     case 'sections.apps-grid':
-      return <AppsGrid key={index} data={section} />;
+      return <AppsGrid key={index} data={section} locale={locale} />;
     case 'sections.brands-grid':
       return <BrandsGrid key={index} data={section} />;
     default:
@@ -43,7 +44,7 @@ function renderSection(section: Section, index: number, featureHighlightOrder: n
  * can stream progressively, reducing the initial HTML/RSC payload and allowing
  * the browser to paint the hero before async sections (e.g. AppsGrid) resolve.
  */
-export async function SectionRenderer({ sections }: SectionRendererProps) {
+export async function SectionRenderer({ sections, locale }: SectionRendererProps) {
   if (!sections || sections.length === 0) return null;
   let featureHighlightOrder = 0;
 
@@ -53,7 +54,7 @@ export async function SectionRenderer({ sections }: SectionRendererProps) {
         if (section.__component === 'sections.feature-highlight') {
           featureHighlightOrder += 1;
         }
-        const element = renderSection(section, index, featureHighlightOrder);
+        const element = renderSection(section, index, featureHighlightOrder, locale);
         if (!element) return null;
 
         // First section (hero) renders immediately — critical for LCP
@@ -70,12 +71,39 @@ export async function SectionRenderer({ sections }: SectionRendererProps) {
   );
 }
 
-const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
-  <section className="bg-white pt-12 md:pt-24 pb-12 overflow-hidden">
+function splitStatText(value: string | undefined, fallbackLabel: string) {
+  if (!value) {
+    return { emphasis: fallbackLabel, supporting: "" };
+  }
+
+  const firstSpaceIndex = value.indexOf(" ");
+  if (firstSpaceIndex === -1) {
+    return { emphasis: value, supporting: fallbackLabel };
+  }
+
+  return {
+    emphasis: value.slice(0, firstSpaceIndex),
+    supporting: value.slice(firstSpaceIndex + 1).trim() || fallbackLabel,
+  };
+}
+
+const Hero = async ({ data, locale = 'en' }: { data: HeroSection; locale?: string }) => {
+  const [tvRemoteRes, screenMirroringRes] = await Promise.all([
+    getApps({ type: 'tv-remote', locale }),
+    getApps({ type: 'screen-mirroring', locale }),
+  ]);
+
+  const desktopApps = [
+    screenMirroringRes.data?.find((app) => app.order === 1) || screenMirroringRes.data?.[0],
+    tvRemoteRes.data?.find((app) => app.order === 1) || tvRemoteRes.data?.[0],
+  ].filter((app): app is App => Boolean(app));
+
+  return (
+  <section className="bg-white pt-0 md:pt-24 pb-0 md:pb-12 overflow-hidden">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
       <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-16">
         <div className="order-2 lg:order-1 text-center lg:text-left">
-          <h1 className="max-w-[900px] text-[32px] md:text-[55px] font-black leading-tight">
+          <h1 className="mb-[6px] max-w-[900px] text-[32px] md:mb-0 md:text-[55px] font-black leading-tight">
             {data.title.includes('&') ? data.title.split('&')[0] : data.title}
             {data.title.includes('&') && (
               <>
@@ -84,11 +112,11 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
               </>
             )}
           </h1>
-          <p className="mx-auto mt-8 max-w-[800px] text-[16px] text-muted leading-[1.6] lg:mx-0">
+          <p className="mx-auto mt-0 max-w-[800px] text-[14px] text-muted leading-[1.6] md:mt-8 md:text-[16px] lg:mx-0">
             {data.subtitle}
           </p>
           {data.ctaText && data.ctaLink && (
-            <div className="mt-6 lg:mt-12 flex justify-center lg:justify-start">
+            <div className="mt-4 flex justify-center lg:mt-12 lg:justify-start">
               <div className="group flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-6">
                 <AnalyticsTracker
                   eventName="cta_click"
@@ -96,10 +124,10 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
                   cta_type={data.ctaLink === '/app' ? 'app_entry' : 'internal_cta'}
                   link_text={data.ctaText}
                 >
-                  <Link href={data.ctaLink} className="btn-gradient inline-flex items-center gap-4 px-12">
+                  <Link href={data.ctaLink} className="btn-gradient inline-flex items-center gap-3 px-6 py-2 text-[16px] leading-none md:px-12 md:py-[15px] md:text-[20px]">
                     {data.ctaText}
                     <svg
-                      className="w-6 h-6 transition-transform group-hover:translate-x-2"
+                      className="h-5 w-5 transition-transform group-hover:translate-x-2 md:h-6 md:w-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -109,29 +137,11 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
                   </Link>
                 </AnalyticsTracker>
                 {data.ctaSubtext ? (
-                  <p className="text-[14px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100">
+                  <p className="text-[7px] font-medium text-muted/80 uppercase tracking-wider opacity-50 transition-opacity duration-200 group-hover:opacity-100 md:text-[14px]">
                     {data.ctaSubtext}
                   </p>
                 ) : null}
               </div>
-            </div>
-          )}
-
-          {data.statistics && (
-            <div className="mt-14 mx-auto flex max-w-[760px] flex-wrap items-start justify-center gap-y-4 px-12 md:gap-y-8 md:px-0">
-              {[
-                { label: "Downloads", value: data.statistics.downloads, icon: "downloads" },
-                { label: "Countries and Regions", value: data.statistics.countries, icon: "global" },
-                { label: "Satisfied Customers", value: data.statistics.customers, icon: "users" },
-                { label: "Customer Service", value: data.statistics.supportHours, icon: "service" },
-              ].map((stat) => (
-                <div key={stat.label} className="w-full md:w-1/2 px-2 flex justify-start">
-                  <div className="flex items-center gap-2">
-                    <Image src={`/icons/${stat.icon}.svg`} alt={stat.label} width={20} height={20} />
-                    <span className="text-[14px] text-heading leading-none">{stat.value}</span>
-                  </div>
-                </div>
-              ))}
             </div>
           )}
         </div>
@@ -151,9 +161,179 @@ const Hero: React.FC<{ data: HeroSection }> = ({ data }) => (
           </div>
         )}
       </div>
+
+      {data.statistics && (
+        <div className="mt-3 md:mt-4">
+          {(() => {
+            const stats = [
+              { label: "Downloads", value: data.statistics.downloads },
+              { label: "Countries and Regions", value: data.statistics.countries },
+              { label: "Satisfied Customers", value: data.statistics.customers },
+              { label: "Customer Service", value: data.statistics.supportHours },
+            ].map((stat) => ({
+              ...stat,
+              ...splitStatText(stat.value, stat.label),
+            }));
+
+            return (
+              <>
+                {desktopApps.length > 0 && (
+                  <div className="mb-3 hidden grid-cols-2 gap-6 md:grid">
+                    {desktopApps.map((app) => (
+                      <div
+                        key={app.id}
+                        className={cn(
+                          "rounded-[12px] px-4 py-4 shadow-none",
+                          app.type === "tv-remote"
+                            ? "border border-[#b8f732] bg-transparent md:shadow-[0_12px_36px_rgba(184,247,50,0.18)]"
+                            : "border border-[#1e6cf455] bg-transparent md:shadow-[0_12px_36px_rgba(30,108,244,0.18)]"
+                        )}
+                      >
+                        <div className="grid grid-cols-[38px_minmax(0,1fr)_auto] items-center gap-3">
+                          <div className="relative mx-auto h-[38px] w-[38px] shrink-0 overflow-hidden rounded-[12px] md:mx-0">
+                            <OptimizedImage
+                              src={app.icon?.url || "/icons/app-placeholder.webp"}
+                              alt={app.name}
+                              fill
+                              className="object-cover"
+                              fetchPriority="low"
+                            />
+                          </div>
+                          <h3 className="min-w-0 text-center text-[16px] font-black leading-[1.2] text-heading md:text-left">
+                            {app.displayTitle || app.name}
+                          </h3>
+                          {app.downloadLinks && app.downloadLinks.length > 0 ? (
+                            <div className="flex items-center justify-end gap-2 justify-self-end">
+                              {app.downloadLinks.slice(0, 2).map((link) => (
+                                <AnalyticsTracker
+                                  key={link.id}
+                                  eventName={getStoreClickEventName(link.url)}
+                                  placement="home_statistics_app_card"
+                                  app_slug={app.slug}
+                                  app_name={app.name}
+                                  link_text={link.platform}
+                                >
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-[1.02]">
+                                  <Image
+                                    src={link.badge.url}
+                                    alt={link.platform}
+                                      width={150}
+                                      height={45}
+                                      className="h-10 w-auto"
+                                    />
+                                  </a>
+                                </AnalyticsTracker>
+                              ))}
+                            </div>
+                          ) : <div />}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-y-1 bg-transparent md:hidden">
+                  {stats.map((stat, index) => (
+                    <div key={stat.label} className="relative px-4 py-1 text-center">
+                      {index % 2 === 0 && (
+                        <div className="absolute right-0 top-1/2 h-[28px] w-px -translate-y-1/2 bg-[#d9e6f5]" />
+                      )}
+                      <p className="bg-[linear-gradient(45deg,var(--color-primary)_20%,var(--color-accent)_100%)] bg-clip-text text-[16px] font-black leading-none tracking-[-0.04em] text-transparent">
+                        {stat.emphasis}
+                      </p>
+                      <p className="mt-2 text-[7px] font-semibold uppercase leading-[1.4] tracking-[0.14em] text-muted">
+                        {stat.supporting}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {desktopApps.length > 0 && (
+                  <div className="mt-3 space-y-3 md:hidden">
+                    {desktopApps.map((app) => (
+                      <div
+                        key={app.id}
+                        className={cn(
+                          "rounded-[12px] px-4 py-4",
+                          app.type === "tv-remote"
+                            ? "border border-[#b8f732] bg-transparent"
+                            : "border border-[#1e6cf455] bg-transparent"
+                        )}
+                      >
+                        <div className="mx-auto flex w-[180px] items-center justify-center gap-3">
+                          <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-[10px]">
+                            <OptimizedImage
+                              src={app.icon?.url || "/icons/app-placeholder.webp"}
+                              alt={app.name}
+                              fill
+                              className="object-cover"
+                              fetchPriority="low"
+                            />
+                          </div>
+                          <h3 className="whitespace-nowrap text-center text-[14px] font-black leading-[1.2] text-heading">
+                            {app.displayTitle || app.name}
+                          </h3>
+                        </div>
+                        {app.downloadLinks && app.downloadLinks.length > 0 ? (
+                          <div className="mt-3 flex items-center justify-center gap-2">
+                            {app.downloadLinks.slice(0, 2).map((link) => (
+                              <AnalyticsTracker
+                                key={link.id}
+                                eventName={getStoreClickEventName(link.url)}
+                                placement="home_statistics_app_card"
+                                app_slug={app.slug}
+                                app_name={app.name}
+                                link_text={link.platform}
+                              >
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" className="transition-transform hover:scale-[1.02]">
+                                  <Image
+                                    src={link.badge.url}
+                                    alt={link.platform}
+                                    width={132}
+                                    height={40}
+                                    className="h-9 w-auto"
+                                  />
+                                </a>
+                              </AnalyticsTracker>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="relative left-1/2 hidden w-screen -translate-x-1/2 md:block">
+                  <div>
+                    <div className="mx-auto grid max-w-[1440px] grid-cols-4">
+                      {stats.map((stat, index) => (
+                        <div
+                          key={stat.label}
+                          className="relative flex flex-col items-center justify-center px-10 py-6 text-center"
+                        >
+                          {index < stats.length - 1 && (
+                            <div className="absolute right-0 top-1/2 h-[72px] w-px -translate-y-1/2 bg-[#d9e6f5]" />
+                          )}
+                          <p className="bg-[linear-gradient(45deg,var(--color-primary)_20%,var(--color-accent)_100%)] bg-clip-text text-[32px] font-black leading-none tracking-[-0.04em] text-transparent">
+                            {stat.emphasis}
+                          </p>
+                          <p className="mt-4 text-[13px] font-semibold uppercase leading-[1.5] tracking-[0.24em] text-muted">
+                            {stat.supporting}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      )}
     </div>
   </section>
-);
+  );
+};
 
 const FeatureHighlight: React.FC<{ data: FeatureHighlightSection; order: number }> = ({ data, order }) => (
   <section className={cn("py-5 md:py-32", order % 2 === 1 ? "bg-white" : "bg-[#f3f9ff]")}>
@@ -228,7 +408,7 @@ const CTA: React.FC<{ data: CTASection }> = ({ data }) => (
 );
 
 const WhyChoose: React.FC<{ data: WhyChooseSection }> = ({ data }) => (
-  <section className="pt-12 pb-20 md:pt-16 md:pb-32 bg-gradient-to-b from-white to-section-bg-2 text-center">
+  <section className="pt-12 pb-20 md:pt-0 md:pb-32 bg-gradient-to-b from-white to-section-bg-2 text-center">
     <div className="container-custom max-w-[1320px] px-3 md:px-4">
       {data.badge && (
         <span className="mb-4 inline-flex items-center rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1 text-[12px] font-bold tracking-[0.12em] text-white">
@@ -328,8 +508,8 @@ const Reviews: React.FC<{ data: ReviewsSection }> = ({ data }) => (
   </section>
 );
 
-async function AppsGrid({ data }: { data: AppsGridSection }) {
-  const res = await getApps({ type: data.type, isFeatured: true, limit: data.limit });
+async function AppsGrid({ data, locale }: { data: AppsGridSection; locale?: string }) {
+  const res = await getApps({ type: data.type, isFeatured: true, limit: data.limit, locale });
   const apps = res.data || [];
 
   return (
