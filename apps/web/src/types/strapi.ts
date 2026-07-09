@@ -119,6 +119,7 @@ export interface BlogPost {
   updatedAt?: string;
   readTime: number;
   isFeatured: boolean;
+  relatedApps?: App[];
   relatedPosts?: BlogPost[];
   seo?: SEO;
 }
