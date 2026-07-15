@@ -4,7 +4,7 @@ import { getApps } from "@/lib/strapi/api/apps";
 import { getPageBySlug } from "@/lib/strapi/api/pages";
 import { getGlobalSetting } from "@/lib/strapi/api/global";
 import { generateMetadata as genMetadata } from "@/lib/seo";
-import { App, HeroSection, CTASection } from "@/types/strapi";
+import { App, HeroSection, CTASection, AppsFilterSection } from "@/types/strapi";
 import { ListPageHero, QRCode } from "@/components/shared";
 import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 import { cn } from "@/lib/utils";
@@ -45,6 +45,12 @@ export default async function AppsPage({ params }: Props) {
   // 从动态区域中寻找 Hero 和 CTA 配置
   const heroSection = sections.find(s => s.__component === 'sections.hero') as HeroSection | undefined;
   const ctaSection = sections.find(s => s.__component === 'sections.cta') as CTASection | undefined;
+  const appsFilterSection = sections.find(s => s.__component === 'sections.apps-filter') as AppsFilterSection | undefined;
+  const hasPositiveOrderApp = apps.some((app) => typeof app.order === "number" && app.order > 0);
+  const featuredHeroApps = [
+    getTopAppByType(apps, "tv-remote", appsFilterSection?.tvRemoteLabel || "TV Remote", hasPositiveOrderApp),
+    getTopAppByType(apps, "screen-mirroring", appsFilterSection?.screenMirroringLabel || "Screen Mirroring", hasPositiveOrderApp),
+  ].filter(Boolean) as HeroFeaturedApp[];
   const groupedApps = Object.entries(
     apps.reduce<Record<string, App[]>>((acc, app) => {
       const typeKey = app.type || "other";
@@ -61,10 +67,21 @@ export default async function AppsPage({ params }: Props) {
           heroSection={heroSection}
           fallbackTitle="Download Screen Mirroring & TV Remote Apps ｜BoostVision"
           fallbackSubtitle="Download screen mirroring & TV remote apps for free at App Store and Google Play Store."
-        />
+          className="bg-transparent py-8 md:py-10"
+          titleClassName="mb-3 text-[20px] font-semibold leading-[1.2] text-heading md:mb-4 md:text-[32px]"
+          subtitleClassName="max-w-[720px] text-[14px] leading-[1.7] text-muted md:text-[17px]"
+        >
+          {featuredHeroApps.length > 0 && (
+            <div className="mt-6 grid gap-4 md:mt-8 md:grid-cols-2 md:gap-6">
+              {featuredHeroApps.map(({ app, badge }) => (
+                <HeroFeaturedAppCard key={app.documentId} app={app} badge={badge} />
+              ))}
+            </div>
+          )}
+        </ListPageHero>
 
         {/* Apps List */}
-        <section className="py-12 md:py-24">
+        <section className="pt-6 pb-12 md:pt-8 md:pb-24">
           <div className="container-custom">
             <div className="min-h-[600px]">
               {groupedApps.length > 0 ? groupedApps.map(([type, typeApps], index) => (
@@ -150,6 +167,11 @@ export default async function AppsPage({ params }: Props) {
   );
 }
 
+interface HeroFeaturedApp {
+  app: App;
+  badge: string;
+}
+
 function formatAppTypeTitle(type: string) {
   return type
     .split("-")
@@ -161,7 +183,121 @@ function formatAppTypeTitle(type: string) {
     .join(" ");
 }
 
+function getTopAppByType(
+  apps: App[],
+  type: App["type"],
+  badge: string,
+  hasPositiveOrderApp: boolean
+): HeroFeaturedApp | null {
+  const typedApps = apps.filter((item) => item.type === type);
+  const prioritizedApps = hasPositiveOrderApp
+    ? typedApps.filter((item) => typeof item.order === "number" && item.order > 0)
+    : typedApps.filter((item) => item.order === 0);
+
+  const app = [...prioritizedApps].sort((left, right) => {
+    if (hasPositiveOrderApp) {
+      return (left.order ?? Number.MAX_SAFE_INTEGER) - (right.order ?? Number.MAX_SAFE_INTEGER);
+    }
+
+    return left.name.localeCompare(right.name, "en", { sensitivity: "base" });
+  })[0];
+
+  if (!app) return null;
+
+  return {
+    app,
+    badge,
+  };
+}
+
+function HeroFeaturedAppCard({ app, badge }: HeroFeaturedApp) {
+  const heroDownloadLinks = (app.downloadLinks ?? [])
+    .filter((link) => link.isClickable !== false)
+    .slice(0, 2);
+
+  return (
+    <div className="flex h-full flex-col rounded-[28px] bg-white/95 p-5 text-left shadow-[0_12px_30px_rgba(15,23,42,0.05)] backdrop-blur md:p-6">
+      <div className="mb-5 flex justify-center md:justify-start">
+        <span className="btn-gradient px-3 py-1 text-[12px] font-semibold leading-none uppercase tracking-[0.08em] text-white">
+          {badge}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <Link
+          href={`/app/${app.slug}`}
+          className="relative block h-[64px] w-[64px] shrink-0 overflow-hidden rounded-[18px] transition duration-200 hover:-translate-y-0.5 hover:scale-[1.03] hover:opacity-90"
+        >
+          <Image
+            src={app.icon?.url || "/icons/app-placeholder.webp"}
+            alt={app.name}
+            fill
+            className="object-contain"
+          />
+        </Link>
+
+        <div className="min-w-0">
+          <h2 className="line-clamp-2 text-[20px] font-semibold leading-tight text-heading md:text-[22px]">
+            <Link
+              href={`/app/${app.slug}`}
+              className="transition duration-200 hover:text-primary"
+            >
+              {app.name}
+            </Link>
+          </h2>
+          {app.shortDescription && (
+            <p className="mt-2 line-clamp-2 text-[14px] leading-6 text-muted">
+              {app.shortDescription}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-6 flex justify-center">
+        {heroDownloadLinks.length > 0 ? (
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {heroDownloadLinks.map((link) => (
+              <AnalyticsTracker
+                key={link.id}
+                eventName={getStoreClickEventName(link.url)}
+                placement="app_list_hero"
+                app_slug={app.slug}
+                app_name={app.name}
+                link_text={link.platform}
+              >
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex transition duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:brightness-95"
+                >
+                  <Image
+                    src={link.badge.url}
+                    alt={link.platform}
+                    width={140}
+                    height={42}
+                    className="h-12 w-auto object-contain"
+                  />
+                </a>
+              </AnalyticsTracker>
+            ))}
+          </div>
+        ) : (
+          <Link
+            href={`/app/${app.slug}`}
+            className="inline-flex min-h-12 items-center justify-center rounded-full border border-gray-300 px-5 py-3 text-[14px] font-semibold text-heading transition hover:border-heading"
+          >
+            View details
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AppCatalogCard({ app }: { app: App }) {
+  const visibleDownloadLinks = (app.downloadLinks ?? []).slice(0, 2);
+
   return (
     <div className="relative z-0 isolate flex flex-col items-start rounded-[40px] bg-white p-6 text-left card-shadow md:flex-row md:items-center md:justify-between md:gap-6 md:p-8">
       <div className="mb-5 w-full md:mb-0 md:flex-1">
@@ -172,7 +308,7 @@ function AppCatalogCard({ app }: { app: App }) {
                 src={app.icon?.url || "/icons/app-placeholder.webp"}
                 alt={app.name}
                 fill
-                className="object-contain"
+                className="scale-[0.8] object-contain"
               />
             </div>
           </Link>
@@ -188,17 +324,17 @@ function AppCatalogCard({ app }: { app: App }) {
       </div>
 
       <div className="mt-auto flex w-full flex-col items-center gap-4 md:mt-0 md:w-auto md:items-end">
-        <div className="flex w-full flex-col items-center justify-center gap-3 md:w-auto md:flex-col md:items-end md:justify-start md:gap-3 md:isolate">
-          {app.downloadLinks && app.downloadLinks.length > 0 ? (
-            app.downloadLinks.map((link) => {
+        <div className="flex w-full flex-row items-center justify-center gap-3 md:w-auto md:flex-col md:items-end md:justify-start md:gap-3 md:isolate">
+          {visibleDownloadLinks.length > 0 ? (
+            visibleDownloadLinks.map((link) => {
               const ButtonContent = (
                 <div className="relative group/qr z-0">
                   <Image
                     src={link.badge.url}
                     alt={link.platform}
-                    width={120}
-                    height={36}
-                    className="h-12 w-full object-contain sm:h-14"
+                    width={140}
+                    height={42}
+                    className="h-12 w-auto object-contain"
                   />
                   {link.generateQRCode && (
                     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-[260] pointer-events-none">
@@ -222,7 +358,7 @@ function AppCatalogCard({ app }: { app: App }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "relative z-0 mx-auto flex w-[160px] justify-center sm:w-[186px] md:mx-0 md:hover:z-[250] md:focus-within:z-[250]",
+                      "relative z-0 inline-flex justify-center md:hover:z-[250] md:focus-within:z-[250]",
                       link.isClickable ? "transition duration-200 hover:brightness-95" : "pointer-events-none opacity-50"
                     )}
                     {...(!link.isClickable && { 'aria-disabled': 'true' })}

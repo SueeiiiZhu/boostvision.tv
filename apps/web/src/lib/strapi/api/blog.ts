@@ -1,6 +1,7 @@
 import { fetchStrapi, buildStrapiQuery } from "../client";
 import { CACHE_TAGS, blogPostTag } from "../cacheTags";
 import { BlogPost, BlogCategory } from "../../../types/strapi";
+import { normalizeApps } from "../normalize";
 
 export async function getBlogPosts(params: {
   categorySlug?: string;
@@ -41,6 +42,14 @@ export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
     author: {
       populate: ["avatar"],
     },
+    relatedApps: {
+      populate: {
+        icon: true,
+        downloadLinks: {
+          populate: ["badge"],
+        },
+      },
+    },
     relatedPosts: {
       populate: {
         coverImage: true,
@@ -62,7 +71,12 @@ export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
   const slugResponse = await fetchStrapi<BlogPost[]>(`/blog-posts${slugQuery}`, {
     tags: [CACHE_TAGS.blogPosts, blogPostTag(slug)],
   });
-  const defaultPost = slugResponse.data?.[0];
+  const defaultPost = slugResponse.data?.[0]
+    ? {
+        ...slugResponse.data[0],
+        relatedApps: normalizeApps(slugResponse.data[0].relatedApps),
+      }
+    : null;
   if (!defaultPost) return null;
 
   // Step 2: If a non-default locale is requested, fetch the localized version by documentId
@@ -75,7 +89,12 @@ export async function getBlogPostBySlug(slug: string, locale: string = 'en') {
           tags: [CACHE_TAGS.blogPosts, blogPostTag(slug)],
         }
       );
-      if (localizedResponse.data) return localizedResponse.data;
+      if (localizedResponse.data) {
+        return {
+          ...localizedResponse.data,
+          relatedApps: normalizeApps(localizedResponse.data.relatedApps),
+        };
+      }
     } catch {
       // Localized version not available, fall back to default
     }
