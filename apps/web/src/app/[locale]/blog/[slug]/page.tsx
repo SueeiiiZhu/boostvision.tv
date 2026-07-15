@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { AnalyticsTracker } from "@/components/analytics";
+import { AnalyticsTracker, getStoreClickEventName } from "@/components/analytics";
 import { RichText, JsonLd } from "@/components/shared";
 import { BlogCard } from "../_components/BlogCard";
 import { BlogToc } from "../_components/BlogToc";
@@ -111,6 +111,7 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   // 使用 Strapi 后台配置的相关文章，增加空值保护
+  const relatedApps = post?.relatedApps?.filter((app) => app?.downloadLinks?.length) || [];
   const relatedPosts = post?.relatedPosts || [];
 
   // 提取目录 (Table of Contents)
@@ -245,16 +246,60 @@ export default async function BlogPostPage({ params }: Props) {
                   </div>
                 </header>
 
-                {/* Quick Answer */}
-                {post.excerpt && (
-                  <div className="mb-12 rounded-[20px] border border-primary/20 bg-section-bg-cta p-8">
-                    <h2 className="mb-3 flex items-center gap-2 text-[18px] font-black text-heading">
-                      <svg className="h-5 w-5 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Quick Answer
-                    </h2>
-                    <p className="text-[16px] leading-[1.7] text-muted">{post.excerpt}</p>
+                {relatedApps.length > 0 && (
+                  <div className="mb-10 space-y-3">
+                    {relatedApps.map((app) => (
+                      <div
+                        key={app.id}
+                        className="rounded-[20px] border border-primary/15 bg-[linear-gradient(135deg,#f6faff_0%,#eef6ff_55%,#ffffff_100%)] p-4 shadow-[0_12px_32px_rgba(30,108,244,0.08)] md:p-5"
+                      >
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                          <div className="flex min-w-0 items-center gap-3 md:gap-4">
+                            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[16px] md:h-16 md:w-16">
+                              <Image
+                                src={app.icon?.url || "/icons/app-placeholder.webp"}
+                                alt={app.displayTitle || app.name}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h2 className="line-clamp-2 text-[24px] font-black leading-[1.15] text-heading">
+                                {app.displayTitle || app.name}
+                              </h2>
+                            </div>
+                          </div>
+
+                          <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 md:justify-end">
+                            {app.downloadLinks?.slice(0, 2).map((link) => (
+                              <AnalyticsTracker
+                                key={link.id}
+                                eventName={getStoreClickEventName(link.url)}
+                                placement="blog_related_apps_banner"
+                                app_slug={app.slug}
+                                app_name={app.name}
+                                link_text={link.platform}
+                              >
+                                <a
+                                  href={link.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-[150px] shrink-0 transition-transform hover:scale-[1.02]"
+                                >
+                                  <Image
+                                    src={link.badge.url}
+                                    alt={link.platform}
+                                    width={150}
+                                    height={45}
+                                    className="h-10 w-[150px] sm:h-11"
+                                  />
+                                </a>
+                              </AnalyticsTracker>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
 
